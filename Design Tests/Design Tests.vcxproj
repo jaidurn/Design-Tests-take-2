@@ -69,14 +69,30 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>B:\SDL2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>B:\SDL2\lib\x86;$(LibraryPath)</LibraryPath>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>B:\SDL2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>B:\SDL2\lib\x86;$(LibraryPath)</LibraryPath>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <EnablePREfast>true</EnablePREfast>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -94,10 +110,13 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <EnablePREfast>true</EnablePREfast>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -115,6 +134,106 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="AnimationComponent.cpp" />
+    <ClCompile Include="Camera2D.cpp" />
+    <ClCompile Include="Circle.cpp" />
+    <ClCompile Include="CollisionComponent.cpp" />
+    <ClCompile Include="CollisionSystem.cpp" />
+    <ClCompile Include="Component.cpp" />
+    <ClCompile Include="EnemyAttackState.cpp" />
+    <ClCompile Include="EnemyIdleState.cpp" />
+    <ClCompile Include="EnemyLogicComponent.cpp" />
+    <ClCompile Include="EnemyState.cpp" />
+    <ClCompile Include="EntitySystem.cpp" />
+    <ClCompile Include="ErrorSystem.cpp" />
+    <ClCompile Include="GameInitSystem.cpp" />
+    <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="InputComponent.cpp" />
+    <ClCompile Include="InputSystem.cpp" />
+    <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="Line.cpp" />
+    <ClCompile Include="LogicSystem.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MessageSystem.cpp" />
+    <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="PhysicsSystem.cpp" />
+    <ClCompile Include="PlayerIdleState.cpp" />
+    <ClCompile Include="PlayerLogicComponent.cpp" />
+    <ClCompile Include="PlayerMoveState.cpp" />
+    <ClCompile Include="Rectangle.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="RenderSystem.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="Rotation.cpp" />
+    <ClCompile Include="SpriteComponent.cpp" />
+    <ClCompile Include="SpriteParser.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TextureCache.cpp" />
+    <ClCompile Include="Vector2D.cpp" />
+    <ClCompile Include="VelocityComponent.cpp" />
+    <ClCompile Include="Window.cpp" />
+    <ClCompile Include="ZombieIdleState.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Animation.h" />
+    <ClInclude Include="AnimationChangeMessage.h" />
+    <ClInclude Include="AnimationComponent.h" />
+    <ClInclude Include="AttackInfo.h" />
+    <ClInclude Include="Camera2D.h" />
+    <ClInclude Include="Circle.h" />
+    <ClInclude Include="CollisionComponent.h" />
+    <ClInclude Include="CollisionMessage.h" />
+    <ClInclude Include="CollisionSystem.h" />
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="EnemyAttackState.h" />
+    <ClInclude Include="EnemyIdleState.h" />
+    <ClInclude Include="EnemyLogicComponent.h" />
+    <ClInclude Include="EnemyState.h" />
+    <ClInclude Include="EntitySystem.h" />
+    <ClInclude Include="ErrorSystem.h" />
+    <ClInclude Include="GameInitSystem.h" />
+    <ClInclude Include="Grid.h" />
+    <ClInclude Include="Header Template.h" />
+    <ClInclude Include="IMessage.h" />
+    <ClInclude Include="InputComponent.h" />
+    <ClInclude Include="InputDevice.h" />
+    <ClInclude Include="InputSystem.h" />
+    <ClInclude Include="Controller.h" />
+    <ClInclude Include="IState.h" />
+    <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Line.h" />
+    <ClInclude Include="List.h" />
+    <ClInclude Include="LogicComponent.h" />
+    <ClInclude Include="LogicSystem.h" />
+    <ClInclude Include="MoveMessage.h" />
+    <ClInclude Include="OldMessage.h" />
+    <ClInclude Include="MessageSystem.h" />
+    <ClInclude Include="Mouse.h" />
+    <ClInclude Include="Node.h" />
+    <ClInclude Include="PhysicsSystem.h" />
+    <ClInclude Include="PlayerIdleState.h" />
+    <ClInclude Include="PlayerLogicComponent.h" />
+    <ClInclude Include="PlayerMoveState.h" />
+    <ClInclude Include="Rectangle.h" />
+    <ClInclude Include="RenderSystem.h" />
+    <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="Rotation.h" />
+    <ClInclude Include="IShape.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="SettingIO.h" />
+    <ClInclude Include="SpriteComponent.h" />
+    <ClInclude Include="SpriteParser.h" />
+    <ClInclude Include="StateChangeMessage.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureCache.h" />
+    <ClInclude Include="Timer.h" />
+    <ClInclude Include="Vector2D.h" />
+    <ClInclude Include="VelocityComponent.h" />
+    <ClInclude Include="VelocityIncreaseMessage.h" />
+    <ClInclude Include="Window.h" />
+    <ClInclude Include="ZombieIdleState.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

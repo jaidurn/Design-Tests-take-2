@@ -1,0 +1,5 @@
+WIDTH= 1280
+HEIGHT= 720
+TILEMAP= Resources\mapA.dat
+TILEMAP_TEXTURE= Resources\tileSetA.png
+ENTITYMAP= NONE

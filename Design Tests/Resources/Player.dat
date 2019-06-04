@@ -1,0 +1,21 @@
+Type Player
+CollisionComponent
+Shape Rectangle
+RectWidth 32
+RectHeight 32
+SpriteComponent
+SpriteTexture Resources/knight.png
+AnimationComponent
+Animation_Count 2
+Animation_0 Idle
+Idle_Width 32
+Idle_Height 32
+Idle_Frames 8
+Idle_Speed 0
+Idle_Loop 1
+Animation_1 Walk
+Walk_Width 32
+Walk_Height 32
+Walk_Frames 8
+Walk_Speed 0
+Walk_Loop 1
