@@ -1,9 +1,9 @@
 #include "AnimationComponent.h"
 #include <cmath>
-
+#include <iostream>
 
 AnimationComponent::AnimationComponent()
-	:Component(ANIMATION), m_currentName(""), m_currentFrameIndex(0)
+	:Component(ANIMATION), m_currentName(""), m_currentFrameIndex(0), m_currentDirection(DIR_DOWN)
 {
 
 }
@@ -32,14 +32,14 @@ void AnimationComponent::update()
 			{
 				if(mit->second.loop())
 				{
-					m_currentFrameIndex = (float)mit->second.frameCount() - 1.0f;
+					m_currentFrameIndex = (float)mit->second.frameCount(m_currentDirection) - 1.0f;
 				}
 				else
 				{
 					m_currentFrameIndex = 0.0f;
 				}
 			}
-			else if(mit->second.frameCount() <= m_currentFrameIndex)
+			else if(mit->second.frameCount(m_currentDirection) <= m_currentFrameIndex)
 			{
 				if(mit->second.loop())
 				{
@@ -47,7 +47,7 @@ void AnimationComponent::update()
 				}
 				else
 				{
-					m_currentFrameIndex = (float)mit->second.frameCount() - 1.0f;
+					m_currentFrameIndex = (float)mit->second.frameCount(m_currentDirection) - 1.0f;
 				}
 			}
 		}
@@ -86,9 +86,9 @@ SDL_Rect* AnimationComponent::currentFrame()
 		{
 			int frameIndex = currentFrameIndex();
 			
-			if(frameIndex < mit->second.frameCount())
+			if(frameIndex < mit->second.frameCount(m_currentDirection))
 			{
-				clip = mit->second.getFrame(frameIndex);
+				clip = mit->second.getFrame(m_currentDirection, frameIndex);
 			}
 		}
 	}
@@ -176,7 +176,7 @@ int AnimationComponent::currentAnimationLength()
 
 		if(mit != m_animations.end())
 		{
-			length = mit->second.frameCount();
+			length = mit->second.frameCount(m_currentDirection);
 		}
 	}
 
@@ -203,7 +203,7 @@ int AnimationComponent::animationLength(std::string name)
 
 		if(mit != m_animations.end())
 		{
-			length = mit->second.frameCount();
+			length = mit->second.frameCount(m_currentDirection);
 		}
 	}
 
@@ -217,7 +217,7 @@ int AnimationComponent::animationLength(std::string name)
 // Parameters:
 // string name - The name of the animation to create.
 //=============================================================================
-void AnimationComponent::addAnimation(std::string name, bool loop, float speed)
+void AnimationComponent::addAnimation(std::string name, bool loop, float speed, int directionCount)
 {
 	if(name != "")
 	{
@@ -226,7 +226,7 @@ void AnimationComponent::addAnimation(std::string name, bool loop, float speed)
 
 		if(mit == m_animations.end())
 		{
-			m_animations.insert(std::make_pair(name, Animation(loop, speed)));
+			m_animations.insert(std::make_pair(name, Animation(loop, speed, directionCount)));
 		}
 	}
 }
@@ -240,7 +240,7 @@ void AnimationComponent::addAnimation(std::string name, bool loop, float speed)
 // string name - The name of the animation to add the frame to.
 // SDL_Rect frame - The frame to add.
 //=============================================================================
-void AnimationComponent::addFrame(std::string name, SDL_Rect frame)
+void AnimationComponent::addFrame(std::string name, Direction direction, SDL_Rect frame)
 {
 	if(name != "")
 	{
@@ -251,7 +251,7 @@ void AnimationComponent::addFrame(std::string name, SDL_Rect frame)
 
 			if(mit != m_animations.end())
 			{
-				mit->second.addFrame(frame);
+				mit->second.addFrame(direction, frame);
 			}
 		}
 	}
@@ -274,12 +274,17 @@ void AnimationComponent::setAnimation(std::string name)
 		{
 			m_currentName = mit->first;
 
-			if(mit->second.frameCount() <= m_currentFrameIndex)
+			if(mit->second.frameCount(m_currentDirection) <= m_currentFrameIndex)
 			{
 				resetIndex();
 			}
 		}
 	}
+}
+
+void AnimationComponent::setCurrentDirection(Direction direction)
+{
+	m_currentDirection = direction;
 }
 
 //=============================================================================

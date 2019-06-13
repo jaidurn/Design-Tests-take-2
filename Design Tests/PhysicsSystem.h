@@ -26,6 +26,11 @@ public:
 
 	void update();
 
+	CollisionSystem* collisionSystem()
+	{
+		return m_collisionSystem;
+	}
+
 	// Collision Functions
 	CollisionComponent* createCollisionComponent(int ID, 
 												 Shape::ShapeType shapeType,

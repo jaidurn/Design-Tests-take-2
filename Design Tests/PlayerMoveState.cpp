@@ -23,7 +23,7 @@ PlayerMoveState::~PlayerMoveState()
 //=============================================================================
 void PlayerMoveState::enter()
 {
-	sendAnimationChangeMessage(m_name, 0);
+	sendAnimationChangeMessage(m_name, AnimationComponent::DIR_NONE, 0);
 }
 
 //=============================================================================
@@ -92,7 +92,25 @@ void PlayerMoveState::update()
 				}
 			}
 
-			sendAnimationChangeMessage(m_name, direction);
+			AnimationComponent::Direction dir = AnimationComponent::DIR_NONE;
+
+			switch(direction)
+			{
+			case 0:
+				dir = AnimationComponent::DIR_DOWN;
+				break;
+			case 1:
+				dir = AnimationComponent::DIR_RIGHT;
+				break;
+			case 2:
+				dir = AnimationComponent::DIR_UP;
+				break;
+			case 3:
+				dir = AnimationComponent::DIR_LEFT;
+				break;
+			}
+
+			sendAnimationChangeMessage(m_name, dir, 0);
 			sendVelocityIncreaseMsg(xMove, yMove);
 		}
 	}

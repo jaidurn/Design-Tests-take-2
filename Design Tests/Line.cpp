@@ -224,12 +224,12 @@ float totalDistance(const Line line)
 	float distanceX = line.end.getX() - line.start.getX();
 	float distanceY = line.end.getY() - line.start.getY();
 
-	if (distanceX < 0) { distanceX *= -1; }
-	if (distanceY < 0) { distanceY *= -1; }
+	distanceX *= distanceX;
+	distanceY *= distanceY;
 
 	totalDistance = distanceX + distanceY;
 
-	return totalDistance;
+	return sqrt(totalDistance);
 }
 
 // Returns the total distance between the two points

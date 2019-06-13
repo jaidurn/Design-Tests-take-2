@@ -17,15 +17,14 @@ public:
 	EnemyAttackState(int entityID, float weight);
 	virtual ~EnemyAttackState();
 
-	virtual bool canEnter(Behavior behavior);
+	virtual bool canEnter(int targetID, Behavior behavior);
 	virtual bool canExit();
 
+	virtual void enter();
 	virtual void update();
 	virtual void exit();
 
 private:
 	AttackInfo *m_currentAttack;
-
-	virtual void enter();
 };
 

@@ -7,6 +7,7 @@
 // Handles the enemy logic. Uses a priority queue.
 //==========================================================================================
 #include "LogicComponent.h"
+#include "EnemyState.h"
 #include <map>
 #include <vector>
 
@@ -20,6 +21,8 @@ public:
 	virtual void addState(std::string stateName, IState *state);
 	// The default to use.
 	void addState(std::string stateName, IState *state, float weight);
+
+	void setBehavior(EnemyState::Behavior behavior);
 
 	virtual void removeState(std::string stateName);
 	virtual IState* getState(std::string stateName);
@@ -35,7 +38,11 @@ private:
 	std::map<std::string, IState*> m_states;
 	std::vector<std::string> m_statesByValue;
 
+	std::string m_currentStateName;
 	IState *m_currentState;
+
+	EnemyState::Behavior m_behavior;
+	int m_currentTarget;
 
 	void sortStatesByValue();
 };

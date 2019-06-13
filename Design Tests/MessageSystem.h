@@ -27,14 +27,16 @@ public:
 
 	bool pollMessage(IMessage *& message);
 	void pushMessage(IMessage *message);
-//	void peekMessage(SystemMessage &message);
+	bool peekMessage(IMessage *& message);
 
 private:
-	const int m_MAX_MESSAGES = 100;
+	const int m_MAX_MESSAGES = 1000;
+	int m_currentPeekIndex;
 	std::vector<IMessage*> m_messages;
 	std::vector<bool> m_messageFlag;
 
 	MessageSystem()
+		:m_currentPeekIndex(0)
 	{
 	}
 

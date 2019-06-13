@@ -19,7 +19,7 @@ EnemyIdleState::~EnemyIdleState()
 // Output:
 // Returns true if the state can be entered.
 //=============================================================================
-bool EnemyIdleState::canEnter()
+bool EnemyIdleState::canEnter(int targetID, Behavior behavior)
 {
 	return true;
 }
@@ -44,6 +44,7 @@ bool EnemyIdleState::canExit()
 void EnemyIdleState::enter()
 {
 	m_timer.start();
+	sendAnimationChangeMessage("Idle", AnimationComponent::DIR_NONE, 0);
 }
 
 //=============================================================================

@@ -16,6 +16,15 @@
 class AnimationComponent : public Component
 {
 public:
+	enum Direction
+	{
+		DIR_NONE = -1,
+		DIR_DOWN = 0,
+		DIR_RIGHT = 1,
+		DIR_UP = 2,
+		DIR_LEFT = 3
+	};
+
 	AnimationComponent();
 	virtual ~AnimationComponent();
 
@@ -23,6 +32,7 @@ public:
 
 	// Current information.
 	std::string currentAnimation();
+	Direction currentDirection() { return m_currentDirection; }
 	SDL_Rect* currentFrame();
 	float currentSpeed();
 	bool currentLoop();
@@ -33,11 +43,12 @@ public:
 	int animationLength(std::string name);
 
 	// Adding animations/frames
-	void addAnimation(std::string name, bool loop, float speed);
-	void addFrame(std::string name, SDL_Rect frame);
+	void addAnimation(std::string name, bool loop, float speed, int directionCount);
+	void addFrame(std::string name, Direction direction, SDL_Rect frame);
 
 	// Setting information.
 	void setAnimation(std::string name);
+	void setCurrentDirection(Direction direction);
 	void setCurrentFrame(float frame);
 	void setCurrentSpeed(float speed);
 	void setAnimationSpeed(std::string name, float speed);
@@ -47,6 +58,7 @@ private:
 	std::map<std::string, Animation> m_animations;
 
 	std::string m_currentName;
+	Direction m_currentDirection;
 	float m_currentFrameIndex;
 };
 

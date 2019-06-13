@@ -37,6 +37,14 @@ float convertRotationToDegrees(float rotation)
 	return degrees;
 }
 
+float angleToDegrees(Vector2D origin, Vector2D point)
+{
+	float xDistance = point.getX() - origin.getX();
+	float yDistance = point.getY() - origin.getY();
+
+	return radiansToDegrees(atan2(-xDistance, yDistance));
+}
+
 // Vector2D rotatePoint(Vector2D, float)
 // Vector2D - The point to rotate
 // float - The rotation percentage

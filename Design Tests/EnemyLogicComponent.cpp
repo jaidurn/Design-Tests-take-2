@@ -1,9 +1,8 @@
 #include "EnemyLogicComponent.h"
-
-
+#include "EnemyTargetState.h"
 
 EnemyLogicComponent::EnemyLogicComponent()
-	:LogicComponent(LOGIC_ENEMY), m_currentState(NULL)
+	:LogicComponent(LOGIC_ENEMY), m_currentState(NULL), m_currentStateName(""), m_currentTarget(-1), m_behavior(EnemyState::BEHAVIOR_AGGRESSIVE)
 {
 
 }
@@ -59,6 +58,11 @@ void EnemyLogicComponent::addState(std::string stateName, IState *state, float w
 	{
 		delete state;
 	}
+}
+
+void EnemyLogicComponent::setBehavior(EnemyState::Behavior behavior)
+{
+	m_behavior = behavior;
 }
 
 //=============================================================================
@@ -138,7 +142,134 @@ void EnemyLogicComponent::changeState(std::string stateName)
 		if(mit != m_states.end())
 		{
 			m_currentState = mit->second;
+			m_currentStateName = mit->first;
 		}
 	}
 }
 
+//=============================================================================
+// Function: void update()
+// Description:
+// Looks through the states and finds the next one able to function.
+//=============================================================================
+void EnemyLogicComponent::update()
+{
+	int it = 0;
+	bool stateEntered = false;
+
+	if (m_states.size() != 0)
+	{
+		std::string name = m_statesByValue[it];
+		IState *state = getState(name);
+		EnemyState *enemy = static_cast<EnemyState*>(state);
+
+		if (m_currentState)
+		{
+			EnemyState *current = static_cast<EnemyState*>(m_currentState);
+
+			if (current->canExit())
+			{
+				while (!stateEntered && (unsigned int)it < m_statesByValue.size())
+				{
+					name = m_statesByValue[it];
+					state = getState(name);
+					enemy = static_cast<EnemyState*>(state);
+
+					if (enemy->canEnter(m_currentTarget, m_behavior))
+					{
+						stateEntered = true;
+					}
+
+					it++;
+				}
+
+				if (stateEntered)
+				{
+					if (m_currentStateName != name)
+					{
+						if (m_currentState)
+						{
+							m_currentState->exit();
+						}
+
+						enemy->enter();
+
+						m_currentStateName = name;
+						m_currentState = state;
+					}
+
+					m_currentState->update();
+
+					if (m_currentStateName == "Target")
+					{
+						m_currentTarget = static_cast<EnemyTargetState*>(m_currentState)->currentTarget();
+					}
+				}
+			}
+			else
+			{
+				m_currentState->update();
+			}
+		}
+		else
+		{
+			while (!stateEntered && (unsigned int)it < m_statesByValue.size())
+			{
+				name = m_statesByValue[it];
+				state = getState(name);
+				enemy = static_cast<EnemyState*>(state);
+
+				if (enemy->canEnter(m_currentTarget, m_behavior))
+				{
+					stateEntered = true;
+				}
+
+				it++;
+			}
+
+			if (stateEntered)
+			{
+				if (m_currentStateName != name)
+				{
+					if (m_currentState)
+					{
+						m_currentState->exit();
+					}
+
+					enemy->enter();
+
+					m_currentStateName = name;
+					m_currentState = state;
+				}
+
+				m_currentState->update();
+
+				if (m_currentStateName == "Target")
+				{
+					m_currentTarget = static_cast<EnemyTargetState*>(m_currentState)->currentTarget();
+				}
+			}
+		}
+	}
+}
+
+void EnemyLogicComponent::cleanUp()
+{
+	auto mit = m_states.begin();
+
+	while(mit != m_states.end())
+	{
+		delete mit->second;
+		mit = m_states.erase(mit);
+
+		if(mit != m_states.end())
+		{
+			mit++;
+		}
+	}
+}
+
+void EnemyLogicComponent::sortStatesByValue()
+{
+	// Find a way to sort.
+}

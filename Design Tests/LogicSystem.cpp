@@ -2,6 +2,8 @@
 #include "MoveMessage.h"
 #include "EntitySystem.h"
 #include "ZombieIdleState.h"
+#include "PlayerLogicComponent.h"
+#include "EnemyLogicComponent.h"
 
 LogicSystem::~LogicSystem()
 {
@@ -56,7 +58,19 @@ LogicComponent* LogicSystem::createLogicComponent(int entityID, LogicComponent::
 	else
 	{
 		// Fill this in with the player and enemy logic components
-		component = new LogicComponent();
+		switch(type)
+		{
+		case LogicComponent::LOGIC_PLAYER:
+		{
+			component = new PlayerLogicComponent(LogicComponent::LOGIC_PLAYER);
+			break;
+		}
+		case LogicComponent::LOGIC_ENEMY:
+		{
+			component = new EnemyLogicComponent();
+			break;
+		}
+		}
 
 		if(component)
 		{
@@ -87,17 +101,6 @@ void LogicSystem::processMessage(IMessage *message)
 			if(component)
 			{
 				component->changeState(state->m_stateName);
-			}
-		}
-		else if(message->type() == IMessage::MessageType::MOVE)
-		{
-			MoveMessage *move = static_cast<MoveMessage*>(message);
-
-			LogicComponent *component = getLogicComponent(move->m_entityID);
-
-			if(component)
-			{
-				component->setPosition(move->m_newPosition);
 			}
 		}
 	}

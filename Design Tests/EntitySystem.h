@@ -57,5 +57,6 @@ private:
 	void loadPhysicsComponents(int entityID, Vector2D position);
 	void loadRenderComponents(int entityID, Vector2D position);
 	void loadLogicComponents(int entityID);
+	void loadAttackInfo(int entityID);
 	void loadEntityData();
 };

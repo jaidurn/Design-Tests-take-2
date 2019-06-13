@@ -26,7 +26,7 @@ public:
 	float getWeight() { return m_weight; }
 
 	// These need to be defined by the states themselves.
-	virtual bool canEnter() = 0;
+	virtual bool canEnter(int targetID, Behavior behavior) = 0;
 	virtual bool canExit() = 0;
 
 	virtual void enter() = 0;

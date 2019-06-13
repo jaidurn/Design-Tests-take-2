@@ -1,18 +1,17 @@
 #pragma once
 //==========================================================================================
-// File Name: EnemyIdleState.h
+// File Name: EnemyTargetState.h
 // Author: Brian Blackmon
-// Date Created: 5/31/2019
+// Date Created: 6/10/2019
 // Purpose: 
-// Holds the information required for the enemy's idle state.
+// Handles the logic for targeting.
 //==========================================================================================
 #include "EnemyState.h"
-
-class EnemyIdleState : public EnemyState
+class EnemyTargetState : public EnemyState
 {
 public:
-	EnemyIdleState(int entityID, float weight);
-	virtual ~EnemyIdleState();
+	EnemyTargetState(int entityID, float weight, bool lineOfSight, std::string targetType, int range);
+	virtual ~EnemyTargetState();
 
 	virtual bool canEnter(int targetID, Behavior behavior);
 	virtual bool canExit();
@@ -20,5 +19,13 @@ public:
 	virtual void enter();
 	virtual void update();
 	virtual void exit();
+
+	int currentTarget() { return m_currentTarget; }
+
+private:
+	std::string m_targetType;
+	int m_range;
+	int m_currentTarget;
+	bool m_lineOfSight;
 };
 

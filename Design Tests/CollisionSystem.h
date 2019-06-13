@@ -22,6 +22,8 @@ public:
 	bool isColliding(int ID);
 	bool hasLineOfSight(int entityID, int otherEntityID);
 
+	bool circleCollision(int ID, int radius);
+
 	CollisionComponent* getCollisionComponent(int ID);
 	CollisionComponent* createCollisionComponent(int ID, Shape::ShapeType shape, float centerX, float centerY);
 

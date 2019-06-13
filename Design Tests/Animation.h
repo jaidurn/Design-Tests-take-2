@@ -12,10 +12,10 @@
 class Animation
 {
 public:
-	Animation(bool loop, float speed);
+	Animation(bool loop, float speed, int directionCount);
 	~Animation();
 
-	void addFrame(SDL_Rect frame);
+	void addFrame(int direction, SDL_Rect frame);
 
 	void setSpeed(float speed) { m_speed = speed; }
 	void setLoop(bool loop) { m_loop = loop; }
@@ -23,14 +23,14 @@ public:
 	bool loop() { return m_loop; }
 	float speed() { return m_speed; }
 
-	int frameCount() { return m_frameCount; }
-	SDL_Rect* getFrame(int frameIndex);
+	int frameCount(int direction);
+	SDL_Rect* getFrame(int direction, int frameIndex);
 
 private:
 	bool m_loop;
 	float m_speed;
-	int m_frameCount;
+	int m_directionCount;
 
-	std::vector<SDL_Rect> m_frames;
+	std::vector<std::vector<SDL_Rect>> m_frames;
 };
 

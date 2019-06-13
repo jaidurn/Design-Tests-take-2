@@ -7,6 +7,7 @@
 #include <SDL.h>
 #include <cmath>
 #include <iostream>
+
 //=============================================================================
 // Function: bool pollMessage(IMessage)
 // Description:
@@ -82,6 +83,41 @@ void MessageSystem::pushMessage(IMessage *message)
 		}
 	}
 
+}
+
+//=============================================================================
+// Function: bool peekMessage(IMessage *& message)
+// Description:
+// Loops through the message queue and peeks through the messages.
+// Parameters:
+// IMessage *& message - The message to fill the data of.
+// Output:
+// bool - Returns true on message found
+// Returns false if no message.
+//=============================================================================
+bool MessageSystem::peekMessage(IMessage *& message)
+{
+	bool messageFound = false;
+
+	if(m_messages.size() <= (unsigned int)m_currentPeekIndex)
+	{
+		m_currentPeekIndex = 0;
+	}
+	else
+	{
+		if (m_messages[m_currentPeekIndex] != NULL)
+		{
+			if (m_messageFlag[m_currentPeekIndex] == false)
+			{
+				message = m_messages[m_currentPeekIndex];
+				messageFound = true;
+			}
+		}
+	}
+
+	m_currentPeekIndex++;
+
+	return messageFound;
 }
 
 //=============================================================================
@@ -344,6 +380,7 @@ bool MessageSystem::combineAnimationChange(IMessage *message)
 			{
 				combine->m_name = animation->m_name;
 				combine->m_frame = animation->m_frame;
+				combine->m_direction = animation->m_direction;
 
 				m_messageFlag[i] = false;
 

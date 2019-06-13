@@ -145,6 +145,7 @@
     <ClCompile Include="EnemyIdleState.cpp" />
     <ClCompile Include="EnemyLogicComponent.cpp" />
     <ClCompile Include="EnemyState.cpp" />
+    <ClCompile Include="EnemyTargetState.cpp" />
     <ClCompile Include="EntitySystem.cpp" />
     <ClCompile Include="ErrorSystem.cpp" />
     <ClCompile Include="GameInitSystem.cpp" />
@@ -191,6 +192,7 @@
     <ClInclude Include="EnemyIdleState.h" />
     <ClInclude Include="EnemyLogicComponent.h" />
     <ClInclude Include="EnemyState.h" />
+    <ClInclude Include="EnemyTargetState.h" />
     <ClInclude Include="EntitySystem.h" />
     <ClInclude Include="ErrorSystem.h" />
     <ClInclude Include="GameInitSystem.h" />

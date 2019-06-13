@@ -519,6 +519,110 @@ bool CollisionSystem::hasLineOfSight(int entityID, int otherEntityID)
 	return hasSight;
 }
 
+bool CollisionSystem::circleCollision(int ID, int radius)
+{
+	bool isColliding = false;
+
+	CollisionComponent *collision = getCollisionComponent(ID);
+
+	if (collision)
+	{
+		pCircle circle = new Shape::Circle(collision->center().getX(), collision->center().getY(), radius);
+
+		// Find the farthest point away
+		float radius = (float)circle->radius();
+
+		Vector2D center = circle->center();
+		Vector2D topPoint{ center.getX(), center.getY() - radius };
+		Vector2D bottomPoint{ center.getX(), center.getY() + radius };
+		Vector2D leftPoint{ center.getX() - radius, center.getY() };
+		Vector2D rightPoint{ center.getX() + radius, center.getY() };
+
+		// Convert those points to the grid
+		center = m_grid->convertToCellCoordinates(center);
+		topPoint = m_grid->convertToCellCoordinates(topPoint);
+		bottomPoint = m_grid->convertToCellCoordinates(bottomPoint);
+		leftPoint = m_grid->convertToCellCoordinates(leftPoint);
+		rightPoint = m_grid->convertToCellCoordinates(rightPoint);
+
+		Vector2D topPointDist = absoluteValue(topPoint - center);
+		Vector2D bottomPointDist = absoluteValue(bottomPoint - center);
+		Vector2D leftPointDist = absoluteValue(leftPoint - center);
+		Vector2D rightPointDist = absoluteValue(rightPoint - center);
+
+		float tempX = leftPointDist.getX();
+		// We only have to check the left and right for X
+		if (tempX < rightPointDist.getX()) { tempX = rightPointDist.getX(); }
+
+		float tempY = topPointDist.getY();
+		// We only have to check the top and bottom for Y
+		if (tempY < bottomPointDist.getY()) { tempY = bottomPointDist.getY(); }
+
+		// If we're only checking one area for some reason, check more!
+		if (tempX <= 0) { tempX = 1; }
+		if (tempY <= 0) { tempY = 1; }
+
+		int distanceX = (int)round(tempX);
+		int distanceY = (int)round(tempY);
+
+		int totalXDistance = distanceX * 2;
+		int totalYDistance = distanceY * 2;
+
+		int startingX = (int)round(center.getX() - tempX);
+		int startingY = (int)round(center.getY() - tempY);
+
+		// If starting position is off the grid, fix everything
+		if (startingX < 0)
+		{
+			totalXDistance -= startingX;
+			startingX = 0;
+		}
+		if (startingY < 0)
+		{
+			totalYDistance -= startingY;
+			startingY = 0;
+		}
+
+		for (int y = startingY; y < totalYDistance; y++)
+		{
+			if (y < m_grid->rowCount())
+			{
+				for (int x = startingX; x < totalXDistance; x++)
+				{
+					if (x < m_grid->rowCount())
+					{
+						Node<int> *cell = m_grid->getCell(x, y);
+
+						while(cell != NULL)
+						{
+							if(cell->data() != ID)
+							{
+								pShape shapeA = static_cast<pShape>(circle);
+								CollisionComponent *componentB = getCollisionComponent(cell->data());
+
+								if(handleCollision(shapeA, componentB->shape()))
+								{
+									isColliding = true;
+
+									sendCollisionMessage(ID, cell->data(), circle->center());
+								}
+							}
+
+							cell = cell->m_next;
+						}
+					}
+					// We can't check anymore X, so break.
+					else { break; }
+				}
+			}
+			// We're unable to check any more, so exit the check.
+			else { break; }
+		}
+	}
+
+	return isColliding;
+}
+
 CollisionComponent* CollisionSystem::getCollisionComponent(int ID)
 {
 	CollisionComponent *component = NULL;

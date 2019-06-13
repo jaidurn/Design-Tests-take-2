@@ -2,10 +2,10 @@
 
 
 
-Animation::Animation(bool loop, float speed)
-	:m_loop(loop), m_speed(speed), m_frameCount(0)
+Animation::Animation(bool loop, float speed, int directionCount)
+	:m_loop(loop), m_speed(speed), m_directionCount(directionCount)
 {
-
+	m_frames.resize(m_directionCount);
 }
 
 
@@ -14,16 +14,31 @@ Animation::~Animation()
 }
 
 //=============================================================================
-// Function: void addFrame(SDL_Rect frame)
+// Function: void addFrame(int direction, SDL_Rect frame)
 // Description:
-// Adds the frame to the current frames.
+// Adds the frame to the frames of the current direction.
 // Parameters:
+// int direction - The direction to add the frame to.
 // SDL_Rect frame - The frame to add.
 //=============================================================================
-void Animation::addFrame(SDL_Rect frame)
+void Animation::addFrame(int direction, SDL_Rect frame)
 {
-	m_frames.push_back(frame);
-	m_frameCount++;
+	if (0 <= direction && direction < m_directionCount)
+	{
+		m_frames[direction].push_back(frame);
+	}
+}
+
+int Animation::frameCount(int direction)
+{
+	int frameCount = -1;
+
+	if(0 <= direction && direction < m_directionCount)
+	{
+		frameCount = m_frames[direction].size();
+	}
+
+	return frameCount;
 }
 
 //=============================================================================
@@ -36,14 +51,18 @@ void Animation::addFrame(SDL_Rect frame)
 // SDL_Rect* - The rect found.
 // Returns NULL if one isn't found.
 //=============================================================================
-SDL_Rect* Animation::getFrame(int frameIndex)
+SDL_Rect* Animation::getFrame(int direction, int frameIndex)
 {
 	SDL_Rect *frame = NULL;
 
-	if(0 <= frameIndex && frameIndex < m_frameCount)
+	if (0 <= direction && direction < m_directionCount)
 	{
-		frame = &m_frames[frameIndex];
+		if (0 <= frameIndex && frameIndex < m_frames[direction].size())
+		{
+			frame = &m_frames[direction][frameIndex];
+		}
 	}
 
 	return frame;
 }
+

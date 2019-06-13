@@ -74,6 +74,12 @@ int EntitySystem::createEntity(entityKey entityName)
 				loadComponents(entityID, Vector2D(0,0));
 
 				m_entityList[entityID] = true;
+
+				if (entityAttack(entityID) == NULL)
+				{
+					loadAttackInfo(entityID);
+				}
+
 				return entityID;
 			}
 		}
@@ -126,6 +132,12 @@ int EntitySystem::createEntity(entityKey entityName, Vector2D position)
 				loadComponents(entityID, position);
 
 				m_entityList[entityID] = true;
+
+				if (entityAttack(entityID) == NULL)
+				{
+					loadAttackInfo(entityID);
+				}
+
 				return entityID;
 			}
 		}
@@ -174,6 +186,7 @@ std::string EntitySystem::entityType(int entityID)
 AttackInfo* EntitySystem::entityAttack(int entityID)
 {
 	AttackInfo *attack = NULL;
+
 	std::string type = entityType(entityID);
 
 	if(type != "")
@@ -380,6 +393,8 @@ void EntitySystem::loadRenderComponents(int entityID, Vector2D position)
 							int currentY = 0;
 							int totalWidth = sprite->width();
 							int totalHeight = sprite->height();
+							int currentDirection = 0;
+							int directionCount = 4;
 
 							for (int i = 0; i < animationCount; i++)
 							{
@@ -388,6 +403,8 @@ void EntitySystem::loadRenderComponents(int entityID, Vector2D position)
 
 								if (name != "")
 								{
+									std::string s_startX = m_settingsManager.loadSetting(name + "_StartX");
+									std::string s_startY = m_settingsManager.loadSetting(name + "_StartY");
 									std::string s_width = m_settingsManager.loadSetting(name + "_Width");
 									std::string s_height = m_settingsManager.loadSetting(name + "_Height");
 									std::string s_frames = m_settingsManager.loadSetting(name + "_Frames");
@@ -414,25 +431,61 @@ void EntitySystem::loadRenderComponents(int entityID, Vector2D position)
 											speed = stof(s_speed);
 										}
 
+										if(s_startX != "")
+										{
+											currentX = stoi(s_startX);
+										}
+
+										if(s_startY != "")
+										{
+											currentY = stoi(s_startY);
+										}
+
 										int width = stoi(s_width);
 										int height = stoi(s_height);
 										int frames = stoi(s_frames);
 
-										animation->addAnimation(name, loop, speed);
+										animation->addAnimation(name, loop, speed, directionCount);
 
-										for (int j = 0; j < frames; j++)
+										for (int k = 0; k < directionCount; k++)
 										{
-											SDL_Rect rect{ currentX, currentY, width, height };
+											int startingX = currentX;
+											int startingY = currentY; 
 
-											animation->addFrame(name, rect);
-
-											currentY += height;
-
-											if (totalHeight <= currentY)
+											for (int j = 0; j < frames; j++)
 											{
-												currentY = 0;
+												SDL_Rect rect{ currentX, currentY, width, height };
+												AnimationComponent::Direction dir = AnimationComponent::DIR_NONE;
+
+												switch(k)
+												{
+												case 0:
+													dir = AnimationComponent::DIR_DOWN;
+													break;
+												case 1:
+													dir = AnimationComponent::DIR_RIGHT;
+													break;
+												case 2:
+													dir = AnimationComponent::DIR_UP;
+													break;
+												case 3:
+													dir = AnimationComponent::DIR_LEFT;
+													break;
+												}
+
+												animation->addFrame(name, dir, rect);
+
 												currentX += width;
+
+												if (totalWidth <= currentX)
+												{
+													currentX = 0;
+													currentY += height;
+												}
 											}
+											
+											currentX = startingX;
+											currentY = startingY + height;
 										}
 
 										if (i == 0)
@@ -442,6 +495,101 @@ void EntitySystem::loadRenderComponents(int entityID, Vector2D position)
 									}
 								}
 							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+//=============================================================================
+// Function: void loadAttackInfo(int)
+// Description:
+// Loads the information about an attack for an entity type.
+// Parameters:
+// int entityID - The entity to create the attack information for.
+//=============================================================================
+void EntitySystem::loadAttackInfo(int entityID)
+{
+	std::string type = entityType(entityID);
+
+	if(type != "")
+	{
+		if(m_settingsManager.isOpen())
+		{
+			std::string s_count = m_settingsManager.loadSetting("Attack_Count");
+
+			if(s_count != "")
+			{
+				int count = stoi(s_count);
+
+				for(int i = 0; i < count; i++)
+				{
+					std::string name = m_settingsManager.loadSetting("Attack_" + std::to_string(i));
+
+					if(name != "")
+					{
+						std::string s_range = m_settingsManager.loadSetting(name + "_Range");
+						std::string s_knockback = m_settingsManager.loadSetting(name + "_Knockback");
+						std::string s_maskCount = m_settingsManager.loadSetting(name + "_Mask_Count");
+
+						if(s_maskCount != "")
+						{
+							int range = stoi(s_range);
+							float knockback = stof(s_knockback);
+							int maskCount = stoi(s_maskCount);
+
+							AttackInfo *attack = new AttackInfo(knockback, range, maskCount);
+
+							for(int j = 0; j < maskCount; j++)
+							{
+								std::string currentMask = name + "_Mask" + std::to_string(j);
+								std::string s_maskLength = m_settingsManager.loadSetting(currentMask + "_Length");
+
+								if (s_maskLength != "")
+								{
+									int maskLength = stoi(s_maskLength);
+
+									for (int k = 0; k < maskLength; k++)
+									{
+										std::string workingMaskFrame = currentMask + "_" + std::to_string(k);
+										std::string s_x = m_settingsManager.loadSetting(workingMaskFrame + "_X");
+										std::string s_y = m_settingsManager.loadSetting(workingMaskFrame + "_Y");
+										std::string s_width = m_settingsManager.loadSetting(workingMaskFrame + "_Width");
+										std::string s_height = m_settingsManager.loadSetting(workingMaskFrame + "_Height");
+
+										int x = 0;
+										int y = 0;
+										int width = 0;
+										int height = 0;
+
+										if(s_x != "")
+										{
+											x = stoi(s_x);
+										}
+
+										if(s_y != "")
+										{
+											y = stoi(s_y);
+										}
+
+										if(s_width != "")
+										{
+											width = stoi(s_width);
+										}
+
+										if(s_height != "")
+										{
+											height = stoi(s_height);
+										}
+
+										attack->addCollisionBox(j, Vector2D((float)x, (float)y), width, height);
+									}
+								}
+							}
+
+							m_entityAttacks.insert(std::make_pair(entityType(entityID), attack));
 						}
 					}
 				}

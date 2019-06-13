@@ -275,6 +275,8 @@ void RenderSystem::drawSprites()
 				yPosition = (int)round((position.getY() * scale.getY()) - ((clip->h * scale.getY())/ 2));
 				width = (int)round((float)clip->w * scale.getX());
 				height = (int)round((float)clip->h * scale.getY());
+
+				animation->update();
 			}
 
 			SDL_Rect destination{xPosition, yPosition, width, height};
@@ -325,6 +327,11 @@ void RenderSystem::processAnimationChange(AnimationChangeMessage *message)
 
 			if(component->currentAnimation() == message->m_name)
 			{
+				if (message->m_direction != AnimationComponent::DIR_NONE)
+				{
+					component->setCurrentDirection(message->m_direction);
+				}
+
 				if (message->m_frame != -1)
 				{
 					component->setCurrentFrame(message->m_frame);
@@ -333,9 +340,14 @@ void RenderSystem::processAnimationChange(AnimationChangeMessage *message)
 		}
 		else
 		{
+			if(message->m_direction != component->currentDirection() && message->m_direction != AnimationComponent::DIR_NONE)
+			{
+				component->setCurrentDirection(message->m_direction);
+			}
+
 			if (message->m_frame != -1)
 			{
-				component->setCurrentFrame(message->m_frame);
+				component->setCurrentFrame((float)message->m_frame);
 			}
 		}
 	}

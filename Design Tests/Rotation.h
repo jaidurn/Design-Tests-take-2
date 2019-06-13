@@ -15,6 +15,7 @@
 float degreesToRadians(float degrees); 
 float radiansToDegrees(float radians);
 float convertRotationToDegrees(float rotation);
+float angleToDegrees(Vector2D origin, Vector2D point);
 Vector2D rotatePoint(Vector2D point, Vector2D origin, float rotation);
 Vector2D rotatePoint(int x, int y, int originX, int originY, float rotation);
 

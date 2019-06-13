@@ -19,7 +19,9 @@
 #include "LogicSystem.h"
 #include "PlayerIdleState.h"
 #include "PlayerMoveState.h"
-#include "ZombieIdleState.h"
+#include "EnemyIdleState.h"
+#include "EnemyAttackState.h"
+#include "EnemyTargetState.h"
 
 int main(int argc, char *argv[])
 {
@@ -59,20 +61,18 @@ int main(int argc, char *argv[])
 	input->createInputComponent(2);
 	input->createInputComponent(0)->addDevice(input->getNextFreeDevice());
 	input->getInputComponent(0)->addDevice(input->getNextFreeDevice());
-	input->getInputComponent(2)->addDevice(input->getNextFreeDevice());
+	input->getInputComponent(0)->addDevice(input->getNextFreeDevice());
 	input->createInputComponent(3)->addDevice(input->getNextFreeDevice());
 
-	LogicComponent *playerLog = logic->createLogicComponent(player);
-	LogicComponent *player2Log = logic->createLogicComponent(player2);
-	LogicComponent *enemyLog = logic->createLogicComponent(enemy);
-	LogicComponent *enemy2Log = logic->createLogicComponent(enemy2);
+	LogicComponent *playerLog = logic->createLogicComponent(player, LogicComponent::LOGIC_PLAYER);
+	LogicComponent *player2Log = logic->createLogicComponent(player2, LogicComponent::LOGIC_PLAYER);
+	LogicComponent *enemyLog = logic->createLogicComponent(enemy, LogicComponent::LOGIC_ENEMY);
+	LogicComponent *enemy2Log = logic->createLogicComponent(enemy2, LogicComponent::LOGIC_ENEMY);
 
 	PlayerIdleState *idle1 = new PlayerIdleState(player, "Idle");
 	PlayerMoveState *move1 = new PlayerMoveState(player, "Walk", 2.0f);
-	PlayerIdleState *idle3 = new PlayerIdleState(player2, "Idle");
-	PlayerMoveState *move3 = new PlayerMoveState(player2, "Walk", 2.0f);
-	PlayerIdleState *idle4 = new PlayerIdleState(enemy2, "Idle");
-	PlayerMoveState *move4 = new PlayerMoveState(enemy2, "Walk", 2.0f);
+	EnemyAttackState *move4 = new EnemyAttackState(enemy, 2.0f);
+	EnemyTargetState *target4 = new EnemyTargetState(enemy, 2.0f, false, "Player", 100);
 
 	Line lineOfSight{ Vector2D(50, 50), Vector2D(200, 100) };
 
@@ -81,15 +81,11 @@ int main(int argc, char *argv[])
 
 	playerLog->addState("Idle", idle1);
 	playerLog->addState("Walk", move1);
-	player2Log->addState("Idle", idle3);
-	player2Log->addState("Walk", move3);
-	enemy2Log->addState("Idle", idle4);
-	enemy2Log->addState("Walk", move4);
+	enemyLog->addState("Target", target4);
+	enemyLog->addState("Attack", move4);
 
 	playerLog->changeState("Idle");
 	player2Log->changeState("Idle");
-	enemyLog->changeState("Idle");
-	enemy2Log->changeState("Idle");
 
 	IMessage *message = NULL;
 
