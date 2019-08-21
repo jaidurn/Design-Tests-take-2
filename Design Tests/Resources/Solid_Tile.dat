@@ -1,0 +1,6 @@
+Type Tile
+CollisionComponent
+Shape Rectangle
+RectWidth 32
+RectHeight 32
+Solid 1

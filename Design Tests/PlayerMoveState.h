@@ -6,8 +6,8 @@
 // Purpose: 
 // Handles the player movement.
 //==========================================================================================
-#include "IState.h"
-class PlayerMoveState :	public IState
+#include "PlayerState.h"
+class PlayerMoveState :	public PlayerState
 {
 public:
 	PlayerMoveState(int entityID, std::string stateName, float walkSpeed);
@@ -17,8 +17,9 @@ public:
 	virtual void update();
 	virtual void exit();
 	
+	virtual void processMessage(IMessage *message);
+
 private:
-	std::string m_name;
 	float m_walkSpeed;
 
 	void sendVelocityIncreaseMsg(float xSpeed, float ySpeed);

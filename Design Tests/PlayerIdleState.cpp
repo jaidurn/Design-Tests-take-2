@@ -5,7 +5,7 @@
 #include "Controller.h"
 
 PlayerIdleState::PlayerIdleState(int entityID, std::string name)
-	:IState(entityID), m_name(name)
+	:PlayerState(entityID, name)
 {
 }
 
@@ -22,6 +22,7 @@ PlayerIdleState::~PlayerIdleState()
 void PlayerIdleState::enter()
 {
 	// Start the animation for the entrance to the state here
+	sendAnimationChangeMessage("Idle", AnimationComponent::DIR_NONE, 0);
 }
 
 //=============================================================================
@@ -31,11 +32,11 @@ void PlayerIdleState::enter()
 //=============================================================================
 void PlayerIdleState::update()
 {
-	Input::InputComponent *input = Input::InputSystem::instance()->getInputComponent(m_entityID);
+	InputComponent *input = InputSystem::instance()->getInputComponent(m_entityID);
 	
 	if (input)
 	{
-		if (input->xAxis() != 0 || input->yAxis() != 0)
+		if (input->xLeftAxis() != 0 || input->yLeftAxis() != 0)
 		{
 			sendStateChangeMessage("Walk");
 		}

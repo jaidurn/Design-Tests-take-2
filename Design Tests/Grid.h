@@ -29,6 +29,7 @@ public:
 
 	int rowCount() { return m_rowCount; }
 	int columnCount() { return m_columnCount; }
+	int cellSize() { return m_cellSize; }
 
 private:
 	int m_originX;

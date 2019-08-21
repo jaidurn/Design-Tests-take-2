@@ -1,9 +1,10 @@
 #include "LogicSystem.h"
 #include "MoveMessage.h"
 #include "EntitySystem.h"
-#include "ZombieIdleState.h"
 #include "PlayerLogicComponent.h"
 #include "EnemyLogicComponent.h"
+#include "EntityDestroyMessage.h"
+#include "DoorLogicComponent.h"
 
 LogicSystem::~LogicSystem()
 {
@@ -62,12 +63,17 @@ LogicComponent* LogicSystem::createLogicComponent(int entityID, LogicComponent::
 		{
 		case LogicComponent::LOGIC_PLAYER:
 		{
-			component = new PlayerLogicComponent(LogicComponent::LOGIC_PLAYER);
+			component = new PlayerLogicComponent(LogicComponent::LOGIC_PLAYER, entityID);
 			break;
 		}
 		case LogicComponent::LOGIC_ENEMY:
 		{
-			component = new EnemyLogicComponent();
+			component = new EnemyLogicComponent(entityID);
+			break;
+		}
+		case LogicComponent::LOGIC_DOOR:
+		{
+			component = new DoorLogicComponent(entityID, NULL);
 			break;
 		}
 		}
@@ -92,16 +98,38 @@ void LogicSystem::processMessage(IMessage *message)
 {
 	if (message)
 	{
-		if(message->type() == IMessage::MessageType::STATE_CHANGE)
+		switch (message->type())
+		{
+		case IMessage::STATE_CHANGE:
 		{
 			StateChangeMessage *state = static_cast<StateChangeMessage*>(message);
 
 			LogicComponent *component = getLogicComponent(state->m_entityID);
 
-			if(component)
+			if (component)
 			{
 				component->changeState(state->m_stateName);
 			}
+
+			break;
+		}
+		case IMessage::ENTITY_DESTROY:
+		{
+			EntityDestroyMessage *destroy = static_cast<EntityDestroyMessage*>(message);
+
+			removeLogicComponent(destroy->m_entityID);
+
+			break;
+		}
+		}
+
+		// Send the messages to the logic components
+		auto mit = m_logicComponents.begin();
+
+		while(mit != m_logicComponents.end())
+		{
+			mit->second->processMessage(message);
+			mit++;
 		}
 	}
 }
@@ -111,7 +139,7 @@ void LogicSystem::processMessage(IMessage *message)
 // Description:
 // Updates all of the logic components.
 //=============================================================================
-void LogicSystem::update()
+void LogicSystem::update(float delta)
 {
 	auto mit = m_logicComponents.begin();
 
@@ -140,5 +168,24 @@ void LogicSystem::cleanUp()
 		{
 			mit++;
 		}
+	}
+}
+
+//=============================================================================
+// Function: void removeLogicComponent(int)
+// Description:
+// Finds and removes the logic component for the entity ID.
+// Parameters:
+// int entityID - The ID of the logic component to remove.
+//=============================================================================
+void LogicSystem::removeLogicComponent(int entityID)
+{
+	auto mit = m_logicComponents.find(entityID);
+
+	if(mit != m_logicComponents.end())
+	{
+		delete mit->second;
+
+		mit = m_logicComponents.erase(mit);
 	}
 }

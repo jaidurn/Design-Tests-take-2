@@ -1,11 +1,63 @@
 #include "SpriteComponent.h"
 #include <cassert>
+#include <iostream>
 
 SpriteComponent::SpriteComponent(Texture *texture)
-	:Component(SPRITE), m_texture(texture), m_anchor(-1,-1), m_position(0, 0), m_rotation(0.0f)
+	:Component(SPRITE),
+	m_texture(texture),
+	m_anchor(-1, -1),
+	m_position(0, 0),
+	m_rotation(0.0f),
+	m_visible(true),
+	m_layer(0),
+	m_scaleable(true)
 {
+	m_colorMod.r = 0;
+	m_colorMod.g = 0;
+	m_colorMod.b = 0;
+	m_colorMod.a = 0;
+
+	m_clip.x = 0; m_clip.y = 0;
+	m_clip.w = 0; m_clip.h = 0;
+
+	m_blendMode = SDL_BLENDMODE_BLEND;
+
 	// Default the anchor to the center
-	if (texture) { m_anchor = m_texture->center(); }
+	if (texture) 
+	{ 
+		m_anchor = m_texture->center(); 
+
+		m_clip.w = m_texture->width();
+		m_clip.h = m_texture->height();
+	
+		if(SDL_GetTextureColorMod(texture->texture(), &m_colorMod.r, &m_colorMod.g, &m_colorMod.b) != 0)
+		{
+			std::cout << SDL_GetError() << std::endl;
+			
+			m_colorMod.r = 0;
+			m_colorMod.g = 0;
+			m_colorMod.b = 0;
+		}
+		
+		if(SDL_GetTextureAlphaMod(texture->texture(), &m_colorMod.a) != 0)
+		{
+			std::cout << SDL_GetError() << std::endl;
+
+			m_colorMod.a = 255;
+		}
+
+		if (SDL_GetTextureBlendMode(texture->texture(), &m_blendMode) != 0)
+		{
+			std::cout << "Error getting blend mode: " << SDL_GetError() << std::endl;
+
+			m_blendMode = SDL_BLENDMODE_BLEND;
+		}
+
+		if(m_blendMode != SDL_BLENDMODE_BLEND)
+		{
+			std::cout << "WHAT\n";
+		}
+	}
 }
 
 SpriteComponent::~SpriteComponent()
@@ -34,4 +86,22 @@ void SpriteComponent::setTexture(Texture *texture)
 			m_anchor = m_texture->center();
 		}
 	}
+}
+
+//=============================================================================
+// Function: void setClip(int, int, int, int)
+// Description:
+// Sets the texture clip of the sprite.
+// Parameters:
+// int x - The x position of the clip.
+// int y - The y position of the clip.
+// int w - The width of the clip.
+// int h - The height of the clip.
+//=============================================================================
+void SpriteComponent::setClip(int x, int y, int w, int h)
+{
+	if (0 <= x) { m_clip.x = x; }
+	if (0 <= y) { m_clip.y = y; }
+	if (0 < w) { m_clip.w = w; }
+	if (0 < h) { m_clip.h = h; }
 }

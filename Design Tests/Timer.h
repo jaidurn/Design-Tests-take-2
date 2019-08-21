@@ -94,13 +94,13 @@ public:
 		{
 			if(m_paused)
 			{
-				int ticks = (int)(SDL_GetTicks() - m_pausedTick);
-				current = (float)ticks / (float)m_ticksPerSecond;
+				float ticks = (float)(SDL_GetTicks() - m_pausedTick);
+				current = ticks / (float)m_ticksPerSecond;
 			}
 			else
 			{
-				int ticks = (int)(SDL_GetTicks() - m_startTick);
-				current = (float)ticks / (float)m_ticksPerSecond;
+				float ticks = (float)(SDL_GetTicks() - m_startTick);
+				current = ticks / (float)m_ticksPerSecond;
 			}
 		}
 

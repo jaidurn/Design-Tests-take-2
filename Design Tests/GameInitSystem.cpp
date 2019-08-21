@@ -15,9 +15,14 @@ GameInitSystem::~GameInitSystem()
 // Initializes all of the systems required for the game.
 // Parameters:
 // string settingsFile - The file to load all the settings from.
+// Output:
+// Returns true on success.
+// Returns false on failure.
 //=============================================================================
-void GameInitSystem::initialize(std::string settingsFile)
+bool GameInitSystem::initialize(std::string settingsFile)
 {
+	bool success = false;
+
 	if (!m_initialized)
 	{
 		m_settingsManager.open(settingsFile, SettingIO::READ);
@@ -29,10 +34,13 @@ void GameInitSystem::initialize(std::string settingsFile)
 			loadPhysics();
 			loadInput();
 			loadEntity();
-		}
-		
-		m_initialized = true;
+
+			m_initialized = true;
+			success = true;
+		}		
 	}
+
+	return success;
 }
 
 //=============================================================================
@@ -89,7 +97,7 @@ void GameInitSystem::loadVideo()
 	int baseWidth = std::stoi(s_baseWidth);
 	int baseHeight = std::stoi(s_baseHeight);
 
-	SDL_Rect rect{ 0, 0, baseWidth, baseHeight };
+	SDL_Rect rect{ 0, 0, ResourceManager::instance()->window()->width(), ResourceManager::instance()->window()->height() };
 
 	float scaleX = (float)ResourceManager::instance()->window()->width() / (float)baseWidth;
 	float scaleY = (float)ResourceManager::instance()->window()->height() / (float)baseHeight;
@@ -107,8 +115,8 @@ void GameInitSystem::loadPhysics()
 	int originX = std::stoi(m_settingsManager.loadSetting("GridOriginX"));
 	int originY = std::stoi(m_settingsManager.loadSetting("GridOriginY"));
 
-	int width = 1280;
-	int height = 720;
+	int width = std::stoi(m_settingsManager.loadSetting("GridWidth"));
+	int height = std::stoi(m_settingsManager.loadSetting("GridHeight"));
 
 	int cellSize = std::stoi(m_settingsManager.loadSetting("GridCellSize"));
 
@@ -122,7 +130,7 @@ void GameInitSystem::loadPhysics()
 //=============================================================================
 void GameInitSystem::loadInput()
 {
-	Input::InputSystem::instance();
+	InputSystem::instance();
 }
 
 //=============================================================================

@@ -24,22 +24,38 @@ namespace Input
 		virtual void releaseButton(Button button);
 		virtual bool buttonPressed(Button button);
 
-		void moveAxisX(Sint16 movement);
-		void moveAxisY(Sint16 movement);
+		void moveLeftAxisX(Sint16 movement);
+		void moveLeftAxisY(Sint16 movement);
+		void moveRightAxisX(Sint16 movement);
+		void moveRightAxisY(Sint16 movement);
+		void moveLeftTriggerAxis(Sint16 movement);
+		void moveRightTriggerAxis(Sint16 movement);
 
 		void triggerHaptic(float strength, Uint32 length);
 		void toggleHapticOnOff();
 
-		float xAxis() { return m_xAxis; }
-		float yAxis() { return m_yAxis; }
+		float xLeftAxis() { return m_xLeftAxis; }
+		float yLeftAxis() { return m_yLeftAxis; }
+		
+		float xRightAxis() { return m_xRightAxis; }
+		float yRightAxis() { return m_yRightAxis; }
+
+		float leftTriggerAxis() { return m_leftTriggerAxis; }
+		float rightTriggerAxis() { return m_rightTriggerAxis; }
 
 	private:
 		SDL_GameController *m_controller;
 		SDL_Haptic *m_haptic;
 		int m_ID;
 
-		float m_xAxis;
-		float m_yAxis;
+		float m_xLeftAxis;
+		float m_yLeftAxis;
+
+		float m_xRightAxis;
+		float m_yRightAxis;
+
+		float m_leftTriggerAxis;
+		float m_rightTriggerAxis;
 
 		const int m_DEAD_ZONE = 8000;
 		const int m_AXIS_MAX = 32768;

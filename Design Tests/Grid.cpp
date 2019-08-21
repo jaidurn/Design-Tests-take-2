@@ -35,21 +35,29 @@ Grid::~Grid()
 
 Node<int>* Grid::getCoordinateCell(int x, int y)
 {
-	assert(0 <= x && 0 <= y);
-	assert(x <= (m_cellSize * m_columnCount) && y <= (m_cellSize * m_rowCount));
+	int workingX = x;
+	int workingY = y;
 
-	convertToGridCoordinates(x, y);
+	if (workingX < 0) { workingX = 0; }
+	if (workingY < 0) { workingY = 0; }
 
-	return m_grid[x][y];
+	convertToGridCoordinates(workingX, workingY);
+
+	return m_grid[workingX][workingY];
 }
 
 Node<int>* Grid::getCell(int cellX, int cellY)
 {
 	// Make sure we're not trying to use global coordinates
-	assert(0 <= cellX && cellX < m_columnCount);
-	assert(0 <= cellY && cellY < m_rowCount);
+	Node<int> *cell = NULL;
 
-	return m_grid[cellX][cellY];
+	if (0 <= cellX && cellX < m_columnCount &&
+		0 <= cellY && cellY < m_rowCount)
+	{
+		cell = m_grid[cellX][cellY];
+	}
+
+	return cell;
 }
 
 void Grid::add(int ID, int x, int y)
@@ -132,9 +140,22 @@ void Grid::remove(int ID, int x, int y)
 
 void Grid::move(int ID, int oldX, int oldY, int movedX, int movedY)
 {
+	int workingOldX = oldX;
+	int workingNewX = movedX;
+	int workingOldY = oldY;
+	int workingNewY = movedY;
+
+	convertToGridCoordinates(workingOldX, workingOldY);
+	convertToGridCoordinates(workingNewX, workingNewY);
+
 	// Remove the ID from it's old location
-	this->remove(ID, oldX, oldY);
-	this->add(ID, movedX, movedY);
+
+	if (workingOldX != workingNewX ||
+		workingOldY != workingNewY)
+	{
+		this->remove(ID, oldX, oldY);
+		this->add(ID, movedX, movedY);
+	}
 }
 
 Vector2D Grid::convertToCellCoordinates(Vector2D point)
@@ -162,12 +183,35 @@ void Grid::convertToGridCoordinates(int& x, int& y)
 	int workingX = x;
 	int workingY = y;
 
+	if (workingX < 0) { 
+		workingX = 0; }
+	if (workingY < 0) { workingY = 0; }
+
 	workingX = (int)(workingX / m_cellSize);
 	workingY = (int)(workingY / m_cellSize);
 
 	// Make sure the coordinates are inside the boundaries
-	assert(0 <= workingX && 0 <= workingY);
-	assert(workingX < m_columnCount && workingY < m_rowCount);
+	if(m_columnCount <= workingX)
+	{
+		m_columnCount = workingX + 1;
+
+		m_grid.resize(m_columnCount);
+
+		for (int i = 0; i < m_columnCount; i++)
+		{
+			m_grid[i].resize(m_rowCount);
+		}
+	}
+
+	if(m_rowCount <= workingY)
+	{
+		m_rowCount = workingY + 1;
+
+		for (int i = 0; i < m_columnCount; i++)
+		{
+			m_grid[i].resize(m_rowCount);
+		}
+	}
 
 	x = workingX;
 	y = workingY;

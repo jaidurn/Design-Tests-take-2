@@ -13,8 +13,8 @@ public:
 	~Vector2D();
 
 	// Public Functions
-	void setX(const float x) { m_x = x; }
-	void setY(const float y) { m_y = y; }
+	void setX(float x) { m_x = x; }
+	void setY(float y) { m_y = y; }
 
 	float getX() const { return m_x; }
 	float getY() const { return m_y; }

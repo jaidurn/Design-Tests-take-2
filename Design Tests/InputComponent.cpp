@@ -71,7 +71,7 @@ InputDevice::DEVICE_TYPE InputComponent::getDeviceType(int deviceNumber)
 // Output:
 // Returns true if the button is pressed, false if it isn't.
 //=============================================================================
-bool InputComponent::buttonPressed(Button button)
+bool InputComponent::buttonPressed(InputDevice::Button button)
 {
 	bool pressed = false;
 
@@ -84,14 +84,14 @@ bool InputComponent::buttonPressed(Button button)
 }
 
 //=============================================================================
-// Function: float xAxis()
+// Function: float xLeftAxis()
 // Description:
-// Checks the current status of the x axis.
+// Checks the current status of the left x axis.
 // Output:
 // Returns between -1 and 1 if there's axis movement.
 // Returns 0 if there's no axis movement.
 //=============================================================================
-float InputComponent::xAxis()
+float InputComponent::xLeftAxis()
 {
 	float xAmount = 0.0f;
 
@@ -105,9 +105,9 @@ float InputComponent::xAxis()
 			{
 				Controller *controller = static_cast<Controller*>(m_devices[i]);
 
-				if (controller->xAxis() != 0)
+				if (controller->xLeftAxis() != 0)
 				{
-					xAmount = controller->xAxis();
+					xAmount = controller->xLeftAxis();
 				}
 
 				break;
@@ -134,14 +134,14 @@ float InputComponent::xAxis()
 }
 
 //=============================================================================
-// Function: float yAxis()
+// Function: float yLeftAxis()
 // Description:
-// Gets the direction of the Y axis.
+// Gets the direction of the left Y axis.
 // Parameters:
 // Output:
 // Outputs a number between -1 and 1.
 //=============================================================================
-float InputComponent::yAxis()
+float InputComponent::yLeftAxis()
 {
 	float yAmount = 0.0f;
 
@@ -155,9 +155,9 @@ float InputComponent::yAxis()
 			{
 				Controller *controller = static_cast<Controller*>(m_devices[i]);
 
-				if (controller->yAxis() != 0)
+				if (controller->yLeftAxis() != 0)
 				{
-					yAmount = controller->yAxis();
+					yAmount = controller->yLeftAxis();
 				}
 
 				break;
@@ -183,22 +183,113 @@ float InputComponent::yAxis()
 }
 
 //=============================================================================
+// Function: float xRightAxis()
+// Description:
+// Checks the current status of the right x axis.
+// Output:
+// Returns between -1 and 1 if there's axis movement.
+// Returns 0 if there's no axis movement.
+//=============================================================================
+float InputComponent::xRightAxis()
+{
+	float xAmount = 0.0f;
+
+	for (unsigned int i = 0; i < m_devices.size(); i++)
+	{
+		if (m_devices[i])
+		{
+			switch (m_devices[i]->type())
+			{
+			case InputDevice::DEVICE_TYPE::GAMEPAD:
+			{
+				Controller *controller = static_cast<Controller*>(m_devices[i]);
+
+				if (controller->xRightAxis() != 0)
+				{
+					xAmount = controller->xRightAxis();
+				}
+
+				break;
+			}
+			}
+		}
+	}
+
+	return xAmount;
+}
+
+//=============================================================================
+// Function: float yRightAxis()
+// Description:
+// Gets the direction of the right Y axis.
+// Parameters:
+// Output:
+// Outputs a number between -1 and 1.
+//=============================================================================
+float InputComponent::yRightAxis()
+{
+	float yAmount = 0.0f;
+
+	for (unsigned int i = 0; i < m_devices.size(); i++)
+	{
+		if (m_devices[i])
+		{
+			switch (m_devices[i]->type())
+			{
+			case InputDevice::DEVICE_TYPE::GAMEPAD:
+			{
+				Controller *controller = static_cast<Controller*>(m_devices[i]);
+
+				if (controller->yRightAxis() != 0)
+				{
+					yAmount = controller->yRightAxis();
+				}
+
+				break;
+			}
+			}
+		}
+	}
+
+	return yAmount;
+}
+
+//=============================================================================
 // Function: float axisAngle()
 // Description:
 // Gets the angle of the axis' from their origin using y+ as the origin.
 // Output:
 // float - Returns the angle of the axis in degrees.
 //=============================================================================
-float InputComponent::axisAngle()
+float InputComponent::leftAxisAngle()
 {
 	float angle = 0.0f;
 
-	float radians = (float)atan2(-xAxis(), yAxis());
+	float radians = (float)atan2(-xLeftAxis(), yLeftAxis());
 
 	angle = radiansToDegrees(radians);
 
 	return angle;
 }
+
+//=============================================================================
+// Function: float rightAxisAngle()
+// Description:
+// Gets the angle of the right axis' from their origin using y+ as the origin.
+// Output:
+// float - Returns the angle of the axis in degrees.
+//=============================================================================
+float InputComponent::rightAxisAngle()
+{
+	float angle = 0.0f;
+
+	float radians = (float)atan2(-xRightAxis(), yRightAxis());
+
+	angle = radiansToDegrees(radians);
+
+	return angle;
+}
+
 
 //=============================================================================
 // Function: void freeDevices()

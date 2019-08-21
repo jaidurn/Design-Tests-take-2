@@ -35,17 +35,17 @@ namespace Shape
 
 		virtual ShapeType type() { return NONE; }
 
-		void setCenter(const float x, const float y) 
+		void setCenter(float x, float y) 
 		{ 
 			m_center.setX(x);
 			m_center.setY(y);
 		}
 
-		void setCenterX(const float centerX) { m_center.setX(centerX); }
-		void setCenterY(const float centerY) { m_center.setY(centerY); }
-		void setRotation(const float rotation) { m_rotation = rotation; }
+		virtual void setCenterX(float centerX) { m_center.setX(centerX); }
+		virtual void setCenterY(float centerY) { m_center.setY(centerY); }
+		void setRotation(float rotation) { m_rotation = rotation; }
 
-		Vector2D center() const { return m_center; }
+		virtual Vector2D center() const { return m_center; }
 		float rotation() const { return m_rotation; }
 
 	protected:

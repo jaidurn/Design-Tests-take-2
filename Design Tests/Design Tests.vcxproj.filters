@@ -52,15 +52,30 @@
     <Filter Include="Header Files\Logic\Player States">
       <UniqueIdentifier>{ce334fe3-2d52-461d-a5c3-f419c395eafa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Logic\Enemy States">
+      <UniqueIdentifier>{d714f114-614b-4062-998d-4755a18d057a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Logic">
+      <UniqueIdentifier>{3637eeab-5e1e-4e82-8ffa-1d43c1dc5f78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Logic\Enemy States">
+      <UniqueIdentifier>{a833453d-b94a-4864-b88a-38de61160c2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Logic\Player States">
+      <UniqueIdentifier>{c7b58e9a-43b0-44e6-8f8b-3ae401efc70b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Message System">
+      <UniqueIdentifier>{a02d8b0c-8a05-4273-bdf3-47456dabfa39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\World System">
+      <UniqueIdentifier>{b51bdc68-55b0-4e25-a3d2-a84814612ff2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ErrorSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CollisionComponent.cpp">
@@ -123,9 +138,6 @@
     <ClCompile Include="InputSystem.cpp">
       <Filter>Source Files\Input System</Filter>
     </ClCompile>
-    <ClCompile Include="MessageSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Keyboard.cpp">
       <Filter>Source Files\Input System</Filter>
     </ClCompile>
@@ -138,46 +150,79 @@
     <ClCompile Include="EntitySystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerIdleState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerMoveState.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Source Files\Render System</Filter>
     </ClCompile>
     <ClCompile Include="AnimationComponent.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Render System</Filter>
     </ClCompile>
-    <ClCompile Include="SpriteParser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Animation.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Component.cpp">
+      <Filter>Source Files\Resources</Filter>
     </ClCompile>
     <ClCompile Include="Camera2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LogicSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ZombieIdleState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerLogicComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EnemyLogicComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EnemyState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EnemyIdleState.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Render System</Filter>
     </ClCompile>
     <ClCompile Include="EnemyAttackState.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Logic\Enemy States</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyIdleState.cpp">
+      <Filter>Source Files\Logic\Enemy States</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyLogicComponent.cpp">
+      <Filter>Source Files\Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyState.cpp">
+      <Filter>Source Files\Logic\Enemy States</Filter>
     </ClCompile>
     <ClCompile Include="EnemyTargetState.cpp">
+      <Filter>Source Files\Logic\Enemy States</Filter>
+    </ClCompile>
+    <ClCompile Include="LogicSystem.cpp">
+      <Filter>Source Files\Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageSystem.cpp">
+      <Filter>Source Files\Message System</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerIdleState.cpp">
+      <Filter>Source Files\Logic\Player States</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerLogicComponent.cpp">
+      <Filter>Source Files\Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerMoveState.cpp">
+      <Filter>Source Files\Logic\Player States</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureEffect.cpp">
+      <Filter>Source Files\Render System</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Room.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DoorLogicComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterfaceSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UIComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UIButton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FontCache.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -186,9 +231,6 @@
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="ErrorSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CollisionComponent.h">
@@ -281,20 +323,8 @@
     <ClInclude Include="MessageSystem.h">
       <Filter>Header Files\Message System</Filter>
     </ClInclude>
-    <ClInclude Include="IState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LogicComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerIdleState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OldMessage.h">
       <Filter>Header Files\Message System</Filter>
-    </ClInclude>
-    <ClInclude Include="IMessage.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StateChangeMessage.h">
       <Filter>Header Files\Message System</Filter>
@@ -305,56 +335,121 @@
     <ClInclude Include="CollisionMessage.h">
       <Filter>Header Files\Message System</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerMoveState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VelocityIncreaseMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AnimationComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SpriteParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Animation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AnimationChangeMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LogicSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ZombieIdleState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerLogicComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnemyLogicComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnemyState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnemyIdleState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Timer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnemyAttackState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AttackInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Header Files\Render System</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationChangeMessage.h">
+      <Filter>Header Files\Message System</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationComponent.h">
+      <Filter>Header Files\Render System</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyAttackState.h">
+      <Filter>Header Files\Logic\Enemy States</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyIdleState.h">
+      <Filter>Header Files\Logic\Enemy States</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyState.h">
+      <Filter>Header Files\Logic\Enemy States</Filter>
+    </ClInclude>
     <ClInclude Include="EnemyTargetState.h">
+      <Filter>Header Files\Logic\Enemy States</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera2D.h">
+      <Filter>Header Files\Render System</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Header Files\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="IMessage.h">
+      <Filter>Header Files\Message System</Filter>
+    </ClInclude>
+    <ClInclude Include="IState.h">
+      <Filter>Header Files\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerIdleState.h">
+      <Filter>Header Files\Logic\Player States</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerMoveState.h">
+      <Filter>Header Files\Logic\Player States</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerLogicComponent.h">
+      <Filter>Header Files\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyLogicComponent.h">
+      <Filter>Header Files\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="LogicSystem.h">
+      <Filter>Header Files\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="LogicComponent.h">
+      <Filter>Header Files\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="VelocityIncreaseMessage.h">
+      <Filter>Header Files\Message System</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityDestroyMessage.h">
+      <Filter>Header Files\Message System</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TextureEffect.h">
+      <Filter>Header Files\Render System</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="World.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Room.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeNode.h">
+      <Filter>Header Files\Storage Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="GridNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DoorLogicComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UserInterfaceSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UIComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UIButton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InputMessage.h">
+      <Filter>Header Files\Message System</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraMoveMessage.h">
+      <Filter>Header Files\Message System</Filter>
+    </ClInclude>
+    <ClInclude Include="FontCache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Design Tests.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

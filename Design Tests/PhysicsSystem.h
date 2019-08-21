@@ -24,7 +24,7 @@ public:
 
 	~PhysicsSystem();
 
-	void update();
+	void update(float delta);
 
 	CollisionSystem* collisionSystem()
 	{
@@ -57,9 +57,12 @@ private:
 	CollisionSystem *m_collisionSystem;
 
 	void sendMoveMessage(int entityID, Vector2D oldPosition, Vector2D newPosition);
+	
+	void removeVelocityComponent(int entityID);
 
 	void cleanUp();
-	void applyVelocity();
-	void applyFriction(int entityID);
+	void applyVelocity(float delta);
+	void applyFriction(int entityID, float delta);
+	Vector2D lerp(Vector2D goal, Vector2D current, float amount);
 };
 

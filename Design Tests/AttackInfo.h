@@ -24,6 +24,7 @@ public:
 
 	int range() { return m_range; }
 	int maskCount() { return m_maskCount; }
+	float knockback() { return m_knockback; }
 
 	void addCollisionBox(int maskNumber, Vector2D position, int width, int height)
 	{

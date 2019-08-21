@@ -1,0 +1,21 @@
+Width 512
+Height 512
+Map Resources/largeRoom.map
+
+DoorCount 8
+Door0_x 128
+Door0_y 512
+Door1_x 384
+Door1_y 512
+Door2_x 0
+Door2_y 128
+Door3_x 0
+Door3_y 384
+Door4_x 128
+Door4_y 0
+Door5_x 384
+Door5_y 0
+Door6_x 512
+Door6_y 128
+Door7_x 512
+Door7_y 384

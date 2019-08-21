@@ -4,7 +4,9 @@
 using namespace Input;
 
 Controller::Controller(int controllerID, bool hapticEnabled)
-	:m_controller(NULL), m_haptic(NULL), m_ID(controllerID), m_xAxis(0.0f), m_yAxis(0.0f)
+	:m_controller(NULL), m_haptic(NULL), m_ID(controllerID), m_xLeftAxis(0.0f), m_yLeftAxis(0.0f),
+	m_xRightAxis(0.0f), m_yRightAxis(0.0f),
+	m_leftTriggerAxis(0.0f), m_rightTriggerAxis(0.0f)
 {
 	open();
 	if (hapticEnabled) { enableHaptic(); }
@@ -42,13 +44,13 @@ void Controller::releaseButton(Button button)
 }
 
 //=============================================================================
-// Function: void moveAxisX(Sint16)
+// Function: void moveLeftAxisX(Sint16)
 // Description:
-// Sets the x axis to the movement amount.
+// Sets the left x axis to the movement amount.
 // Parameters:
 // Sint16 movement - How much to move our x axis.
 //=============================================================================
-void Controller::moveAxisX(Sint16 movement)
+void Controller::moveLeftAxisX(Sint16 movement)
 {
 	float moveAmount = 0.0f;
 
@@ -73,17 +75,17 @@ void Controller::moveAxisX(Sint16 movement)
 		}
 	}
 
-	m_xAxis = moveAmount;
+	m_xLeftAxis = moveAmount;
 }
 
 //=============================================================================
-// Function: void moveAxisY(Sint16)
+// Function: void moveLeftAxisY(Sint16)
 // Description:
-// Sets the y axis to the movement amount.
+// Sets the left y axis to the movement amount.
 // Parameters:
 // Sint16 movement - How much to move our y axis.
 //=============================================================================
-void Controller::moveAxisY(Sint16 movement)
+void Controller::moveLeftAxisY(Sint16 movement)
 {
 	float moveAmount = 0.0f;
 
@@ -108,7 +110,115 @@ void Controller::moveAxisY(Sint16 movement)
 		}
 	}
 
-	m_yAxis = moveAmount;
+	m_yLeftAxis = moveAmount;
+}
+
+//=============================================================================
+// Function: void moveRightAxisX(Sint16)
+// Description:
+// Sets the x axis to the movement amount.
+// Parameters:
+// Sint16 movement - How much to move our x axis.
+//=============================================================================
+void Controller::moveRightAxisX(Sint16 movement)
+{
+	float moveAmount = 0.0f;
+
+	int workingDeadZone = m_DEAD_ZONE;
+	float workingAxisMax = (float)(m_AXIS_MAX);
+	float workingMovement = (float)(movement);
+
+	if (movement < 0.0f)
+	{
+		workingDeadZone *= -1;
+
+		if (movement < workingDeadZone)
+		{
+			moveAmount = workingMovement / workingAxisMax;
+		}
+	}
+	else if (0.0f < movement)
+	{
+		if (workingDeadZone < movement)
+		{
+			moveAmount = workingMovement / (workingAxisMax - 1);
+		}
+	}
+
+	m_xRightAxis = moveAmount;
+}
+
+//=============================================================================
+// Function: void moveRightAxisY(Sint16)
+// Description:
+// Sets the y axis to the movement amount.
+// Parameters:
+// Sint16 movement - How much to move our y axis.
+//=============================================================================
+void Controller::moveRightAxisY(Sint16 movement)
+{
+	float moveAmount = 0.0f;
+
+	int workingDeadZone = m_DEAD_ZONE;
+	float workingAxisMax = (float)(m_AXIS_MAX);
+	float workingMovement = (float)(movement);
+
+	if (movement < 0.0f)
+	{
+		workingDeadZone *= -1;
+
+		if (workingMovement < workingDeadZone)
+		{
+			moveAmount = workingMovement / workingAxisMax;
+		}
+	}
+	else if (0.0f < movement)
+	{
+		if (workingDeadZone < workingMovement)
+		{
+			moveAmount = workingMovement / (workingAxisMax - 1);
+		}
+	}
+
+	m_yRightAxis = moveAmount;
+}
+
+//=============================================================================
+// Function: void moveLeftTriggerAxis(Sint16)
+// Description:
+// Sets the left trigger axis to the movement amount.
+// Parameters:
+// Sint16 movement - How much to move our trigger axis.
+//=============================================================================
+void Controller::moveLeftTriggerAxis(Sint16 movement)
+{
+	float moveAmount = 0.0f;
+
+	float workingAxisMax = (float)(m_AXIS_MAX);
+	float workingMovement = (float)(movement);
+
+	moveAmount = workingMovement / (workingAxisMax - 1);
+
+	m_leftTriggerAxis = moveAmount;
+}
+
+//=============================================================================
+// Function: void moveRightTriggerAxis(Sint16)
+// Description:
+// Sets the right trigger axis to the movement amount.
+// Parameters:
+// Sint16 movement - How much to move our trigger axis.
+//=============================================================================
+void Controller::moveRightTriggerAxis(Sint16 movement)
+{
+	float moveAmount = 0.0f;
+
+	float workingAxisMax = (float)(m_AXIS_MAX);
+	float workingMovement = (float)(movement);
+
+	moveAmount = workingMovement / (workingAxisMax - 1);
+
+	m_rightTriggerAxis = moveAmount;
 }
 
 //=============================================================================

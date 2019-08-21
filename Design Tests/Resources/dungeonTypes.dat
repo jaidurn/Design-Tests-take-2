@@ -1,0 +1,3 @@
+// Holds the different dungeon types
+DungeonCount 1
+Dungeon0 dungeon.dat

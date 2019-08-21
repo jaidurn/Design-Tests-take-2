@@ -20,7 +20,9 @@ public:
 		ANIMATION,
 		INPUT,
 		STATE,
-		LOGIC
+		LOGIC,
+		UI,
+		TEXT
 	};
 
 	Component(componentID id);

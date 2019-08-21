@@ -1,0 +1,13 @@
+Width 448
+Height 256
+Map Resources/smallRoomB.map
+
+DoorCount 4
+Door0_x 224
+Door0_y 256
+Door1_x 0
+Door1_y 128
+Door2_x 224
+Door2_y 0
+Door3_x 448
+Door3_y 128

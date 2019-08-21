@@ -24,7 +24,10 @@ Vector2D Rectangle::getTopRight()
 {
 	Vector2D topRight(m_center.getX() + (m_width / 2), m_center.getY() - (m_height / 2));
 
-	topRight = rotatePoint(topRight, m_center, m_rotation);
+	if (m_rotation != 0.0f)
+	{
+		topRight = rotatePoint(topRight, m_center, m_rotation);
+	}
 
 	return topRight;
 }
@@ -33,7 +36,10 @@ Vector2D Rectangle::getTopLeft()
 {
 	Vector2D topLeft(m_center.getX() - (m_width / 2), m_center.getY() - (m_height / 2));
 
-	topLeft = rotatePoint(topLeft, m_center, m_rotation);
+	if (m_rotation != 0.0f)
+	{
+		topLeft = rotatePoint(topLeft, m_center, m_rotation);
+	}
 
 	return topLeft;
 }
@@ -42,7 +48,10 @@ Vector2D Rectangle::getBottomRight()
 {
 	Vector2D bottomRight(m_center.getX() + (m_width / 2), m_center.getY() + (m_height / 2));
 
-	bottomRight = rotatePoint(bottomRight, m_center, m_rotation);
+	if (m_rotation != 0.0f)
+	{
+		bottomRight = rotatePoint(bottomRight, m_center, m_rotation);
+	}
 
 	return bottomRight;
 }
@@ -51,7 +60,10 @@ Vector2D Rectangle::getBottomLeft()
 {
 	Vector2D bottomLeft(m_center.getX() - (m_width / 2), m_center.getY() + (m_height / 2));
 
-	bottomLeft = rotatePoint(bottomLeft, m_center, m_rotation);
+	if (m_rotation != 0.0f)
+	{
+		bottomLeft = rotatePoint(bottomLeft, m_center, m_rotation);
+	}
 
 	return bottomLeft;
 }

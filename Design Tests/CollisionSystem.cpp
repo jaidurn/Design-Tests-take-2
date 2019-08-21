@@ -1,5 +1,6 @@
 #include "CollisionSystem.h"
 #include "CollisionMessage.h"
+#include "EntityDestroyMessage.h"
 #include "Vector2D.h"
 #include "Rotation.h"
 #include "Rectangle.h"
@@ -117,32 +118,30 @@ bool CollisionSystem::isColliding(int ID)
 			int distanceX = (int)round(tempX);
 			int distanceY = (int)round(tempY);
 
-			int totalXDistance = distanceX * 2;
-			int totalYDistance = distanceY * 2;
-
 			// Find the starting grid space
 			int startingX = (int)round(center.getX() - tempX);
 			int startingY = (int)round(center.getY() - tempY);
 
+			int endingX = (int)round(center.getX() + tempX);
+			int endingY = (int)round(center.getY() + tempY);
+
 			// If starting position is off the grid, fix everything
 			if (startingX < 0) 
 			{ 
-				totalXDistance -= startingX; 
 				startingX = 0;
 			}
 			if (startingY < 0) 
 			{ 
-				totalYDistance -= startingY; 
 				startingY = 0;
 			}
 
-			for(int y = startingY; y < totalYDistance; y++)
+			for(int y = startingY; y <= endingY; y++)
 			{
 				if (y < m_grid->rowCount())
 				{
-					for (int x = startingX; x < totalXDistance; x++)
+					for (int x = startingX; x <= endingX; x++)
 					{
-						if (x < m_grid->rowCount())
+						if (x < m_grid->columnCount())
 						{
 							collision = collisionInCell(ID, x, y) || collision;
 						}
@@ -219,7 +218,7 @@ bool CollisionSystem::isColliding(int ID)
 				{
 					for (int x = startingX; x < totalXDistance; x++)
 					{
-						if (x < m_grid->rowCount())
+						if (x < m_grid->columnCount())
 						{
 							collision = collisionInCell(ID, x, y) || collision;
 						}
@@ -519,6 +518,173 @@ bool CollisionSystem::hasLineOfSight(int entityID, int otherEntityID)
 	return hasSight;
 }
 
+bool CollisionSystem::collisionOnLine(int entityID, Line line)
+{
+	bool collision = false;
+
+	Vector2D gridStart = line.start;
+	Vector2D gridEnd = line.end;
+
+	int gridMaxX = m_grid->cellSize() * m_grid->columnCount();
+	int gridMaxY = m_grid->cellSize() * m_grid->rowCount();
+
+	if (gridStart.getX() < 0) { gridStart.setX(0); }
+	else if (gridMaxY < gridStart.getX()) { gridStart.setX((float)gridMaxY); }
+
+	if (gridStart.getY() < 0) { gridStart.setY(0); }
+	else if (gridMaxY < gridStart.getY()) { gridStart.setY((float)gridMaxY); }
+	
+	if (gridEnd.getX() < 0) { gridEnd.setX(0); }
+	else if (gridMaxX < gridEnd.getX()) { gridEnd.setX((float)gridMaxX); }
+	
+	if (gridEnd.getY() < 0) { gridEnd.setY(0); }
+	else if (gridMaxY < gridEnd.getY()) { gridEnd.setY((float)gridMaxY); }
+
+	gridStart = m_grid->convertToCellCoordinates(gridStart);
+	gridEnd = m_grid->convertToCellCoordinates(gridEnd);
+
+	int xStart = (int)round(gridStart.getX());
+	int yStart = (int)round(gridStart.getY());
+	int xEnd = (int)round(gridEnd.getX());
+	int yEnd = (int)round(gridEnd.getY());
+
+	if (gridEnd.getX() < gridStart.getX())
+	{
+		xStart = xEnd;
+		xEnd = (int)round(gridStart.getX());
+	}
+
+	if (gridEnd.getY() < gridStart.getY())
+	{
+		yStart = yEnd;
+		yEnd = (int)round(gridStart.getY());
+	}
+
+	if (xStart == xEnd || yStart == yEnd)
+	{
+		if (xStart == xEnd && yStart != yEnd)
+		{
+			for (int i = yStart; i < yEnd; i++)
+			{
+				Node<int> *cell = m_grid->getCell(xStart, i);
+
+				while (cell != NULL)
+				{
+					if (cell->data() != entityID)
+					{
+						CollisionComponent *comp = getCollisionComponent(cell->data());
+
+						if (comp)
+						{
+							if (handleCollision(line, comp->shape()))
+							{
+								if (comp->isSolid())
+								{
+									collision = true;
+								}
+							}
+						}
+					}
+
+					cell = cell->m_next;
+				}
+			}
+		}
+		else if (yStart == yEnd && xStart != xEnd)
+		{
+			for (int i = xStart; i < xEnd; i++)
+			{
+				Node<int> *cell = m_grid->getCell(i, yStart);
+
+				while (cell != NULL)
+				{
+					if (cell->data() != entityID)
+					{
+						CollisionComponent *comp = getCollisionComponent(cell->data());
+
+						if (comp)
+						{
+							if (handleCollision(line, comp->shape()))
+							{
+								if (comp->isSolid())
+								{
+									collision = true;
+								}
+							}
+						}
+					}
+
+					cell = cell->m_next;
+				}
+			}
+		}
+		else
+		{
+			Node<int> *cell = m_grid->getCell(xStart, yStart);
+
+			while (cell != NULL)
+			{
+				if (cell->data() != entityID)
+				{
+					CollisionComponent *comp = getCollisionComponent(cell->data());
+
+					if (comp)
+					{
+						if (handleCollision(line, comp->shape()))
+						{
+							if (comp->isSolid())
+							{
+								collision = true;
+							}
+						}
+					}
+				}
+
+				cell = cell->m_next;
+			}
+		}
+	}
+	else
+	{
+		for (int i = xStart; i < xEnd; i++)
+		{
+			if (0 <= i && i < m_grid->columnCount())
+			{
+				for (int j = yStart; j < yEnd; j++)
+				{
+					if (0 <= j && j < m_grid->rowCount())
+					{
+						Node<int> *cell = m_grid->getCell(i, j);
+
+						while (cell != NULL)
+						{
+							if (cell->data() != entityID)
+							{
+								CollisionComponent *comp = getCollisionComponent(cell->data());
+
+								if (comp)
+								{
+									if (handleCollision(line, comp->shape()))
+									{
+										if (comp->isSolid())
+										{
+											collision = true;
+										}
+									}
+								}
+							}
+
+							cell = cell->m_next;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return collision;
+}
+
 bool CollisionSystem::circleCollision(int ID, int radius)
 {
 	bool isColliding = false;
@@ -527,12 +693,12 @@ bool CollisionSystem::circleCollision(int ID, int radius)
 
 	if (collision)
 	{
-		pCircle circle = new Shape::Circle(collision->center().getX(), collision->center().getY(), radius);
+		Shape::Circle circle(collision->center().getX(), collision->center().getY(), radius);
 
 		// Find the farthest point away
-		float radius = (float)circle->radius();
+		float radius = (float)circle.radius();
 
-		Vector2D center = circle->center();
+		Vector2D center = circle.center();
 		Vector2D topPoint{ center.getX(), center.getY() - radius };
 		Vector2D bottomPoint{ center.getX(), center.getY() + radius };
 		Vector2D leftPoint{ center.getX() - radius, center.getY() };
@@ -597,14 +763,17 @@ bool CollisionSystem::circleCollision(int ID, int radius)
 						{
 							if(cell->data() != ID)
 							{
-								pShape shapeA = static_cast<pShape>(circle);
+								pShape shapeA = static_cast<pShape>(&circle);
 								CollisionComponent *componentB = getCollisionComponent(cell->data());
 
-								if(handleCollision(shapeA, componentB->shape()))
+								if (componentB)
 								{
-									isColliding = true;
+									if (handleCollision(shapeA, componentB->shape()))
+									{
+										isColliding = true;
 
-									sendCollisionMessage(ID, cell->data(), circle->center());
+										sendCollisionMessage(ID, cell->data(), circle.center());
+									}
 								}
 							}
 
@@ -618,9 +787,115 @@ bool CollisionSystem::circleCollision(int ID, int radius)
 			// We're unable to check any more, so exit the check.
 			else { break; }
 		}
+
 	}
 
 	return isColliding;
+}
+
+bool CollisionSystem::squareCollision(int ID, int centerX, int centerY, int width, int height)
+{
+	bool colliding = false;
+
+	// Find out what cells the rectangle is located in
+	Shape::Rectangle rect((float)centerX, (float)centerY, width, height);
+
+	Vector2D topLeft = rect.getTopLeft();
+	Vector2D topRight = rect.getTopRight();
+	Vector2D bottomLeft = rect.getBottomLeft();
+	Vector2D bottomRight = rect.getBottomRight();
+	Vector2D center = rect.center();
+
+	// Convert the points to cells
+	topLeft = m_grid->convertToCellCoordinates(topLeft);
+	topRight = m_grid->convertToCellCoordinates(topRight);
+	bottomLeft = m_grid->convertToCellCoordinates(bottomLeft);
+	bottomRight = m_grid->convertToCellCoordinates(bottomRight);
+	center = m_grid->convertToCellCoordinates(center);
+
+	Vector2D topLeftDist = absoluteValue(topLeft - center);
+	Vector2D topRightDist = absoluteValue(topRight - center);
+	Vector2D bottomLeftDist = absoluteValue(bottomLeft - center);
+	Vector2D bottomRightDist = absoluteValue(bottomRight - center);
+
+	// Find the one with the greatest X distance
+	float tempX = topLeftDist.getX();
+
+	if (tempX < topRightDist.getX()) { tempX = topRightDist.getX(); }
+	if (tempX < bottomLeftDist.getX()) { tempX = bottomLeftDist.getX(); }
+	if (tempX < bottomRightDist.getX()) { tempX = bottomRightDist.getX(); }
+
+	float tempY = topLeftDist.getY();
+
+	if (tempY < topRightDist.getY()) { tempY = topRightDist.getY(); }
+	if (tempY < bottomLeftDist.getY()) { tempY = bottomLeftDist.getY(); }
+	if (tempY < bottomRightDist.getY()) { tempY = bottomRightDist.getY(); }
+
+	if (tempX <= 0) { tempX = 1; }
+	if (tempY <= 0) { tempY = 1; }
+
+	int distanceX = (int)round(tempX);
+	int distanceY = (int)round(tempY);
+
+	int totalXDistance = distanceX * 2;
+	int totalYDistance = distanceY * 2;
+
+	// Find the starting grid space
+	int startingX = (int)round(center.getX() - tempX);
+	int startingY = (int)round(center.getY() - tempY);
+
+	// If starting position is off the grid, fix everything
+	if (startingX < 0)
+	{
+		totalXDistance -= startingX;
+		startingX = 0;
+	}
+	if (startingY < 0)
+	{
+		totalYDistance -= startingY;
+		startingY = 0;
+	}
+
+	for (int y = startingY; y < totalYDistance; y++)
+	{
+		if (y < m_grid->rowCount())
+		{
+			for (int x = startingX; x < totalXDistance; x++)
+			{
+				if (x < m_grid->columnCount())
+				{
+					Node<int> *cell = m_grid->getCell(x, y);
+
+					while (cell != NULL)
+					{
+						if (cell->data() != ID)
+						{
+							pShape shapeA = static_cast<pShape>(&rect);
+							CollisionComponent *componentB = getCollisionComponent(cell->data());
+
+							if (componentB)
+							{
+								if (handleCollision(shapeA, componentB->shape()))
+								{
+									colliding = true;
+
+									sendCollisionMessage(ID, cell->data(), Vector2D((float)centerX, (float)centerY));
+								}
+							}
+						}
+
+						cell = cell->m_next;
+					}
+				}
+				// We can't check anymore X, so break.
+				else { break; }
+			}
+		}
+		// We're unable to check any more, so exit the check.
+		else { break; }
+	}
+
+	return colliding;
 }
 
 CollisionComponent* CollisionSystem::getCollisionComponent(int ID)
@@ -693,7 +968,7 @@ CollisionComponent* CollisionSystem::createCollisionComponent(
 	return component;
 }
 
-void CollisionSystem::updatePosition(int ID, int movedX, int movedY)
+void CollisionSystem::updatePosition(int ID, float movedX, float movedY)
 {
 	CollisionComponent *component = getCollisionComponent(ID);
 	
@@ -707,10 +982,32 @@ void CollisionSystem::updatePosition(int ID, int movedX, int movedY)
 		int oldY = (int)(round(shapeCenter.getY()));
 
 		// Move its location on the grid
-		m_grid->move(ID, oldX, oldY, movedX, movedY);
+		m_grid->move(ID, oldX, oldY, (int)round(movedX), (int)round(movedY));
 
 		// Actually move it
-		shape->setCenter((float)movedX, (float)movedY);
+		shape->setCenter(movedX, movedY);
+	}
+}
+
+//=============================================================================
+// Function: void processMessage(IMessage*)
+// Description:
+// Processes the messages passed to it.
+// Parameters:
+// IMessage *message - The message to process.
+//=============================================================================
+void CollisionSystem::processMessage(IMessage *message)
+{
+	switch(message->type())
+	{
+	case IMessage::ENTITY_DESTROY:
+	{
+		EntityDestroyMessage *destroy = static_cast<EntityDestroyMessage*>(message);
+
+		removeCollisionComponent(destroy->m_entityID);
+
+		break;
+	}
 	}
 }
 
@@ -729,20 +1026,26 @@ bool CollisionSystem::collisionInCell(int ID, int x, int y)
 			CollisionComponent *a = getCollisionComponent(ID);
 			CollisionComponent *b = getCollisionComponent(node->data());
 
-			if (handleCollision(a->shape(), b->shape()) == true)
+			if (b)
 			{
-				//Get the center point
-				Vector2D centerPoint(a->center());
-
-				// TODO: Limit message sending. Don't send for every collision.
-				sendCollisionMessage(ID, node->data(), centerPoint);
-
-				if (b->isSolid())
+				if (handleCollision(a->shape(), b->shape()) == true)
 				{
-					collision = true;
-				}
+					//Get the center point
+					Vector2D centerPoint(a->center());
 
-				return collision;
+					// TODO: Limit message sending. Don't send for every collision.
+					sendCollisionMessage(ID, node->data(), centerPoint);
+
+					if (b->isSolid())
+					{
+						collision = true;
+						return collision;
+					}
+				}
+			}
+			else
+			{
+				collision = false;
 			}
 		}
 
@@ -927,20 +1230,19 @@ bool CollisionSystem::rectInsideRect(pRectangle a, pRectangle b)
 		Vector2D bTopLeft = b->getTopLeft();
 		Vector2D bBottomRight = b->getBottomRight();
 
-		if(bBottomRight.getX() < aTopLeft.getX())
+		if(bBottomRight.getX() <= aTopLeft.getX())
 		{
 			inside = false;
 		}
-		else if(aBottomRight.getX() < bTopLeft.getX())
+		else if(aBottomRight.getX() <= bTopLeft.getX())
 		{
 			inside = false;
 		}
-
-		if(bBottomRight.getY() < aTopLeft.getY())
+		else if(bBottomRight.getY() <= aTopLeft.getY())
 		{
 			inside = false;
 		}
-		else if(aBottomRight.getY() < bTopLeft.getY())
+		else if(aBottomRight.getY() <= bTopLeft.getY())
 		{
 			inside = false;
 		}
@@ -1121,9 +1423,9 @@ bool CollisionSystem::lineInsideCircle(Line line, pCircle circle)
 		int circleY = (int)round(circle->center().getY());
 		int radius = (int)round(circle->radius());
 
-		double Dx = (Bx - Ax) / totalDist;
-		double Dy = (By - Ay) / totalDist;
-		double t = Dx * (circleX - Ax) + Dy * (circleY - Ay);
+		double Dx = ((double)Bx - (double)Ax) / totalDist;
+		double Dy = ((double)By - (double)Ay) / totalDist;
+		double t = Dx * ((double)circleX - (double)Ax) + Dy * ((double)circleY - (double)Ay);
 
 		double Ex = t * Dx + Ax;
 		double Ey = t * Dy + Ay;
@@ -1191,6 +1493,29 @@ void CollisionSystem::sendCollisionMessage(int entityID, int collidingEntityID, 
 	CollisionMessage *message = new CollisionMessage(entityID, collidingEntityID, position);
 
 	MessageSystem::instance()->pushMessage(message);
+}
+
+//=============================================================================
+// Function: void removeCollisionComponent(int)
+// Description:
+// Finds and deletes the collision component related to the ID.
+// Parameters:
+// int entityID - The id of the component to delete.
+//=============================================================================
+void CollisionSystem::removeCollisionComponent(int entityID)
+{
+	auto mit = m_components.find(entityID);
+
+	if(mit != m_components.end())
+	{
+		int gridX = (int)round(mit->second->center().getX());
+		int gridY = (int)round(mit->second->center().getY());
+		
+		m_grid->remove(mit->first, gridX, gridY);
+
+		delete mit->second;
+		mit = m_components.erase(mit);
+	}
 }
 
 void CollisionSystem::cleanup()

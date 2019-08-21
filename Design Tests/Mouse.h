@@ -30,6 +30,9 @@ namespace Input
 		void setY(float y) { m_position.setY(y); }
 		void setY(int y) { m_position.setY((float)(y)); }
 
+		float getX() { return m_position.getX(); }
+		float getY() { return m_position.getY(); }
+
 	private:
 		Vector2D m_position;
 		std::unordered_map<Button, bool>m_buttons;

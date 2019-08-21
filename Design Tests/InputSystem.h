@@ -13,45 +13,43 @@
 #include "InputDevice.h"
 #include "InputComponent.h"
 
-namespace Input
+class InputSystem
 {
-	class InputSystem
+public:
+	static InputSystem* instance()
 	{
-	public:
-		static InputSystem* instance()
-		{
-			static InputSystem *instance = new InputSystem();
+		static InputSystem *instance = new InputSystem();
 
-			return instance;
-		}
+		return instance;
+	}
 
-		~InputSystem();
+	~InputSystem();
 
-		void processInput(SDL_Event &e);
+	void processInput(SDL_Event &e);
 
-		bool exit() { return m_exit; }
+	bool exit() { return m_exit; }
 
-		InputComponent* createInputComponent(int ID);
-		InputComponent* getInputComponent(int ID);
+	InputComponent* createInputComponent(int ID);
+	InputComponent* getInputComponent(int ID);
 
-		InputDevice* getDevice(int ID);
-		InputDevice* getNextFreeDevice();
+	InputDevice* getDevice(int ID);
+	InputDevice* getNextFreeDevice();
 
-	private:
-		InputSystem();
+private:
+	InputSystem();
 
-		bool m_exit;
-		const int m_DEVICE_INDEX = 2;
-		const int m_MOUSE_ID = 0;
-		const int m_KEYBOARD_ID = 1;
+	bool m_exit;
+	const int m_DEVICE_INDEX = 2;
+	const int m_MOUSE_ID = 0;
+	const int m_KEYBOARD_ID = 1;
 
-		std::unordered_map<int, InputDevice*>m_devices;
-		std::map<int, InputComponent*>m_components;
+	std::unordered_map<int, InputDevice*>m_devices;
+	std::map<int, InputComponent*>m_components;
 
-		void initializeDevices();
-		void addDevice(int deviceID, InputDevice *device);
-		void closeDevice(int deviceID);
-		bool deviceExists(int deviceID);	
-	};
-}
+	void initializeDevices();
+	void addDevice(int deviceID, InputDevice *device);
+	void closeDevice(int deviceID);
+	bool deviceExists(int deviceID);	
+};
+
 

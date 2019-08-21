@@ -1,0 +1,102 @@
+TileCount 15
+
+TypeCount 0
+Type0_Name Floor
+Type0_Count 11
+Type0_0_X 0
+Type0_0_Y 0
+Type0_0_Width 32
+Type0_0_Height 32
+Type0_0_Solid 0
+
+Type0_1_X 32
+Type0_1_Y 0
+Type0_1_Width 32
+Type0_1_Height 32
+Type0_1_Solid 0
+
+Type0_2_X 64
+Type0_2_Y 0
+Type0_2_Width 32
+Type0_2_Height 32
+Type0_2_Solid 0
+
+Type0_3_X 96
+Type0_3_Y 0
+Type0_3_Width 32
+Type0_3_Height 32
+Type0_3_Solid 0
+
+Type0_4_X 128
+Type0_4_Y 0
+Type0_4_Height 32
+Type0_4_Width 32
+Type0_4_Solid 0
+
+Type0_5_X 160
+Type0_5_Y 0
+Type0_5_Height 32
+Type0_5_Width 32
+Type0_5_Solid 0
+
+Type0_6_X 192
+Type0_6_Y 0
+Type0_6_Height 32
+Type0_6_Width 32
+Type0_6_Solid 0
+
+Type0_7_X 224
+Type0_7_Y 0
+Type0_7_Height 32
+Type0_7_Width 32
+Type0_7_Solid 0
+
+Type0_8_X 256
+Type0_8_Y 0
+Type0_8_Height 32
+Type0_8_Width 32
+Type0_8_Solid 0
+
+Type0_9_X 288
+Type0_9_Y 0
+Type0_9_Height 32
+Type0_9_Width 32
+Type0_9_Solid 0
+
+Type0_10_X 0
+Type0_10_Y 32
+Type0_10_Height 32
+Type0_10_Width 32
+Type0_10_Solid 0
+
+Type1_Name Wall_Down
+Type1_Count 1
+Type1_0_X 32
+Type1_0_Y 32
+Type1_0_Height 32
+Type1_0_Width 32
+Type1_0_Solid 0
+
+Type2_Name Wall_Right
+Type2_Count 1
+Type2_0_X 64
+Type2_0_Y 32
+Type2_0_Height 32
+Type2_0_Width 32
+Type2_0_Solid 0
+
+Type3_Name Wall_Left
+Type3_Count 1
+Type3_0_X 96
+Type3_0_Y 32
+Type3_0_Height 32
+Type3_0_Width 32
+Type3_0_Solid 0
+
+Type4_Name Wall_Up
+Type4_Count 1
+Type4_0_X 128
+Type4_0_Y 32
+Type4_0_Height 32
+Type4_0_Width 32
+Type4_0_Solid 0

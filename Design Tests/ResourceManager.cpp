@@ -4,10 +4,12 @@
 
 ResourceManager::~ResourceManager()
 {
+	delete m_fontCache;
 	delete m_textureCache;
 	delete m_renderer;
 	delete m_window;
 
+	m_fontCache = NULL;
 	m_textureCache = NULL;
 	m_renderer = NULL;
 	m_window = NULL;
@@ -21,6 +23,36 @@ Texture* ResourceManager::getTexture(Key key)
 	}
 
 	return m_textureCache->getTexture(key);
+}
+
+Texture* ResourceManager::getTextTexture(string text,
+	Font *font,
+	SDL_Color color,
+	Uint32 *wrapLength)
+{
+	Texture *texture = NULL;
+
+	if(m_fontCache)
+	{
+		texture = m_fontCache->getTextTexture(text, font, color, wrapLength);
+	}
+
+	return texture;
+}
+
+Font* ResourceManager::getFont(string fontPath,
+	int pointSize,
+	Font::FontFlags flag,
+	bool italics)
+{
+	Font *font = NULL;
+
+	if(m_fontCache)
+	{
+		font = m_fontCache->getFont(fontPath, pointSize, flag, italics);
+	}
+
+	return font;
 }
 
 bool ResourceManager::windowInitialized()
@@ -60,6 +92,11 @@ void ResourceManager::initRenderer(bool vSyncEnabled)
 		if(!m_textureCache)
 		{
 			m_textureCache = new TextureCache(m_window, m_renderer);
+		}
+
+		if(!m_fontCache)
+		{
+			m_fontCache = new FontCache(m_renderer);
 		}
 	}
 }

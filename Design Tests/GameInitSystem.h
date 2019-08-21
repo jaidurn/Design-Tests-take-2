@@ -24,7 +24,7 @@ public:
 		return instance;
 	}
 
-	void initialize(std::string settingsFile);
+	bool initialize(std::string settingsFile);
 
 private:
 	GameInitSystem()

@@ -1,8 +1,8 @@
 #include "EnemyLogicComponent.h"
 #include "EnemyTargetState.h"
 
-EnemyLogicComponent::EnemyLogicComponent()
-	:LogicComponent(LOGIC_ENEMY), m_currentState(NULL), m_currentStateName(""), m_currentTarget(-1), m_behavior(EnemyState::BEHAVIOR_AGGRESSIVE)
+EnemyLogicComponent::EnemyLogicComponent(int entityID)
+	:LogicComponent(LOGIC_ENEMY, entityID), m_currentState(NULL), m_currentStateName(""), m_currentTarget(-1), m_behavior(EnemyState::BEHAVIOR_NORMAL)
 {
 
 }
@@ -169,6 +169,8 @@ void EnemyLogicComponent::update()
 
 			if (current->canExit())
 			{
+				current->exit();
+
 				while (!stateEntered && (unsigned int)it < m_statesByValue.size())
 				{
 					name = m_statesByValue[it];
@@ -185,18 +187,10 @@ void EnemyLogicComponent::update()
 
 				if (stateEntered)
 				{
-					if (m_currentStateName != name)
-					{
-						if (m_currentState)
-						{
-							m_currentState->exit();
-						}
+					enemy->enter();
 
-						enemy->enter();
-
-						m_currentStateName = name;
-						m_currentState = state;
-					}
+					m_currentStateName = name;
+					m_currentState = state;
 
 					m_currentState->update();
 
@@ -204,6 +198,11 @@ void EnemyLogicComponent::update()
 					{
 						m_currentTarget = static_cast<EnemyTargetState*>(m_currentState)->currentTarget();
 					}
+				}
+				else
+				{
+					m_currentStateName = "";
+					m_currentState = NULL;
 				}
 			}
 			else
@@ -249,6 +248,24 @@ void EnemyLogicComponent::update()
 					m_currentTarget = static_cast<EnemyTargetState*>(m_currentState)->currentTarget();
 				}
 			}
+		}
+	}
+}
+
+//=============================================================================
+// Function: void processMessage(IMessage *message)
+// Description:
+// Processes system messages passed in.
+// Parameters:
+// IMessage *message - The message to process.
+//=============================================================================
+void EnemyLogicComponent::processMessage(IMessage *message)
+{
+	if (message)
+	{
+		if(m_currentState)
+		{
+			m_currentState->processMessage(message);
 		}
 	}
 }

@@ -10,31 +10,34 @@
 #include "InputDevice.h"
 #include <vector>
 
-namespace Input
+class InputComponent : public Component
 {
-	class InputComponent : public Component
-	{
-	public:
-		InputComponent();
-		~InputComponent();
+public:
+	InputComponent();
+	~InputComponent();
 
-		int numberOfDevices();
+	int numberOfDevices();
 
-		InputDevice *getDevice(int deviceNumber);
-		InputDevice::DEVICE_TYPE getDeviceType(int deviceNumber);
+	InputDevice *getDevice(int deviceNumber);
+	InputDevice::DEVICE_TYPE getDeviceType(int deviceNumber);
 
-		void addDevice(InputDevice *device);
+	void addDevice(InputDevice *device);
 
-		bool buttonPressed(Button button);
+	bool buttonPressed(InputDevice::Button button);
 
-		float xAxis();
-		float yAxis();
-		float axisAngle();
+	float xLeftAxis();
+	float yLeftAxis();
 
-	private:
-		std::vector<InputDevice*> m_devices;
+	float xRightAxis();
+	float yRightAxis();
 
-		void freeDevices();
-	};
-}
+	float leftAxisAngle();
+	float rightAxisAngle();
+
+private:
+	std::vector<InputDevice*> m_devices;
+
+	void freeDevices();
+};
+
 

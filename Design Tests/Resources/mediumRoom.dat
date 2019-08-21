@@ -1,0 +1,14 @@
+Width 384
+Height 384
+Map Resources/mediumRoom.map
+
+DoorCount 4
+
+Door0_x 192
+Door0_y 384
+Door1_x 0
+Door1_y 192
+Door2_x 192
+Door2_y 0
+Door3_x 384
+Door3_y 192

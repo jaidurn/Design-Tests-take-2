@@ -1,6 +1,7 @@
 #include "EntitySystem.h"
 #include "RenderSystem.h"
 #include "PhysicsSystem.h"
+#include "EntityDestroyMessage.h"
 
 EntitySystem::~EntitySystem()
 {
@@ -36,12 +37,12 @@ void EntitySystem::initialize(std::string entityDataPath)
 // Description:
 // Creates a new entity based on the information in the entity data.
 // Parameters:
-// entityKey entityName - The data ID of the entity to load.
+// entityKey key - The data ID of the entity to load.
 // Output:
 // int - The id of the entity that was created. 
 // Returns -1 on failure.
 //=============================================================================
-int EntitySystem::createEntity(entityKey entityName)
+int EntitySystem::createEntity(entityKey key)
 {
 	if (m_initialized)
 	{
@@ -51,7 +52,7 @@ int EntitySystem::createEntity(entityKey entityName)
 			m_settingsManager.close();
 		}
 
-		auto mit = m_entityData.find(entityName);
+		auto mit = m_entityData.find(key);
 
 		if (mit != m_entityData.end())
 		{
@@ -74,11 +75,7 @@ int EntitySystem::createEntity(entityKey entityName)
 				loadComponents(entityID, Vector2D(0,0));
 
 				m_entityList[entityID] = true;
-
-				if (entityAttack(entityID) == NULL)
-				{
-					loadAttackInfo(entityID);
-				}
+				m_entityKeys.insert(std::make_pair(entityID, key));
 
 				return entityID;
 			}
@@ -93,13 +90,13 @@ int EntitySystem::createEntity(entityKey entityName)
 // Description:
 // Creates a new entity based on the information in the entity data.
 // Parameters:
-// entityKey entityName - The data ID of the entity to load.
+// entityKey key - The data ID of the entity to load.
 // Vector2D position - The position of the entity.
 // Output:
 // int - The id of the entity that was created. 
 // Returns -1 on failure.
 //=============================================================================
-int EntitySystem::createEntity(entityKey entityName, Vector2D position)
+int EntitySystem::createEntity(entityKey key, Vector2D position)
 {
 	if (m_initialized)
 	{
@@ -109,7 +106,7 @@ int EntitySystem::createEntity(entityKey entityName, Vector2D position)
 			m_settingsManager.close();
 		}
 
-		auto mit = m_entityData.find(entityName);
+		auto mit = m_entityData.find(key);
 
 		if (mit != m_entityData.end())
 		{
@@ -132,11 +129,7 @@ int EntitySystem::createEntity(entityKey entityName, Vector2D position)
 				loadComponents(entityID, position);
 
 				m_entityList[entityID] = true;
-
-				if (entityAttack(entityID) == NULL)
-				{
-					loadAttackInfo(entityID);
-				}
+				m_entityKeys.insert(std::make_pair(entityID, key));
 
 				return entityID;
 			}
@@ -144,6 +137,29 @@ int EntitySystem::createEntity(entityKey entityName, Vector2D position)
 	}
 
 	return -1;
+}
+
+//=============================================================================
+// Function: entityKey getEntityKey(int entityID)
+// Description:
+// Finds and gets the entity key for the entity ID.
+// Parameters:
+// int entityID - The entity to get the entityKey for.
+// Output:
+// entityKey - Returns the entityKey related to the entityID.
+//=============================================================================
+entityKey EntitySystem::getEntityKey(int entityID)
+{
+	entityKey key = -1;
+
+	auto mit = m_entityKeys.find(entityID);
+
+	if(mit != m_entityKeys.end())
+	{
+		key = mit->second;
+	}
+
+	return key;
 }
 
 //=============================================================================
@@ -174,32 +190,49 @@ std::string EntitySystem::entityType(int entityID)
 }
 
 //=============================================================================
-// Function: AttackInfo* entityAttack(int)
+// Function: AttackInfo* entityAttack(entityKey)
 // Description:
 // Gets the attack information for the specific entity.
 // Parameters:
-// int entityID - The entity to get attack information for.
+// entityKey key - The key of the entity to get attack info for.
 // Output:
 // AttackInfo* - The attack information retrieved.
 // Returns NULL if there is no attack information for the entity.
 //=============================================================================
-AttackInfo* EntitySystem::entityAttack(int entityID)
+AttackInfo* EntitySystem::entityAttack(entityKey key)
 {
 	AttackInfo *attack = NULL;
 
-	std::string type = entityType(entityID);
+	auto mit = m_entityAttacks.find(key);
 
-	if(type != "")
+	if(mit != m_entityAttacks.end())
 	{
-		auto mit = m_entityAttacks.find(type);
-
-		if(mit != m_entityAttacks.end())
-		{
-			attack = mit->second;
-		}
+		attack = mit->second;
 	}
-
+	
 	return attack;
+}
+
+//=============================================================================
+// Function: void processMessage(IMessage*)
+// Description:
+// Processes messages passed to it.
+// Parameters:
+// IMessage *message - The message to process.
+//=============================================================================
+void EntitySystem::processMessage(IMessage *message)
+{
+	switch(message->type())
+	{
+	case IMessage::ENTITY_DESTROY:
+	{
+		EntityDestroyMessage *destroy = static_cast<EntityDestroyMessage*>(message);
+
+		deleteEntity(destroy->m_entityID);
+
+		break;
+	}
+	}
 }
 
 //=============================================================================
@@ -212,22 +245,38 @@ AttackInfo* EntitySystem::entityAttack(int entityID)
 //=============================================================================
 int EntitySystem::findNextAvailableID()
 {
-	auto mit = m_entityList.begin();
-	int ID = 0;
-	bool idFound = false;
+	int ID = -1;
 
-	while (mit != m_entityList.end() && !idFound)
+	auto mit = std::next(m_entityList.begin(), m_currentEntityID);
+
+	while(mit != m_entityList.end())
 	{
-		if (mit->second == false)
+		m_currentEntityID++;
+
+		if(mit->second == false)
 		{
-			idFound = true;
-		}
-		else
-		{
-			ID++;
+			ID = mit->first;
+			break;
 		}
 
 		mit++;
+	}
+
+	if(mit == m_entityList.end())
+	{
+		if(m_currentEntityID == 0)
+		{
+			m_entityList.insert(std::make_pair(m_currentEntityID, true));
+			ID = m_currentEntityID;
+
+			m_currentEntityID++;
+		}
+		else
+		{
+			m_entityList.insert(std::make_pair((m_currentEntityID + 1), true));
+			m_currentEntityID += 1;
+			ID = m_currentEntityID;
+		}
 	}
 
 	return ID;
@@ -260,7 +309,11 @@ void EntitySystem::loadPhysicsComponents(int entityID, Vector2D position)
 	if(m_settingsManager.isOpen())
 	{
 		PhysicsSystem *phys = PhysicsSystem::instance();
-		VelocityComponent *vel = phys->getVelocityComponent(entityID);
+
+		if(m_settingsManager.settingExists("VelocityComponent"))
+		{
+			VelocityComponent *vel = phys->getVelocityComponent(entityID);
+		}
 
 		if (m_settingsManager.settingExists("CollisionComponent"))
 		{
@@ -282,12 +335,10 @@ void EntitySystem::loadPhysicsComponents(int entityID, Vector2D position)
 				}
 			}
 
-			CollisionComponent *collision = phys->createCollisionComponent(entityID, shape, 0, 0);
+			CollisionComponent *collision = phys->createCollisionComponent(entityID, shape, (int)position.getX(), (int)position.getY());
 
 			if (collision)
 			{
-				collision->setCenter(position);
-
 				// Setup the shape information
 				if (shape == Shape::RECTANGLE)
 				{
@@ -353,12 +404,10 @@ void EntitySystem::loadRenderComponents(int entityID, Vector2D position)
 
 		if(texturePath != "")
 		{
-			SpriteComponent *sprite = render->createSprite(entityID, texturePath);
+			SpriteComponent *sprite = render->createSprite(entityID, texturePath, position);
 
 			if (sprite)
 			{
-				sprite->setPosition(position);
-
 				if (m_settingsManager.settingExists("SpriteAnchorX") &&
 					m_settingsManager.settingExists("SpriteAnchorY"))
 				{
@@ -410,6 +459,7 @@ void EntitySystem::loadRenderComponents(int entityID, Vector2D position)
 									std::string s_frames = m_settingsManager.loadSetting(name + "_Frames");
 									std::string s_loop = m_settingsManager.loadSetting(name + "_Loop");
 									std::string s_speed = m_settingsManager.loadSetting(name + "_Speed");
+									std::string s_directionCount = m_settingsManager.loadSetting(name + "_DirectionCount");
 
 									if (s_width != "" && s_height != "" && s_frames != "")
 									{
@@ -439,6 +489,11 @@ void EntitySystem::loadRenderComponents(int entityID, Vector2D position)
 										if(s_startY != "")
 										{
 											currentY = stoi(s_startY);
+										}
+
+										if(s_directionCount != "")
+										{
+											directionCount = std::stoi(s_directionCount);
 										}
 
 										int width = stoi(s_width);
@@ -499,98 +554,113 @@ void EntitySystem::loadRenderComponents(int entityID, Vector2D position)
 					}
 				}
 			}
+			else
+			{
+				std::cout << "Error creating sprite!\n";
+			}
 		}
 	}
 }
 
 //=============================================================================
-// Function: void loadAttackInfo(int)
+// Function: void loadAttackInfo(entityKey)
 // Description:
 // Loads the information about an attack for an entity type.
 // Parameters:
-// int entityID - The entity to create the attack information for.
+// entityKey key - The entity key to create the attack information for.
 //=============================================================================
-void EntitySystem::loadAttackInfo(int entityID)
+void EntitySystem::loadAttackInfo(entityKey key)
 {
-	std::string type = entityType(entityID);
+	m_settingsManager.close();
 
-	if(type != "")
+	std::string entityData = "";
+
+	auto mit = m_entityData.find(key);
+
+	if(mit != m_entityData.end())
 	{
-		if(m_settingsManager.isOpen())
+		entityData = mit->second;
+	}
+
+	if(entityData != "")
+	{
+		m_settingsManager.open(entityData, SettingIO::READ);
+	}
+
+	if (m_settingsManager.isOpen())
+	{
+		std::string s_count = m_settingsManager.loadSetting("Attack_Count");
+
+		if (s_count != "")
 		{
-			std::string s_count = m_settingsManager.loadSetting("Attack_Count");
+			int count = stoi(s_count);
 
-			if(s_count != "")
+			for (int i = 0; i < count; i++)
 			{
-				int count = stoi(s_count);
+				std::string name = m_settingsManager.loadSetting("Attack_" + std::to_string(i));
 
-				for(int i = 0; i < count; i++)
+				if (name != "")
 				{
-					std::string name = m_settingsManager.loadSetting("Attack_" + std::to_string(i));
+					std::string s_range = m_settingsManager.loadSetting(name + "_Range");
+					std::string s_knockback = m_settingsManager.loadSetting(name + "_Knockback");
+					std::string s_maskCount = m_settingsManager.loadSetting(name + "_Mask_Count");
 
-					if(name != "")
+					if (s_maskCount != "")
 					{
-						std::string s_range = m_settingsManager.loadSetting(name + "_Range");
-						std::string s_knockback = m_settingsManager.loadSetting(name + "_Knockback");
-						std::string s_maskCount = m_settingsManager.loadSetting(name + "_Mask_Count");
+						int range = stoi(s_range);
+						float knockback = stof(s_knockback);
+						int maskCount = stoi(s_maskCount);
 
-						if(s_maskCount != "")
+						AttackInfo *attack = new AttackInfo(knockback, range, maskCount);
+
+						for (int j = 0; j < maskCount; j++)
 						{
-							int range = stoi(s_range);
-							float knockback = stof(s_knockback);
-							int maskCount = stoi(s_maskCount);
+							std::string currentMask = name + "_Mask" + std::to_string(j);
+							std::string s_maskLength = m_settingsManager.loadSetting(currentMask + "_Length");
 
-							AttackInfo *attack = new AttackInfo(knockback, range, maskCount);
-
-							for(int j = 0; j < maskCount; j++)
+							if (s_maskLength != "")
 							{
-								std::string currentMask = name + "_Mask" + std::to_string(j);
-								std::string s_maskLength = m_settingsManager.loadSetting(currentMask + "_Length");
+								int maskLength = stoi(s_maskLength);
 
-								if (s_maskLength != "")
+								for (int k = 0; k < maskLength; k++)
 								{
-									int maskLength = stoi(s_maskLength);
+									std::string workingMaskFrame = currentMask + "_" + std::to_string(k);
+									std::string s_x = m_settingsManager.loadSetting(workingMaskFrame + "_X");
+									std::string s_y = m_settingsManager.loadSetting(workingMaskFrame + "_Y");
+									std::string s_width = m_settingsManager.loadSetting(workingMaskFrame + "_Width");
+									std::string s_height = m_settingsManager.loadSetting(workingMaskFrame + "_Height");
 
-									for (int k = 0; k < maskLength; k++)
+									int x = 0;
+									int y = 0;
+									int width = 0;
+									int height = 0;
+
+									if (s_x != "")
 									{
-										std::string workingMaskFrame = currentMask + "_" + std::to_string(k);
-										std::string s_x = m_settingsManager.loadSetting(workingMaskFrame + "_X");
-										std::string s_y = m_settingsManager.loadSetting(workingMaskFrame + "_Y");
-										std::string s_width = m_settingsManager.loadSetting(workingMaskFrame + "_Width");
-										std::string s_height = m_settingsManager.loadSetting(workingMaskFrame + "_Height");
-
-										int x = 0;
-										int y = 0;
-										int width = 0;
-										int height = 0;
-
-										if(s_x != "")
-										{
-											x = stoi(s_x);
-										}
-
-										if(s_y != "")
-										{
-											y = stoi(s_y);
-										}
-
-										if(s_width != "")
-										{
-											width = stoi(s_width);
-										}
-
-										if(s_height != "")
-										{
-											height = stoi(s_height);
-										}
-
-										attack->addCollisionBox(j, Vector2D((float)x, (float)y), width, height);
+										x = stoi(s_x);
 									}
+
+									if (s_y != "")
+									{
+										y = stoi(s_y);
+									}
+
+									if (s_width != "")
+									{
+										width = stoi(s_width);
+									}
+
+									if (s_height != "")
+									{
+										height = stoi(s_height);
+									}
+
+									attack->addCollisionBox(j, Vector2D((float)x, (float)y), width, height);
 								}
 							}
-
-							m_entityAttacks.insert(std::make_pair(entityType(entityID), attack));
 						}
+
+						m_entityAttacks.insert(std::make_pair(key, attack));
 					}
 				}
 			}
@@ -605,19 +675,70 @@ void EntitySystem::loadAttackInfo(int entityID)
 //=============================================================================
 void EntitySystem::loadEntityData()
 {
-	entityKey key = "";
+	entityKey key = -1;
 	std::string entityData = "";
 	int entityCount = m_settingsManager.settingCount();
 
 	for(int i = 0; i < entityCount; i++)
 	{
-		key = std::to_string(i);
+		key = i;
 
-		entityData = m_settingsManager.loadSetting(key);
+		entityData = m_settingsManager.loadSetting(std::to_string(key));
 		
 		if(entityData != "")
 		{
 			m_entityData.insert(std::make_pair(key, entityData));
 		}
+	}
+
+	auto mit = m_entityData.begin();
+
+	while(mit != m_entityData.end())
+	{
+		loadAttackInfo(mit->first);
+		mit++;
+	}
+}
+
+//=============================================================================
+// Function: void deleteEntity(int)
+// Description:
+// Deletes the entity related to the ID.
+// Parameters:
+// int entityID - The entity to destroy.
+//=============================================================================
+void EntitySystem::deleteEntity(int entityID)
+{
+	auto mit = m_entityList.find(entityID);
+
+	//std::cout << "Deleting entity: " << entityID << std::endl;
+
+	if(mit != m_entityList.end())
+	{
+		mit->second = false;
+		
+		if(mit->first < m_currentEntityID)
+		{
+			m_currentEntityID = mit->first;
+		}
+	}
+
+	if(m_entityList.find(entityID)->second != false)
+	{
+		std::cout << "Failed to delete entity: " << entityID << std::endl;
+	}
+
+	auto typeMit = m_entityType.find(entityID);
+
+	if(typeMit != m_entityType.end())
+	{
+		typeMit = m_entityType.erase(typeMit);
+	}
+
+	auto keyMit = m_entityKeys.find(entityID);
+	
+	if(keyMit != m_entityKeys.end())
+	{
+		keyMit = m_entityKeys.erase(keyMit);
 	}
 }

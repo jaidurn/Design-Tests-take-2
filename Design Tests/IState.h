@@ -28,6 +28,11 @@ public:
 	virtual void enter() = 0;
 	virtual void update() = 0;
 	virtual void exit() = 0;
+
+	virtual void processMessage(IMessage *message)
+	{
+		// Use this to process collision events or other event types.
+	}
 	
 protected:
 	int m_entityID;
@@ -43,11 +48,6 @@ protected:
 	{
 		AnimationChangeMessage *animation = new AnimationChangeMessage(m_entityID, animationName, direction, frame);
 		MessageSystem::instance()->pushMessage(animation);
-	}
-
-	virtual void processMessage(IMessage *message)
-	{
-		// Use this to process collision events or other event types.
 	}
 };
 

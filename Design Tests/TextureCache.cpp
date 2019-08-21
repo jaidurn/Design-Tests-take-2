@@ -6,7 +6,6 @@
 #include <cassert>
 #include <iostream>
 #include <string>
-#include "SpriteParser.h"
 
 TextureCache::TextureCache(Window *window, Renderer *renderer)
 	:m_window(window), m_renderer(renderer)

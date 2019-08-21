@@ -9,6 +9,7 @@
 #include "Window.h"
 #include "Renderer.h"
 #include "TextureCache.h"
+#include "FontCache.h"
 
 class ResourceManager
 {
@@ -24,6 +25,9 @@ public:
 	~ResourceManager();
 
 	Texture* getTexture(Key key);
+	Texture* getTextTexture(string text, Font *font, SDL_Color color, Uint32 *wrapLength);
+
+	Font* getFont(string fontPath, int pointSize, Font::FontFlags flag, bool italics);
 
 	Renderer* renderer() { return m_renderer; }
 	Window* window() { return m_window; }
@@ -42,6 +46,7 @@ private:
 	Window *m_window;
 	Renderer *m_renderer;
 	TextureCache *m_textureCache;
+	FontCache *m_fontCache;
 
 };
 

@@ -1,0 +1,13 @@
+Width 320
+Height 320
+Map Resources/smallRoom.map
+
+DoorCount 4
+Door0_x 160
+Door0_y 320
+Door1_x 0
+Door1_y 160
+Door2_x 160
+Door2_y 0
+Door3_x 320
+Door3_y 160

@@ -3,6 +3,8 @@
 #include "Controller.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "InputMessage.h"
+#include "MessageSystem.h"
 
 using namespace Input;
 
@@ -48,7 +50,6 @@ InputSystem::~InputSystem()
 
 void InputSystem::processInput(SDL_Event &e)
 {
-
 	switch (e.type)
 	{
 	case SDL_CONTROLLERDEVICEREMOVED:
@@ -86,6 +87,14 @@ void InputSystem::processInput(SDL_Event &e)
 			InputDevice *device = getDevice(e.cbutton.which + m_DEVICE_INDEX);
 
 			device->pressButton(e.cbutton.button);
+
+			InputButtonMessage *button =
+				new InputButtonMessage(e.cbutton.which + m_DEVICE_INDEX,
+					device->type(), 
+					(Uint32)e.cbutton.button, 
+					true);
+
+			MessageSystem::instance()->pushMessage(button);
 		}
 
 		break;
@@ -97,6 +106,14 @@ void InputSystem::processInput(SDL_Event &e)
 			InputDevice *device = getDevice(e.cbutton.which + m_DEVICE_INDEX);
 
 			device->releaseButton(e.cbutton.button);
+
+			InputButtonMessage *button =
+				new InputButtonMessage(e.cbutton.which + m_DEVICE_INDEX,
+					device->type(), 
+					(Uint32)e.cbutton.button,
+					false);
+
+			MessageSystem::instance()->pushMessage(button);
 		}
 
 		break;
@@ -108,23 +125,127 @@ void InputSystem::processInput(SDL_Event &e)
 			if (deviceExists(e.caxis.which + m_DEVICE_INDEX))
 			{
 				InputDevice *device = getDevice(e.caxis.which + m_DEVICE_INDEX);
+
 				if (device->type() == InputDevice::GAMEPAD)
 				{
 					Controller *controller = static_cast<Controller*>(device);
-					controller->moveAxisX(e.caxis.value);
+					controller->moveLeftAxisX(e.caxis.value);
+
+					InputAxisMessage *axis =
+						new InputAxisMessage(e.caxis.which + m_DEVICE_INDEX,
+							controller->type(), 
+							e.caxis.axis, 
+							controller->xLeftAxis());
+
+					MessageSystem::instance()->pushMessage(axis);
 				}
 			}
 		}
+		else if(e.caxis.axis == SDL_CONTROLLER_AXIS_RIGHTX)
+		{
+			if (deviceExists(e.caxis.which + m_DEVICE_INDEX))
+			{
+				InputDevice *device = getDevice(e.caxis.which + m_DEVICE_INDEX);
+
+				if (device->type() == InputDevice::GAMEPAD)
+				{
+					Controller *controller = static_cast<Controller*>(device);
+					controller->moveRightAxisX(e.caxis.value);
+
+					InputAxisMessage *axis =
+						new InputAxisMessage(e.caxis.which + m_DEVICE_INDEX,
+							controller->type(),
+							e.caxis.axis,
+							controller->xRightAxis());
+
+					MessageSystem::instance()->pushMessage(axis);
+				}
+			}
+		}
+
 
 		if (e.caxis.axis == SDL_CONTROLLER_AXIS_LEFTY)
 		{
 			if (deviceExists(e.caxis.which + m_DEVICE_INDEX))
 			{
 				InputDevice *device = getDevice(e.caxis.which + m_DEVICE_INDEX);
+
 				if (device->type() == InputDevice::GAMEPAD)
 				{
 					Controller *controller = static_cast<Controller*>(device);
-					controller->moveAxisY(e.caxis.value);
+					controller->moveLeftAxisY(e.caxis.value);
+
+					InputAxisMessage *axis =
+						new InputAxisMessage(e.caxis.which + m_DEVICE_INDEX,
+							controller->type(),
+							e.caxis.axis,
+							controller->yLeftAxis());
+
+					MessageSystem::instance()->pushMessage(axis);
+				}
+			}
+		}
+		else if(e.caxis.axis == SDL_CONTROLLER_AXIS_RIGHTY)
+		{
+			if (deviceExists(e.caxis.which + m_DEVICE_INDEX))
+			{
+				InputDevice *device = getDevice(e.caxis.which + m_DEVICE_INDEX);
+				
+				if (device->type() == InputDevice::GAMEPAD)
+				{
+					Controller *controller = static_cast<Controller*>(device);
+					controller->moveRightAxisY(e.caxis.value);
+
+					InputAxisMessage *axis =
+						new InputAxisMessage(e.caxis.which + m_DEVICE_INDEX,
+							controller->type(),
+							e.caxis.axis,
+							controller->yRightAxis());
+
+					MessageSystem::instance()->pushMessage(axis);
+				}
+			}
+		}
+
+		if(e.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERLEFT)
+		{
+			if (deviceExists(e.caxis.which + m_DEVICE_INDEX))
+			{
+				InputDevice *device = getDevice(e.caxis.which + m_DEVICE_INDEX);
+			
+				if (device->type() == InputDevice::GAMEPAD)
+				{
+					Controller *controller = static_cast<Controller*>(device);
+					controller->moveLeftTriggerAxis(e.caxis.value);
+
+					InputAxisMessage *axis =
+						new InputAxisMessage(e.caxis.which + m_DEVICE_INDEX,
+							controller->type(),
+							e.caxis.axis,
+							controller->leftTriggerAxis());
+
+					MessageSystem::instance()->pushMessage(axis);
+				}
+			}
+		}
+		else if(e.caxis.axis == SDL_CONTROLLER_AXIS_TRIGGERRIGHT)
+		{
+			if (deviceExists(e.caxis.which + m_DEVICE_INDEX))
+			{
+				InputDevice *device = getDevice(e.caxis.which + m_DEVICE_INDEX);
+				
+				if (device->type() == InputDevice::GAMEPAD)
+				{
+					Controller *controller = static_cast<Controller*>(device);
+					controller->moveRightTriggerAxis(e.caxis.value);
+
+					InputAxisMessage *axis =
+						new InputAxisMessage(e.caxis.which + m_DEVICE_INDEX,
+							controller->type(),
+							e.caxis.axis,
+							controller->rightTriggerAxis());
+
+					MessageSystem::instance()->pushMessage(axis);
 				}
 			}
 		}
@@ -136,7 +257,19 @@ void InputSystem::processInput(SDL_Event &e)
 		if (deviceExists(m_KEYBOARD_ID))
 		{
 			InputDevice *device = getDevice(m_KEYBOARD_ID);
-			device->pressButton(e.key.keysym.sym);
+
+			if (device)
+			{
+				device->pressButton(e.key.keysym.sym);
+
+				InputButtonMessage *button =
+					new InputButtonMessage(m_KEYBOARD_ID,
+						device->type(),
+						e.key.keysym.sym,
+						true);
+
+				MessageSystem::instance()->pushMessage(button);
+			}
 		}
 		break;
 	}
@@ -145,7 +278,19 @@ void InputSystem::processInput(SDL_Event &e)
 		if(deviceExists(m_KEYBOARD_ID))
 		{
 			InputDevice *device = getDevice(m_KEYBOARD_ID);
-			device->releaseButton(e.key.keysym.sym);
+
+			if (device)
+			{
+				device->releaseButton(e.key.keysym.sym);
+
+				InputButtonMessage *button =
+					new InputButtonMessage(m_KEYBOARD_ID,
+						device->type(),
+						e.key.keysym.sym,
+						false);
+
+				MessageSystem::instance()->pushMessage(button);
+			}
 		}
 		break;
 	}
@@ -154,7 +299,19 @@ void InputSystem::processInput(SDL_Event &e)
 		if(deviceExists(m_MOUSE_ID))
 		{
 			InputDevice *device = getDevice(m_MOUSE_ID);
-			device->pressButton(e.button.button);
+			
+			if (device)
+			{
+				device->pressButton(e.button.button);
+
+				InputButtonMessage *button =
+					new InputButtonMessage(m_MOUSE_ID,
+						device->type(),
+						e.button.button,
+						true);
+
+				MessageSystem::instance()->pushMessage(button);
+			}
 		}
 		break;
 	}
@@ -163,7 +320,19 @@ void InputSystem::processInput(SDL_Event &e)
 		if (deviceExists(m_MOUSE_ID))
 		{
 			InputDevice *device = getDevice(m_MOUSE_ID);
-			device->releaseButton(e.button.button);
+
+			if (device)
+			{
+				device->releaseButton(e.button.button);
+
+				InputButtonMessage *button =
+					new InputButtonMessage(m_MOUSE_ID,
+						device->type(),
+						e.button.button,
+						false);
+
+				MessageSystem::instance()->pushMessage(button);
+			}
 		}
 
 		break;
@@ -173,12 +342,24 @@ void InputSystem::processInput(SDL_Event &e)
 		if(deviceExists(m_MOUSE_ID))
 		{
 			InputDevice *device = getDevice(m_MOUSE_ID);
-
-			if(device->type() == InputDevice::MOUSE)
+		
+			if (device)
 			{
-				Mouse *mouse = static_cast<Mouse*>(device);
-				mouse->setX(e.motion.x);
-				mouse->setY(e.motion.y);
+				if (device->type() == InputDevice::MOUSE)
+				{
+					Mouse *mouse = static_cast<Mouse*>(device);
+
+					mouse->setX(e.motion.x);
+					mouse->setY(e.motion.y);
+
+					InputMoveMessage *move =
+						new InputMoveMessage(m_MOUSE_ID,
+							device->type(),
+							mouse->getX(),
+							mouse->getY());
+
+					MessageSystem::instance()->pushMessage(move);
+				}
 			}
 		}
 		break;

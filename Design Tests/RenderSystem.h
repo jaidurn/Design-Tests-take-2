@@ -16,6 +16,8 @@
 #include "MessageSystem.h"
 #include "AnimationChangeMessage.h"
 #include "Camera2D.h"
+#include "TextureEffect.h"
+#include "Grid.h"
 
 class Renderer;
 
@@ -24,6 +26,15 @@ typedef int ID;
 class RenderSystem
 {
 public:
+	enum RenderLayers
+	{
+		RENDER_BACKGROUND,
+		RENDER_FOREGROUND0,
+		RENDER_FOREGROUND1,
+		RENDER_FOREGROUND2,
+		RENDER_UI
+	};
+
 	static RenderSystem *instance()
 	{
 		static RenderSystem *instance = new RenderSystem();
@@ -34,15 +45,19 @@ public:
 	~RenderSystem();
 
 	void clear();
-	void update();
+	void update(float delta);
 
 	// TODO: Maybe take component creation away from the system, but have the system
 	// have control of registering and destroying them.
-	SpriteComponent* createSprite(ID id, std::string texturePath);
+	SpriteComponent* createSprite(ID id, std::string texturePath, Vector2D position);
+
 	AnimationComponent* createAnimationComponent(ID id);
 
 	SpriteComponent* getSprite(ID id);
 	AnimationComponent* getAnimation(ID id);
+	TextureEffect* getEffect(ID id);
+
+	void setSpriteLayer(ID spriteID, RenderLayers layer);
 
 	void processMessage(IMessage *message);
 
@@ -52,12 +67,24 @@ public:
 
 	void drawLine(Line line, SDL_Color color);
 
+	void createTextureEffect(int entityID, TextureEffect::EffectType type, SDL_Color endColor, SDL_BlendMode blendMode, float duration, float speed);
+//	void deleteTextureEffect(int entityID);
+
+	void setCameraTarget(int targetID);
+
 	Camera2D* camera() { return m_camera; }
 
 private:
+	const int m_LAYER_COUNT = 5;
+	const int m_GRID_SIZE = 256;
+
 	RenderSystem()
-		:m_renderer(NULL), m_camera(NULL)
+		:m_renderer(NULL), m_camera(NULL), m_grid(0, 0, 1280, 720, m_GRID_SIZE)
 	{
+		for(int i = 0; i < m_LAYER_COUNT; i++)
+		{
+			m_layers.push_back(new Grid(0, 0, 1280, 720, m_GRID_SIZE));
+		}
 	}
 
 	Renderer *m_renderer;
@@ -66,12 +93,23 @@ private:
 	// TODO: Create individual cache systems for all of the components.
 	std::map<ID, SpriteComponent*> m_sprites;
 	std::map<ID, AnimationComponent*> m_animations;
+	std::map<ID, TextureEffect*> m_effects;
+
+	std::vector<Grid*> m_layers;
+
+	Grid m_grid;
 
 	void cleanUp();
-	void drawSprites();
+	void drawSprites(float delta, int layer);
+	void drawUI(float delta);
+	void drawText(float delta);
 	void updateAnimations();
+	void updateVisible();
 	// TODO: Add functionality to render our collision objects.
 
 	void processAnimationChange(AnimationChangeMessage *message);
+
+	void removeSprite(int entityID);
+	void removeAnimation(int entityID);
 };
 

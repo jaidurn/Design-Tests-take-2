@@ -1,0 +1,10 @@
+// Holds the information for rooms
+RoomCount 8
+Room0 Resources\smallRoom.dat
+Room1 Resources\mediumRoom.dat
+Room2 Resources\largeRoom.dat
+Room3 Resources\smallRoomA.dat
+Room4 Resources\smallRoomB.dat
+Room5 Resources\smallRoomC.dat
+Room6 Resources\mediumRoomA.dat
+Room7 Resources\mediumRoomB.dat

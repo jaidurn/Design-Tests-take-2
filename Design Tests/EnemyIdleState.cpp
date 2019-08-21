@@ -1,5 +1,5 @@
 #include "EnemyIdleState.h"
-
+#include "Rotation.h"
 
 
 EnemyIdleState::EnemyIdleState(int entityID, float weight)
@@ -21,7 +21,32 @@ EnemyIdleState::~EnemyIdleState()
 //=============================================================================
 bool EnemyIdleState::canEnter(int targetID, Behavior behavior)
 {
-	return true;
+	if(targetID != -1)
+	{
+		CollisionComponent *target = PhysicsSystem::instance()->getCollisionComponent(targetID);
+		CollisionComponent *self = PhysicsSystem::instance()->getCollisionComponent(m_entityID);
+
+		if (target && self)
+		{
+			// Look in the player's direction.
+			float f_direction = angleToDegrees(self->center(), target->center());
+			int directionCount = (int)AnimationComponent::DIR_MAX;
+			float directionDegrees = f_direction / (360.0f / (float)directionCount);
+
+			int i_direction = (int)(round(directionDegrees));
+
+			AnimationComponent::Direction direction = (AnimationComponent::Direction)i_direction;
+
+			if(AnimationComponent::DIR_MAX == direction)
+			{
+				direction = AnimationComponent::DIR_DOWN;
+			}
+
+			sendAnimationChangeMessage("Idle", direction, 0);
+		}
+	}
+
+	return true; 
 }
 
 //=============================================================================
@@ -44,7 +69,6 @@ bool EnemyIdleState::canExit()
 void EnemyIdleState::enter()
 {
 	m_timer.start();
-	sendAnimationChangeMessage("Idle", AnimationComponent::DIR_NONE, 0);
 }
 
 //=============================================================================

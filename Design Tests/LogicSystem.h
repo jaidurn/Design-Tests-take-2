@@ -26,7 +26,7 @@ public:
 	LogicComponent* createLogicComponent(int entityID, LogicComponent::LogicType type);
 
 	void processMessage(IMessage *message);
-	void update();
+	void update(float delta);
 
 private:
 	LogicSystem()
@@ -37,5 +37,7 @@ private:
 	std::map<int, LogicComponent*> m_logicComponents;
 
 	void cleanUp();
+	
+	void removeLogicComponent(int entityID);
 };
 

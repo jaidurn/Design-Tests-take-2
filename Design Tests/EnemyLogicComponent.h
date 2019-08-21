@@ -14,7 +14,7 @@
 class EnemyLogicComponent :	public LogicComponent
 {
 public:
-	EnemyLogicComponent();
+	EnemyLogicComponent(int entityID);
 
 	virtual ~EnemyLogicComponent();
 
@@ -30,6 +30,8 @@ public:
 	virtual void changeState(std::string stateName);
 
 	virtual void update();
+
+	virtual void processMessage(IMessage *message);
 
 protected:	
 	virtual void cleanUp();

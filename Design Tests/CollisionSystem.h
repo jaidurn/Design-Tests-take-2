@@ -21,13 +21,27 @@ public:
 	bool collisionAtPoint(int ID, int x, int y);
 	bool isColliding(int ID);
 	bool hasLineOfSight(int entityID, int otherEntityID);
+	bool collisionOnLine(int entityID, Line line);
 
 	bool circleCollision(int ID, int radius);
+	bool squareCollision(int ID, int centerX, int centerY, int width, int height);
 
 	CollisionComponent* getCollisionComponent(int ID);
 	CollisionComponent* createCollisionComponent(int ID, Shape::ShapeType shape, float centerX, float centerY);
 
-	void updatePosition(int ID, int movedX, int movedY);
+	void updatePosition(int ID, float movedX, float movedY);
+
+	void processMessage(IMessage *message);
+
+	bool rectInsideRect(pRectangle a, pRectangle b);
+	bool lineInsideRect(Line line, pRectangle rect);
+
+	bool circleInsideRectangle(pCircle a, pRectangle b);
+	bool circleInsideCircle(pCircle a, pCircle b);
+	bool lineInsideCircle(Line line, pCircle circle);
+
+	bool pointInsideCircle(pCircle circle, int x, int y);
+	bool pointInsideRect(pRectangle rect, int x, int y);
 
 private:
 	std::map<int, CollisionComponent*> m_components;
@@ -40,19 +54,10 @@ private:
 	bool handleCollision(pShape shapeA, pShape shapeB);
 	bool handleCollision(Line line, pShape shape);
 
-	bool circleInsideCircle(pCircle a, pCircle b);
-	bool circleInsideRectangle(pCircle a, pRectangle b);
-
-	bool rectInsideRect(pRectangle a, pRectangle b);
-
-	bool pointInsideCircle(pCircle circle, int x, int y);
-	bool pointInsideRect(pRectangle rect, int x, int y);
-
-	bool lineInsideCircle(Line line, pCircle circle);
-	bool lineInsideRect(Line line, pRectangle rect);
-
 	void sendCollisionMessage(int entityID, int collidingEntityID, Vector2D position);
 	
+	void removeCollisionComponent(int entityID);
+
 	void cleanup();
 };
 

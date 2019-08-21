@@ -1,0 +1,19 @@
+Type Door
+CollisionComponent
+Shape Rectangle
+RectWidth 5
+RectHeight 64
+Solid 1
+SpriteComponent
+SpriteTexture Resources/Door.png
+AnimationComponent
+Animation_Count 1
+Animation_0 Idle
+Idle_DirectionCount 1
+Idle_StartX 0
+Idle_StartY 0
+Idle_Width 64
+Idle_Height 64
+Idle_Frames 2
+Idle_Speed 0
+Idle_Loop 0

@@ -12,7 +12,8 @@
 #include <map>
 #include <unordered_map>
 
-typedef std::string entityKey;
+typedef int entityKey;
+class IMessage;
 
 class EntitySystem
 {
@@ -27,13 +28,14 @@ public:
 
 	void initialize(std::string entityDataPath);
 
-	int createEntity(entityKey entityName);
-	int createEntity(entityKey entityName, Vector2D position);
+	int createEntity(entityKey key);
+	int createEntity(entityKey key, Vector2D position);
 
+	entityKey getEntityKey(int entityID);
 	std::string entityType(int entityID);
-	AttackInfo* entityAttack(int entityID);
+	AttackInfo* entityAttack(entityKey key);
 
-	//void processMessage(SystemMessage &message);
+	void processMessage(IMessage *message);
 
 private:
 	EntitySystem()
@@ -47,9 +49,10 @@ private:
 	std::string m_entityDataPath;
 
 	std::map<entityKey, std::string> m_entityData;
-	std::unordered_map<int, bool> m_entityList;
+	std::map<int, bool> m_entityList;
 	std::map<int, std::string> m_entityType;
-	std::map<std::string, AttackInfo*> m_entityAttacks;
+	std::map<int, entityKey> m_entityKeys;
+	std::map<entityKey, AttackInfo*> m_entityAttacks;
 
 	int findNextAvailableID();
 
@@ -57,6 +60,8 @@ private:
 	void loadPhysicsComponents(int entityID, Vector2D position);
 	void loadRenderComponents(int entityID, Vector2D position);
 	void loadLogicComponents(int entityID);
-	void loadAttackInfo(int entityID);
+	void loadAttackInfo(entityKey key);
 	void loadEntityData();
+
+	void deleteEntity(int entityID);
 };

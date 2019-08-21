@@ -30,14 +30,15 @@ Attack_StartX 64
 Attack_StartY 0
 Attack_Width 32
 Attack_Height 32
-Attack_Frames 4
-Attack_Speed 0.25
+Attack_Frames 5
+Attack_Speed 0.1
 Attack_Loop 0
 Attack_Count 1
 Attack_0 Basic
-Basic_Range 50
+Basic_Range 32
 Basic_Knockback 10
 Basic_Mask_Count 1
+Basic_Mask0_Length 5
 Basic_Mask0_0_X 0
 Basic_Mask0_0_Y 0
 Basic_Mask0_0_Width 32
@@ -54,3 +55,7 @@ Basic_Mask0_3_X 0
 Basic_Mask0_3_Y 0
 Basic_Mask0_3_Width 32
 Basic_Mask0_3_Height 32
+Basic_Mask0_4_X 0
+Basic_Mask0_4_Y 0
+Basic_Mask0_4_Width 32
+Basic_Mask0_4_Height 32

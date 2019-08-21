@@ -6,10 +6,10 @@
 // Purpose: 
 // Handles the logic for the Player's Idle State.
 //==========================================================================================
-#include "IState.h"
+#include "PlayerState.h"
 #include <string>
 
-class PlayerIdleState :	public IState
+class PlayerIdleState :	public PlayerState
 {
 public:
 	PlayerIdleState(int entityID, std::string name);
@@ -20,6 +20,5 @@ public:
 	virtual void exit();
 
 private:
-	std::string m_name;
 };
 

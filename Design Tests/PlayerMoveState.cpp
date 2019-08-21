@@ -1,13 +1,16 @@
 #include "PlayerMoveState.h"
 #include "VelocityIncreaseMessage.h"
 #include "StateChangeMessage.h"
+#include "CollisionMessage.h"
+#include "EntityDestroyMessage.h"
+#include "EntitySystem.h"
 #include "InputSystem.h"
 #include "Controller.h"
 #include "Rotation.h"
 #include <cmath>
 
 PlayerMoveState::PlayerMoveState(int entityID, std::string stateName, float walkSpeed)
-	:IState(entityID), m_name(stateName), m_walkSpeed(walkSpeed)
+	:PlayerState(entityID, stateName), m_walkSpeed(walkSpeed)
 {
 }
 
@@ -33,84 +36,54 @@ void PlayerMoveState::enter()
 //=============================================================================
 void PlayerMoveState::update()
 {
-	Input::InputComponent *input = Input::InputSystem::instance()->getInputComponent(m_entityID);
+	InputComponent *input = InputSystem::instance()->getInputComponent(m_entityID);
 
 	if(input)
 	{
-		if(input->xAxis() == 0 && input->yAxis() == 0)
+		if(input->xLeftAxis() == 0 && input->yLeftAxis() == 0)
 		{
 			sendStateChangeMessage("Idle");
 		}
 		else
 		{
-			float eighthOfCircle = 360.0f / 4.0f;
-			int direction = (int)round(input->axisAngle() / eighthOfCircle);
+			float directionCount = 360.0f / 4.0f;
+			int direction = (int)round(input->leftAxisAngle() / directionCount);
 
-			if(4 < direction)
+			if(4 <= direction)
 			{
 				direction = 0;
 			}
 
-			float xMove = m_walkSpeed * input->xAxis();
-			float yMove = m_walkSpeed * input->yAxis();
+			float xMove = m_walkSpeed * input->xLeftAxis();
+			float yMove = m_walkSpeed * input->yLeftAxis();
 
-			float absX = xMove;
-			float absY = yMove;
+			float magnitude = sqrt((xMove * xMove) + (yMove * yMove));
 
-			if (absX < 0) { absX *= -1; }
-			if (absY < 0) { absY *= -1; }
-
-			if(m_walkSpeed < (absX + absY))
+			if (m_walkSpeed < magnitude)
 			{
-				float totalDifference = (absX + absY) - m_walkSpeed;
+				float xFix = magnitude - abs(xMove);
+				float yFix = magnitude - abs(yMove);
 
-				if(totalDifference < m_walkSpeed)
+				if(xMove < 0)
 				{
-					if(xMove < 0)
-					{
-						xMove += totalDifference / 2.0f;
-					}
-					else
-					{
-						xMove -= totalDifference / 2.0f;
-					}
-
-					if(yMove < 0)
-					{
-						yMove += totalDifference / 2.0f;
-					}
-					else
-					{
-						yMove -= totalDifference / 2.0f;
-					}
+					xMove += yFix;
 				}
 				else
 				{
-//					std::cout << "X speed: " << xMove
-//						<< " Y speed: " << yMove
-//						<< " total: " << totalDifference << std::endl;
+					xMove -= yFix;
+				}
+
+				if(yMove < 0)
+				{
+					yMove += xFix;
+				}
+				else
+				{
+					yMove -= xFix;
 				}
 			}
 
-			AnimationComponent::Direction dir = AnimationComponent::DIR_NONE;
-
-			switch(direction)
-			{
-			case 0:
-				dir = AnimationComponent::DIR_DOWN;
-				break;
-			case 1:
-				dir = AnimationComponent::DIR_RIGHT;
-				break;
-			case 2:
-				dir = AnimationComponent::DIR_UP;
-				break;
-			case 3:
-				dir = AnimationComponent::DIR_LEFT;
-				break;
-			}
-
-			sendAnimationChangeMessage(m_name, dir, 0);
+			sendAnimationChangeMessage(m_name, (AnimationComponent::Direction)direction, -1);
 			sendVelocityIncreaseMsg(xMove, yMove);
 		}
 	}
@@ -124,6 +97,23 @@ void PlayerMoveState::update()
 void PlayerMoveState::exit()
 {
 
+}
+
+//=============================================================================
+// Function: void processMessage(IMessage *message)
+// Description:
+// Processes system messages passed in.
+// Parameters:
+// IMessage *message - The message to process.
+//=============================================================================
+void PlayerMoveState::processMessage(IMessage *message)
+{
+	if (message)
+	{
+		switch (message->type())
+		{
+		}
+	}
 }
 
 //=============================================================================

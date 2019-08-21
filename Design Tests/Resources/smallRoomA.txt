@@ -1,0 +1,3 @@
+Width 320
+Height 320
+Map Resources/smallRoom.map

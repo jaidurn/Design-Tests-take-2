@@ -18,11 +18,12 @@ public:
 	{
 		LOGIC_PLAYER,
 		LOGIC_ENEMY,
-		LOGIC_BOSS
+		LOGIC_BOSS,
+		LOGIC_DOOR
 	};
 
-	LogicComponent(LogicType type)
-	:Component(LOGIC)
+	LogicComponent(LogicType type, int entityID)
+	:Component(LOGIC), m_type(type), m_entityID(entityID)
 	{
 	}
 
@@ -40,9 +41,12 @@ public:
 
 	virtual void update() = 0;
 
-protected:
-	virtual void cleanUp() = 0;
+	virtual void processMessage(IMessage *message) = 0;
 
+protected:
+	int m_entityID;
 	LogicType m_type;
+
+	virtual void cleanUp() = 0;
 };
 

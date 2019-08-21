@@ -25,6 +25,10 @@ public:
 	virtual void exit();
 
 private:
-	AttackInfo *m_currentAttack;
+	bool m_attacked;
+	Timer m_cooldownTimer;
+
+	int m_currentTarget;
+	int m_currentAttack;
 };
 

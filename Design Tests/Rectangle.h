@@ -24,6 +24,9 @@ namespace Shape
 		void setWidth(const int width) { m_width = width; }
 		void setHeight(const int height) { m_height = height; }
 
+		virtual void setCenterX(float x) { m_center.setX(x); }
+		virtual void setCenterY(float y) { m_center.setY(y); }
+
 		int width() const { return m_width; }
 		int height() const { return m_height; }
 

@@ -1,0 +1,17 @@
+Width 512
+Height 256
+Map Resources/mediumRoomB.map
+
+DoorCount 6
+Door0_x 160
+Door0_y 256
+Door1_x 352
+Door1_y 256
+Door2_x 0
+Door2_y 128
+Door3_x 160
+Door3_y 0
+Door4_x 352
+Door4_y 0
+Door5_x 512
+Door5_y 128

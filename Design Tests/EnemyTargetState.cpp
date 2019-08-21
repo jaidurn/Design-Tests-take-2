@@ -72,59 +72,62 @@ void EnemyTargetState::update()
 
 			bool targetFound = false;
 
-			while (MessageSystem::instance()->peekMessage(message))
+			for(int i = 0; i < MessageSystem::instance()->messageCount(); i++)
 			{
-				if (message->type() == IMessage::COLLISION)
+				if (MessageSystem::instance()->peekMessage(message, i))
 				{
-					CollisionMessage *collision = static_cast<CollisionMessage*>(message);
-
-					if (EntitySystem::instance()->entityType(collision->m_collidingID) == m_targetType)
+					if (message->type() == IMessage::COLLISION)
 					{
-						if (m_currentTarget == -1)
-						{
-							if (m_lineOfSight)
-							{
-								if (PhysicsSystem::instance()->hasLineOfSight(m_entityID, collision->m_collidingID))
-								{
-									m_currentTarget = collision->m_collidingID;
-									targetFound = true;
-								}
-							}
-							else
-							{
-								CollisionComponent *target = PhysicsSystem::instance()->getCollisionComponent(collision->m_collidingID);
-								CollisionComponent *self = PhysicsSystem::instance()->getCollisionComponent(m_entityID);
+						CollisionMessage *collision = static_cast<CollisionMessage*>(message);
 
-								if (target && self)
-								{
-									if (totalDistance(target->center(), self->center()) <= m_range)
-									{
-										m_currentTarget = collision->m_collidingID;
-										targetFound = true;
-									}
-								}
-							}
-						}
-						else
+						if (EntitySystem::instance()->entityType(collision->m_collidingID) == m_targetType)
 						{
-							CollisionComponent *compA = PhysicsSystem::instance()->getCollisionComponent(m_entityID);
-							CollisionComponent *compB = PhysicsSystem::instance()->getCollisionComponent(m_currentTarget);
-							CollisionComponent *compC = PhysicsSystem::instance()->getCollisionComponent(collision->m_collidingID);
-
-							if (totalDistance(compA->center(), compC->center()) < totalDistance(compA->center(), compB->center()))
+							if (m_currentTarget == -1)
 							{
 								if (m_lineOfSight)
 								{
 									if (PhysicsSystem::instance()->hasLineOfSight(m_entityID, collision->m_collidingID))
 									{
-										targetFound = true;
 										m_currentTarget = collision->m_collidingID;
+										targetFound = true;
 									}
 								}
 								else
 								{
-									targetFound = true;
-									m_currentTarget = collision->m_collidingID;
+									CollisionComponent *target = PhysicsSystem::instance()->getCollisionComponent(collision->m_collidingID);
+									CollisionComponent *self = PhysicsSystem::instance()->getCollisionComponent(m_entityID);
+
+									if (target && self)
+									{
+										if (totalDistance(target->center(), self->center()) <= m_range)
+										{
+											m_currentTarget = collision->m_collidingID;
+											targetFound = true;
+										}
+									}
+								}
+							}
+							else
+							{
+								CollisionComponent *compA = PhysicsSystem::instance()->getCollisionComponent(m_entityID);
+								CollisionComponent *compB = PhysicsSystem::instance()->getCollisionComponent(m_currentTarget);
+								CollisionComponent *compC = PhysicsSystem::instance()->getCollisionComponent(collision->m_collidingID);
+
+								if (totalDistance(compA->center(), compC->center()) < totalDistance(compA->center(), compB->center()))
+								{
+									if (m_lineOfSight)
+									{
+										if (PhysicsSystem::instance()->hasLineOfSight(m_entityID, collision->m_collidingID))
+										{
+											targetFound = true;
+											m_currentTarget = collision->m_collidingID;
+										}
+									}
+									else
+									{
+										targetFound = true;
+										m_currentTarget = collision->m_collidingID;
+									}
 								}
 							}
 						}

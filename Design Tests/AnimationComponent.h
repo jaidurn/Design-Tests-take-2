@@ -22,7 +22,8 @@ public:
 		DIR_DOWN = 0,
 		DIR_RIGHT = 1,
 		DIR_UP = 2,
-		DIR_LEFT = 3
+		DIR_LEFT = 3,
+		DIR_MAX = 4
 	};
 
 	AnimationComponent();

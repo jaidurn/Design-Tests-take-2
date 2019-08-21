@@ -1,4 +1,11 @@
 #include "PlayerLogicComponent.h"
+#include "CollisionMessage.h"
+#include "EntitySystem.h"
+#include "AttackInfo.h"
+#include "PhysicsSystem.h"
+#include "CollisionComponent.h"
+#include "VelocityIncreaseMessage.h"
+#include "RenderSystem.h"
 
 PlayerLogicComponent::~PlayerLogicComponent()
 {
@@ -135,6 +142,75 @@ void PlayerLogicComponent::update()
 }
 
 //=============================================================================
+// Function: void processMessage(IMessage *message)
+// Description:
+// Processes system messages passed in.
+// Parameters:
+// IMessage *message - The message to process.
+//=============================================================================
+void PlayerLogicComponent::processMessage(IMessage *message)
+{
+	if(message)
+	{
+		switch(message->type())
+		{
+		case IMessage::COLLISION:
+		{
+			CollisionMessage *collision = static_cast<CollisionMessage*>(message);
+
+			if(collision->m_collidingID == m_entityID)
+			{
+				if (EntitySystem::instance()->entityType(collision->m_entityID) == "EnemyAttack")
+				{
+					if (canKnockback())
+					{
+						int attackKey = EntitySystem::instance()->getEntityKey(collision->m_entityID);
+
+						if (attackKey != -1)
+						{
+							AttackInfo *attack = EntitySystem::instance()->entityAttack(attackKey);
+
+							if (attack)
+							{
+								CollisionComponent *selfCol = PhysicsSystem::instance()->getCollisionComponent(m_entityID);
+
+								if (selfCol)
+								{
+									Vector2D distance = collision->m_position - selfCol->center();
+
+									float angle = (float)atan2(distance.getY(), distance.getX());
+
+									float xVel = (float)(cos(angle + M_PI) * attack->knockback());
+									float yVel = (float)(sin(angle + M_PI) * attack->knockback());
+
+									VelocityIncreaseMessage *vel = new VelocityIncreaseMessage(m_entityID, xVel, yVel, attack->knockback(), attack->knockback());
+
+									MessageSystem::instance()->pushMessage(vel);
+
+									SDL_Color redFade{ 255, 40, 40, 100 };
+
+									RenderSystem::instance()->createTextureEffect(m_entityID, TextureEffect::EFFECT_ALL_FLASH, redFade, SDL_BLENDMODE_BLEND, m_knockbackCooldown, 12.0f);
+
+									m_knockback.start();
+								}
+							}
+						}
+					}
+				}
+			}
+				
+			break;
+		}
+		}
+
+		if(m_currentState)
+		{
+			m_currentState->processMessage(message);
+		}
+	}
+}
+
+//=============================================================================
 // Function: void cleanUp()
 // Description:
 // Cleans up all of the states.
@@ -154,4 +230,25 @@ void PlayerLogicComponent::cleanUp()
 			mit++;
 		}
 	}
+}
+
+bool PlayerLogicComponent::canKnockback()
+{
+	bool knockbackAllowed = false;
+
+	if(m_knockback.running() == true)
+	{
+		if(m_knockbackCooldown <= m_knockback.currentSeconds())
+		{
+			knockbackAllowed = true;
+
+			m_knockback.stop();
+		}
+	}
+	else
+	{
+		knockbackAllowed = true;
+	}
+
+	return knockbackAllowed;
 }
