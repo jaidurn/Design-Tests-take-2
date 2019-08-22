@@ -17,6 +17,7 @@
 #include "AnimationChangeMessage.h"
 #include "Camera2D.h"
 #include "TextureEffect.h"
+#include "TextComponent.h"
 #include "Grid.h"
 
 class Renderer;
@@ -50,11 +51,12 @@ public:
 	// TODO: Maybe take component creation away from the system, but have the system
 	// have control of registering and destroying them.
 	SpriteComponent* createSprite(ID id, std::string texturePath, Vector2D position);
-
 	AnimationComponent* createAnimationComponent(ID id);
+	TextComponent* createTextComponent(ID id, string text, Font *font, SDL_Color color, Uint32 wrapWidth, Vector2D position);
 
 	SpriteComponent* getSprite(ID id);
 	AnimationComponent* getAnimation(ID id);
+	TextComponent *getText(ID id);
 	TextureEffect* getEffect(ID id);
 
 	void setSpriteLayer(ID spriteID, RenderLayers layer);
@@ -93,6 +95,7 @@ private:
 	// TODO: Create individual cache systems for all of the components.
 	std::map<ID, SpriteComponent*> m_sprites;
 	std::map<ID, AnimationComponent*> m_animations;
+	std::map<ID, TextComponent*> m_texts;
 	std::map<ID, TextureEffect*> m_effects;
 
 	std::vector<Grid*> m_layers;
@@ -111,5 +114,6 @@ private:
 
 	void removeSprite(int entityID);
 	void removeAnimation(int entityID);
+	void removeText(int entityID);
 };
 

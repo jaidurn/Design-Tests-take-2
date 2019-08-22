@@ -175,6 +175,7 @@
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="Rotation.cpp" />
     <ClCompile Include="SpriteComponent.cpp" />
+    <ClCompile Include="TextComponent.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureCache.cpp" />
     <ClCompile Include="TextureEffect.cpp" />
@@ -247,6 +248,7 @@
     <ClInclude Include="SettingIO.h" />
     <ClInclude Include="SpriteComponent.h" />
     <ClInclude Include="StateChangeMessage.h" />
+    <ClInclude Include="TextComponent.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureCache.h" />
     <ClInclude Include="TextureEffect.h" />

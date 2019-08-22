@@ -25,7 +25,6 @@ public:
 	~ResourceManager();
 
 	Texture* getTexture(Key key);
-	Texture* getTextTexture(string text, Font *font, SDL_Color color, Uint32 *wrapLength);
 
 	Font* getFont(string fontPath, int pointSize, Font::FontFlags flag, bool italics);
 
@@ -40,7 +39,7 @@ public:
 
 private:
 	ResourceManager()
-		:m_window(NULL), m_renderer(NULL), m_textureCache(NULL)
+		:m_window(NULL), m_renderer(NULL), m_textureCache(NULL), m_fontCache(NULL)
 	{}
 
 	Window *m_window;

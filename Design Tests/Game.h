@@ -9,7 +9,7 @@
 #include "Timer.h"
 #include <string>
 
-class Texture;
+class TextComponent;
 class ResourceManager;
 class PhysicsSystem;
 class RenderSystem;
@@ -49,7 +49,7 @@ private:
 	Game();
 
 	ResourceManager *m_resource;
-	Texture *m_texture;
+	TextComponent *m_text;
 	PhysicsSystem *m_physicsSys;
 	RenderSystem *m_renderSys;
 	MessageSystem *m_messageSys;

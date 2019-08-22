@@ -17,7 +17,7 @@
 Game::Game()
 	:m_physicsSys(NULL), m_renderSys(NULL), m_messageSys(NULL),
 	m_inputSys(NULL), m_logicSys(NULL), m_initialized(false), m_currentState(GS_EXIT),
-	m_button(NULL), m_room(NULL), m_resource(NULL)
+	m_button(NULL), m_room(NULL), m_resource(NULL), m_text(NULL)
 {
 	m_world = new World("Resources/rooms.dat");
 }
@@ -31,6 +31,7 @@ Game::~Game()
 	m_messageSys = NULL;
 	m_inputSys = NULL;
 	m_logicSys = NULL;
+	m_text = NULL;
 
 	delete m_button;
 	m_button = NULL;
@@ -39,6 +40,28 @@ Game::~Game()
 	m_world = NULL;
 
 	m_timer.stop();
+}
+
+void press()
+{
+	std::cout << "Pressed!\n";
+}
+
+void release()
+{
+	std::cout << "Released!\n";
+}
+
+void hold()
+{
+	static int time = 0;
+
+	if(time % 10 == 0)
+	{
+		std::cout << "YEE HAW!\n";
+	}
+
+	time++;
 }
 
 //=============================================================================
@@ -70,7 +93,7 @@ bool Game::init(std::string gamePath)
 
 				if (m_physicsSys && m_renderSys && m_messageSys && m_logicSys && m_inputSys)
 				{
-					while(!m_world->exists())
+					while (!m_world->exists())
 					{
 						m_world->dungeon();
 					}
@@ -114,6 +137,19 @@ bool Game::init(std::string gamePath)
 
 					m_button->setRect(rect);
 
+					Font *font = m_resource->getFont("Resources/Fonts/RobotoMono-", 16, Font::FONT_REGULAR, false);
+					SDL_Color red{ 255, 0, 0, 255 };
+
+					m_button->setText("Click", font, red);
+
+					functionPtr onPress = press;
+					functionPtr onHold = hold;
+					functionPtr onRelease = release;
+
+					m_button->setOnPress(onPress);
+					m_button->setOnRelease(onRelease);
+					m_button->setOnHold(onHold);
+
 					m_initialized = true;
 					success = true;
 					m_timer.start();
@@ -148,15 +184,6 @@ void Game::loop()
 		processInput();
 		processLogic(deltaTime);
 		processPhysics(deltaTime);
-
-		if(m_button->getPressed())
-		{
-			std::cout << "Pressed\n";
-		}
-		else if (m_button->getReleased())
-		{
-			std::cout << "Released!\n";
-		}
 
 		m_button->update(deltaTime);
 
@@ -299,16 +326,6 @@ void Game::updateRenderer(float delta)
 {
 	if(m_initialized)
 	{
-		Line left{ m_button->getRect()->getTopLeft(), m_button->getRect()->getBottomLeft() };
-		Line right{ m_button->getRect()->getTopRight(), m_button->getRect()->getBottomRight() };
-		Line top{ m_button->getRect()->getTopLeft(), m_button->getRect()->getTopRight() };
-		Line bottom{ left.end, right.end };
-		SDL_Color red{ 255, 0, 0, 255 };
-
-		m_renderSys->drawLine(left, red);
-		m_renderSys->drawLine(right, red);
-		m_renderSys->drawLine(top, red);
-		m_renderSys->drawLine(bottom, red);
 		m_renderSys->update(delta);
 	}
 }

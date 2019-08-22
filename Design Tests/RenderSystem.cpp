@@ -43,6 +43,8 @@ void RenderSystem::update(float delta)
 			}
 		}
 
+		drawText(delta);
+
 		m_renderer->renderPresent();
 	}
 }
@@ -120,6 +122,57 @@ AnimationComponent* RenderSystem::createAnimationComponent(ID id)
 }
 
 //=============================================================================
+// Function: TextComponent *createTextComponent(ID, string, Font*, SDL_Color,
+//												Uint32, Vector2D)
+// Description:
+// Creates a text component, allowing for the rendering of text.
+// Parameters:
+// ID id - The entity id to create the text component for.
+// string text - The text to initialize it with.
+// Font *font - The font to use.
+// SDL_Color color - The color of the text.
+// Uint32 wrapWidth - The width in pixels to wrap the text after.
+// Use 0 if you don't want to wrap anything.
+// Vector2D position - The position to create the text component at.
+// Output:
+// Returns a pointer to the created text component on success.
+// Returns NULL on failure.
+//=============================================================================
+TextComponent* RenderSystem::createTextComponent(ID id, 
+	string text, 
+	Font *font, 
+	SDL_Color color,
+	Uint32 wrapWidth,
+	Vector2D position)
+{
+	TextComponent *textComp = NULL;
+
+	auto mit = m_texts.find(id);
+
+	if(mit != m_texts.end())
+	{
+		mit->second->setText(text);
+		mit->second->setFont(font);
+		mit->second->setColor(color);
+		mit->second->setWrapWidth(wrapWidth);
+		mit->second->setPosition(position);
+
+		textComp = mit->second;
+	}
+	else
+	{
+		textComp = new TextComponent(font, color, text, wrapWidth, position);
+
+		if(textComp)
+		{
+			m_texts.insert(std::make_pair(id, textComp));
+		}
+	}
+
+	return textComp;
+}
+
+//=============================================================================
 // Function: SpriteComponent* getSprite(ID)
 // Description:
 // Retrieves the sprite related to the ID from the sprite list.
@@ -163,6 +216,30 @@ AnimationComponent* RenderSystem::getAnimation(ID id)
 	}
 
 	return NULL;
+}
+
+//=============================================================================
+// Function: TextComponent* getText(ID)
+// Description:
+// Finds and returns the text component related to the specified ID.
+// Parameters:
+// ID id - The entity id of the text component to find.
+// Output:
+// Returns a pointer to the text component if found.
+// Returns NULL if it doesn't exist.
+//=============================================================================
+TextComponent* RenderSystem::getText(ID id)
+{
+	TextComponent *text = NULL;
+
+	auto mit = m_texts.find(id);
+
+	if(mit != m_texts.end())
+	{
+		text = mit->second;
+	}
+
+	return text;
 }
 
 //=============================================================================
@@ -229,88 +306,97 @@ void RenderSystem::processMessage(IMessage *message)
 	{
 		MoveMessage *move = static_cast<MoveMessage*>(message);
 		SpriteComponent *comp = getSprite(move->m_entityID);
+		TextComponent *text = getText(move->m_entityID);
 
 		Vector2D position = move->m_newPosition;
 
-		m_grid.move(move->m_entityID, (int)round(comp->position().getX()), (int)round(comp->position().getY()), (int)round(position.getX()), (int)round(position.getY()));
-
-		m_layers[comp->layer()]->move(move->m_entityID, (int)round(comp->position().getX()), (int)round(comp->position().getY()), (int)round(position.getX()), (int)round(position.getY()));
-		
-		if (m_camera)
+		if (comp)
 		{
-			if (move->m_entityID == m_camera->currentTarget())
+			m_grid.move(move->m_entityID, (int)round(comp->position().getX()), (int)round(comp->position().getY()), (int)round(position.getX()), (int)round(position.getY()));
+
+			m_layers[comp->layer()]->move(move->m_entityID, (int)round(comp->position().getX()), (int)round(comp->position().getY()), (int)round(position.getX()), (int)round(position.getY()));
+
+			if (m_camera)
 			{
-				if (m_camera->boundingBox())
+				if (move->m_entityID == m_camera->currentTarget())
 				{
-					float cameraLeftX = m_camera->boundingBox()->center().getX() - (m_camera->boundingBox()->width() / 2);
-					float cameraRightX = m_camera->boundingBox()->center().getX() + (m_camera->boundingBox()->width() / 2);
-					float cameraTopY = m_camera->boundingBox()->center().getY() - (m_camera->boundingBox()->height() / 2);
-					float cameraBottomY = m_camera->boundingBox()->center().getY() + (m_camera->boundingBox()->height() / 2);
-
-					float cameraMoveX = 0;
-					float cameraMoveY = 0;
-
-					float spriteX = comp->position().getX() * m_camera->currentScaleX();
-					float spriteY = comp->position().getY() * m_camera->currentScaleY();
-
-					if(spriteX < cameraLeftX)
+					if (m_camera->boundingBox())
 					{
-						cameraMoveX = spriteX - cameraLeftX;
+						float cameraLeftX = m_camera->boundingBox()->center().getX() - (m_camera->boundingBox()->width() / 2);
+						float cameraRightX = m_camera->boundingBox()->center().getX() + (m_camera->boundingBox()->width() / 2);
+						float cameraTopY = m_camera->boundingBox()->center().getY() - (m_camera->boundingBox()->height() / 2);
+						float cameraBottomY = m_camera->boundingBox()->center().getY() + (m_camera->boundingBox()->height() / 2);
+
+						float cameraMoveX = 0;
+						float cameraMoveY = 0;
+
+						float spriteX = comp->position().getX() * m_camera->currentScaleX();
+						float spriteY = comp->position().getY() * m_camera->currentScaleY();
+
+						if (spriteX < cameraLeftX)
+						{
+							cameraMoveX = spriteX - cameraLeftX;
+						}
+						else if (cameraRightX < spriteX)
+						{
+							cameraMoveX = spriteX - cameraRightX;
+						}
+
+						if (spriteY < cameraTopY)
+						{
+							cameraMoveY = spriteY - cameraTopY;
+						}
+						else if (cameraBottomY < spriteY)
+						{
+							cameraMoveY = spriteY - cameraBottomY;
+						}
+
+						if (cameraMoveX != 0 || cameraMoveY != 0)
+						{
+							Vector2D oldPosition{ (float)m_camera->getX(), (float)m_camera->getY() };
+							Vector2D newPosition{ (float)(m_camera->getX() + (int)cameraMoveX),
+												  (float)(m_camera->getY() + (int)cameraMoveY) };
+
+							m_camera->setX(m_camera->getX() + (int)cameraMoveX);
+							m_camera->setY(m_camera->getY() + (int)cameraMoveY);
+
+							CameraMoveMessage *move = new CameraMoveMessage(oldPosition, newPosition);
+
+							MessageSystem::instance()->pushMessage(move);
+						}
 					}
-					else if(cameraRightX < spriteX)
+					else
 					{
-						cameraMoveX = spriteX - cameraRightX;
+						int cameraMoveX = (int)(comp->position().getX() * m_camera->currentScaleX() - ((m_camera->getWidth() / 2)));
+						int cameraMoveY = (int)(comp->position().getY() * m_camera->currentScaleY() - ((m_camera->getHeight() / 2)));
+
+						if (cameraMoveX != m_camera->getX() || cameraMoveY != m_camera->getY())
+						{
+							Vector2D oldPosition{ (float)m_camera->getX(), (float)m_camera->getY() };
+							Vector2D newPosition{ (float)(cameraMoveX),
+												  (float)(cameraMoveY) };
+
+							m_camera->setX(cameraMoveX);
+							m_camera->setY(cameraMoveY);
+
+							CameraMoveMessage *move = new CameraMoveMessage(oldPosition, newPosition);
+
+							MessageSystem::instance()->pushMessage(move);
+
+							//updateVisible();
+						}
 					}
 
-					if(spriteY < cameraTopY)
-					{
-						cameraMoveY = spriteY - cameraTopY;
-					}
-					else if (cameraBottomY < spriteY)
-					{
-						cameraMoveY = spriteY - cameraBottomY;
-					}
-
-					if (cameraMoveX != 0 || cameraMoveY != 0)
-					{
-						Vector2D oldPosition{ (float)m_camera->getX(), (float)m_camera->getY() };
-						Vector2D newPosition{ (float)(m_camera->getX() + (int)cameraMoveX),
-											  (float)(m_camera->getY() + (int)cameraMoveY) };
-						
-						m_camera->setX(m_camera->getX() + (int)cameraMoveX);
-						m_camera->setY(m_camera->getY() + (int)cameraMoveY);
-
-						CameraMoveMessage *move = new CameraMoveMessage(oldPosition, newPosition);
-
-						MessageSystem::instance()->pushMessage(move);
-					}
 				}
-				else
-				{
-					int cameraMoveX = (int)(comp->position().getX() * m_camera->currentScaleX() - ((m_camera->getWidth() / 2)));
-					int cameraMoveY = (int)(comp->position().getY() * m_camera->currentScaleY() - ((m_camera->getHeight() / 2)));
-
-					if (cameraMoveX != m_camera->getX() || cameraMoveY != m_camera->getY())
-					{
-						Vector2D oldPosition{ (float)m_camera->getX(), (float)m_camera->getY() };
-						Vector2D newPosition{ (float)(cameraMoveX),
-											  (float)(cameraMoveY) };
-
-						m_camera->setX(cameraMoveX);
-						m_camera->setY(cameraMoveY);
-
-						CameraMoveMessage *move = new CameraMoveMessage(oldPosition, newPosition);
-
-						MessageSystem::instance()->pushMessage(move);
-
-						//updateVisible();
-					}
-				}
-
 			}
+
+			comp->setPosition(position);
 		}
 
-		comp->setPosition(position);
+		if(text)
+		{
+			text->setPosition(position);
+		}
 
 		break;
 	}
@@ -327,6 +413,7 @@ void RenderSystem::processMessage(IMessage *message)
 
 		removeSprite(destroy->m_entityID);
 		removeAnimation(destroy->m_entityID);
+		removeText(destroy->m_entityID);
 
 		break;
 	}
@@ -474,6 +561,21 @@ void RenderSystem::cleanUp()
 		if(eMit != m_effects.end())
 		{
 			eMit++;
+		}
+	}
+
+	auto tMit = m_texts.begin();
+
+	while(tMit != m_texts.end())
+	{
+		delete tMit->second;
+		tMit->second = NULL;
+
+		tMit = m_texts.erase(tMit);
+
+		if(tMit != m_texts.end())
+		{
+			tMit++;
 		}
 	}
 
@@ -763,6 +865,42 @@ void RenderSystem::drawUI(float delta)
 }
 
 //=============================================================================
+// Function: void drawText(float)
+// Description:
+// Renders all of the existing text components.
+// Parameters:
+// float delta - The amount of time that's passed since the last update.
+//=============================================================================
+void RenderSystem::drawText(float delta)
+{
+	auto mit = m_texts.begin();
+
+	while(mit != m_texts.end())
+	{
+		TextComponent *text = mit->second;
+
+		if(text->getTexture())
+		{
+			Vector2D targetPosition(text->getPosition().getX() - (text->getTexture()->width() / 2),
+				text->getPosition().getY() - (text->getTexture()->height() / 2));
+
+			if(m_camera)
+			{
+				targetPosition.setX(targetPosition.getX() - (float)m_camera->getX());
+				targetPosition.setY(targetPosition.getY() - (float)m_camera->getY());
+			}
+
+			m_renderer->renderTexture(text->getTexture(),
+				(int)targetPosition.getX(),
+				(int)targetPosition.getY(),
+				NULL);
+		}
+
+		mit++;
+	}
+}
+
+//=============================================================================
 // Function: void updateAnimations()
 // Description:
 // Updates all of the animation components.
@@ -914,5 +1052,25 @@ void RenderSystem::removeAnimation(int entityID)
 		delete mit->second;
 
 		mit = m_animations.erase(mit);
+	}
+}
+
+//=============================================================================
+// Function: void removeText(int entityID)
+// Description:
+// Finds and deletes the text component related to the entityID.
+// Parameters:
+// int entityID - The id of the component to find.
+//=============================================================================
+void RenderSystem::removeText(int entityID)
+{
+	auto mit = m_texts.find(entityID);
+
+	if(mit != m_texts.end())
+	{
+		delete mit->second;
+		mit->second = NULL;
+
+		mit = m_texts.erase(mit);
 	}
 }

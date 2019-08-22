@@ -25,21 +25,6 @@ Texture* ResourceManager::getTexture(Key key)
 	return m_textureCache->getTexture(key);
 }
 
-Texture* ResourceManager::getTextTexture(string text,
-	Font *font,
-	SDL_Color color,
-	Uint32 *wrapLength)
-{
-	Texture *texture = NULL;
-
-	if(m_fontCache)
-	{
-		texture = m_fontCache->getTextTexture(text, font, color, wrapLength);
-	}
-
-	return texture;
-}
-
 Font* ResourceManager::getFont(string fontPath,
 	int pointSize,
 	Font::FontFlags flag,
