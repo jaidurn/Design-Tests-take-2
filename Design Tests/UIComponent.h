@@ -17,7 +17,7 @@ public:
 	enum UI_TYPE
 	{
 		UI_BUTTON,
-		UI_LIST,
+		UI_TEXT,
 		UI_GRAPHIC,
 	};
 
@@ -26,15 +26,23 @@ public:
 
 	UI_TYPE getType() { return m_type; }
 
+	int getEntityID() { return m_entityID; }
+
 	// Position
 	Vector2D getPosition() { return m_position; }
 	virtual void setPosition(Vector2D position) { m_position = position; }
 
+	virtual void setWidth(int width) = 0;
+	virtual void setHeight(int height) = 0;
+
 	bool getActive() { return m_active; }
-	void setActive(bool active) { m_active = active; }
+	virtual void setActive(bool active) { m_active = active; }
 
 	bool getDocked() { return m_docked; }
 	void setDocked(bool docked) { m_docked = docked; }
+
+	bool getVisible() { return m_visible; }
+	virtual void setVisible(bool visible) = 0;
 
 	// Logic
 	virtual void update(float delta) = 0;
@@ -44,6 +52,7 @@ protected:
 	int m_entityID;
 	bool m_active;
 	bool m_docked;
+	bool m_visible;
 
 	Vector2D m_position;
 

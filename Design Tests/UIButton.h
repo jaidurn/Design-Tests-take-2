@@ -32,7 +32,11 @@ public:
 
 	void setText(string text, Font *font, SDL_Color color);
 
+	virtual void setWidth(int width);
+	virtual void setHeight(int height);
+	virtual void setActive(bool active);
 	virtual void setPosition(Vector2D position);
+	virtual void setVisible(bool visible);
 
 	virtual void update(float delta);
 	virtual void processMessage(IMessage *message);

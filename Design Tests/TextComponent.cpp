@@ -15,7 +15,8 @@ TextComponent::TextComponent(Font *font,
 	m_color(color),
 	m_wrapWidth(wrapWidth),
 	m_position(position),
-	m_texture(NULL)
+	m_texture(NULL),
+	m_visible(true)
 {
 	createTexture();
 }

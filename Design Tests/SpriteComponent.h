@@ -28,11 +28,13 @@ public:
 	void setVisible(bool visible) { m_visible = visible; }
 	void setLayer(int layer) { m_layer = layer; }
 	void setScaleable(bool scaleable) { m_scaleable = scaleable; }
+	void setRenderSize(int width, int height);
 
 	Texture* texture() { return m_texture; }
 	SDL_Color colorMod() { return m_colorMod; }
 	SDL_BlendMode blendMode() { return m_blendMode; }
 	SDL_Rect& clip() { return m_clip; }
+	SDL_Rect& renderSize() { return m_renderSize; }
 
 	Vector2D anchor() { return m_anchor; }
 	Vector2D position() { return m_position; }
@@ -49,6 +51,7 @@ private:
 	SDL_Color m_colorMod;
 	SDL_BlendMode m_blendMode;
 	SDL_Rect m_clip;
+	SDL_Rect m_renderSize;
 
 	Vector2D m_anchor;
 	Vector2D m_position;

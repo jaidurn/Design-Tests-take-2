@@ -26,7 +26,7 @@ UIButton::UIButton(int entityID, Vector2D position, Shape::Rectangle *rect, std:
 
 		if(sprite)
 		{
-			RenderSystem::instance()->setSpriteLayer(entityID, RenderSystem::RENDER_UI);
+			RenderSystem::instance()->setSpriteLayer(entityID, RenderSystem::RENDER_UI_FOREGROUND);
 			sprite->setScaleable(false);
 		}
 	}
@@ -136,6 +136,13 @@ void UIButton::setRect(Shape::Rectangle *rect)
 
 		m_rect = rect;
 		m_rect->setCenter(m_position.getX(), m_position.getY());
+
+		SpriteComponent *sprite = RenderSystem::instance()->getSprite(m_entityID);
+
+		if (sprite)
+		{
+			sprite->setRenderSize(m_rect->width(), m_rect->height());
+		}
 	}
 }
 
@@ -171,6 +178,82 @@ void UIButton::setText(string text, Font *font, SDL_Color color)
 }
 
 //=============================================================================
+// Function: void setWidth(int)
+// Description:
+// Sets the width of the button.
+// Parameters:
+// int width - The new button width.
+//=============================================================================
+void UIButton::setWidth(int width)
+{
+	if (0 < width)
+	{
+		m_rect->setWidth(width);
+
+		SpriteComponent *sprite = RenderSystem::instance()->getSprite(m_entityID);
+
+		if (sprite)
+		{
+			SDL_Rect clip = sprite->renderSize();
+
+			sprite->setRenderSize(m_rect->width(), clip.h);
+		}
+
+		TextComponent *text = RenderSystem::instance()->getText(m_entityID);
+
+		if (text)
+		{
+			text->setWrapWidth(width - 20);
+		}
+	}
+}
+
+//=============================================================================
+// Function: void setHeight(int)
+// Description:
+// Sets the height of the button.
+// Parameters:
+// int height - The new button height.
+//=============================================================================
+void UIButton::setHeight(int height)
+{
+	if (0 < height)
+	{
+		m_rect->setHeight(height);
+
+		SpriteComponent *sprite = RenderSystem::instance()->getSprite(m_entityID);
+
+		if (sprite)
+		{
+			SDL_Rect clip = sprite->renderSize();
+
+			sprite->setRenderSize(clip.w, m_rect->height());
+		}
+	}
+}
+
+//=============================================================================
+// Function: void setActive(bool)
+// Description:
+// Sets the active state.
+// Parameters:
+// bool active - The active state to set.
+//=============================================================================
+void UIButton::setActive(bool active)
+{
+	if (m_active != active)
+	{
+		if (m_active)
+		{
+			m_pressed = false;
+			m_wasPressed = false;
+		}
+
+		m_active = active;
+	}
+}
+
+//=============================================================================
 // Function: void setPosition(Vector2D)
 // Description:
 // Updates the position of the button and its rect.
@@ -189,6 +272,32 @@ void UIButton::setPosition(Vector2D position)
 	MessageSystem::instance()->pushMessage(move);
 
 	m_position = position;
+}
+
+//=============================================================================
+// Function: void setVisible(bool)
+// Description:
+// Sets the visiblity of the button.
+// Parameters:
+// bool visible - The visibility of the button.
+//=============================================================================
+void UIButton::setVisible(bool visible)
+{
+	SpriteComponent *sprite = RenderSystem::instance()->getSprite(m_entityID);
+
+	if(sprite)
+	{
+		sprite->setVisible(visible);
+	}
+
+	TextComponent *textComp = RenderSystem::instance()->getText(m_entityID);
+
+	if(textComp)
+	{
+		textComp->setVisible(visible);
+	}
+
+	m_visible = visible;
 }
 
 //=============================================================================
@@ -355,6 +464,21 @@ void UIButton::processMessage(IMessage *message)
 			break;
 		}
 		}
+	}
+
+	switch (message->type())
+	{
+	case IMessage::MOVE:
+	{
+		MoveMessage *move = static_cast<MoveMessage*>(message);
+
+		if (move->m_entityID == m_entityID)
+		{
+			setPosition(move->m_newPosition);
+		}
+
+		break;
+	}
 	}
 }
 

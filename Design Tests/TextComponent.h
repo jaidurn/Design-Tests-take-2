@@ -28,6 +28,7 @@ public:
 	void setFont(Font *font);
 	void setWrapWidth(Uint32 width);
 	void setPosition(Vector2D position) { m_position = position; }
+	void setVisible(bool visible) { m_visible = visible; }
 
 	Font* getFont() { return m_font; }
 	Texture* getTexture() { return m_texture; }
@@ -35,6 +36,7 @@ public:
 	string getText() { return m_text; }
 	Uint32 getWrapWidth() { return m_wrapWidth; }
 	Vector2D getPosition() { return m_position; }
+	bool getVisible() { return m_visible; }
 
 private:
 	Font *m_font;
@@ -45,6 +47,7 @@ private:
 
 	string m_text;
 	Uint32 m_wrapWidth;
+	bool m_visible;
 
 	void createTexture();
 	void destroyTexture();

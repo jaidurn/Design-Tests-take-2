@@ -37,7 +37,7 @@ UIComponent* UserInterfaceSystem::createUI(UIComponent::UI_TYPE type, int entity
 			comp = new UIButton(entityID, position, NULL, "");
 			break;
 		}
-		case UIComponent::UI_LIST:
+		case UIComponent::UI_TEXT:
 		{
 			break;
 		}

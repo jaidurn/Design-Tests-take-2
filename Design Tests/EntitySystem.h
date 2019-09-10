@@ -30,6 +30,7 @@ public:
 
 	int createEntity(entityKey key);
 	int createEntity(entityKey key, Vector2D position);
+	int createEntity();
 
 	entityKey getEntityKey(int entityID);
 	std::string entityType(int entityID);

@@ -3,6 +3,7 @@
 #include <SDL_ttf.h>
 #include <iostream>
 #include <string>
+#include "Deck.h"
 
 #include "Game.h"
 

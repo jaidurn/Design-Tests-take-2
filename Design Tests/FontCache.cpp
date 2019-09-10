@@ -45,6 +45,8 @@ Font* FontCache::getFont(string fontPath,
 		if (mit == m_fonts.end())
 		{
 			font = new Font(fontPath, pointSize, flag, italics);
+
+			m_fonts.insert(std::make_pair(fontPath, font));
 		}
 		else
 		{
