@@ -9,7 +9,7 @@
 #include "Timer.h"
 #include <string>
 
-class Texture;
+class TextComponent;
 class ResourceManager;
 class PhysicsSystem;
 class RenderSystem;
@@ -18,7 +18,7 @@ class LogicSystem;
 class InputSystem;
 class World;
 class Room;
-class UIButton;
+class UIDeckGrid;
 
 class Game
 {
@@ -49,16 +49,14 @@ private:
 	Game();
 
 	ResourceManager *m_resource;
-	Texture *m_texture;
 	PhysicsSystem *m_physicsSys;
 	RenderSystem *m_renderSys;
 	MessageSystem *m_messageSys;
 	InputSystem *m_inputSys;
 	LogicSystem *m_logicSys;
 	World *m_world;
-	Room *m_room;
 
-	UIButton *m_button;
+	UIDeckGrid *m_menu;
 
 	Timer m_timer;
 

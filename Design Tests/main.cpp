@@ -3,6 +3,7 @@
 #include <SDL_ttf.h>
 #include <iostream>
 #include <string>
+#include "Deck.h"
 
 #include "Game.h"
 
@@ -40,14 +41,18 @@ int main(int argc, char *argv[])
 	if (!game->init("Resources/load.ini"))
 	{
 		std::cout << "Failed to load the game!\n";
-
-		return 1;
 	}
-
-	while(game->state() != game->GS_EXIT)
+	else
 	{
-		game->loop();
+		while (game->state() != game->GS_EXIT)
+		{
+			game->loop();
+		}
 	}
+
+	TTF_Quit();
+	IMG_Quit();
+	SDL_Quit();
 
 	return 0;
 }

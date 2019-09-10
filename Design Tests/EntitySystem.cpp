@@ -140,6 +140,29 @@ int EntitySystem::createEntity(entityKey key, Vector2D position)
 }
 
 //=============================================================================
+// Function: int createEntity()
+// Description:
+// Creates a new entity ID.
+// ONLY use this when creating a custom entity that isn't
+// in the existing entity list.
+// Output:
+// int - The id of the entity that was created. 
+// Returns -1 on failure.
+//=============================================================================
+int EntitySystem::createEntity()
+{
+	int entityID = -1;
+
+	if(m_initialized)
+	{
+		entityID = findNextAvailableID();
+		m_entityList[entityID] = true;
+	}
+
+	return entityID;
+}
+
+//=============================================================================
 // Function: entityKey getEntityKey(int entityID)
 // Description:
 // Finds and gets the entity key for the entity ID.

@@ -14,12 +14,14 @@
 #include "AnimationComponent.h"
 #include "IMessage.h"
 #include "MessageSystem.h"
-#include "AnimationChangeMessage.h"
 #include "Camera2D.h"
 #include "TextureEffect.h"
+#include "TextComponent.h"
 #include "Grid.h"
 
 class Renderer;
+class AnimationChangeMessage;
+class MoveMessage;
 
 typedef int ID;
 
@@ -32,7 +34,9 @@ public:
 		RENDER_FOREGROUND0,
 		RENDER_FOREGROUND1,
 		RENDER_FOREGROUND2,
-		RENDER_UI
+		RENDER_UI_BACKGROUND,
+		RENDER_UI_MIDGROUND,
+		RENDER_UI_FOREGROUND
 	};
 
 	static RenderSystem *instance()
@@ -50,11 +54,12 @@ public:
 	// TODO: Maybe take component creation away from the system, but have the system
 	// have control of registering and destroying them.
 	SpriteComponent* createSprite(ID id, std::string texturePath, Vector2D position);
-
 	AnimationComponent* createAnimationComponent(ID id);
+	TextComponent* createTextComponent(ID id, string text, Font *font, SDL_Color color, Uint32 wrapWidth, Vector2D position);
 
 	SpriteComponent* getSprite(ID id);
 	AnimationComponent* getAnimation(ID id);
+	TextComponent *getText(ID id);
 	TextureEffect* getEffect(ID id);
 
 	void setSpriteLayer(ID spriteID, RenderLayers layer);
@@ -75,11 +80,11 @@ public:
 	Camera2D* camera() { return m_camera; }
 
 private:
-	const int m_LAYER_COUNT = 5;
+	const int m_LAYER_COUNT = 7;
 	const int m_GRID_SIZE = 256;
 
 	RenderSystem()
-		:m_renderer(NULL), m_camera(NULL), m_grid(0, 0, 1280, 720, m_GRID_SIZE)
+		:m_renderer(NULL), m_camera(NULL)
 	{
 		for(int i = 0; i < m_LAYER_COUNT; i++)
 		{
@@ -90,26 +95,26 @@ private:
 	Renderer *m_renderer;
 
 	Camera2D *m_camera;
-	// TODO: Create individual cache systems for all of the components.
+
 	std::map<ID, SpriteComponent*> m_sprites;
 	std::map<ID, AnimationComponent*> m_animations;
+	std::map<ID, TextComponent*> m_texts;
 	std::map<ID, TextureEffect*> m_effects;
 
 	std::vector<Grid*> m_layers;
-
-	Grid m_grid;
 
 	void cleanUp();
 	void drawSprites(float delta, int layer);
 	void drawUI(float delta);
 	void drawText(float delta);
 	void updateAnimations();
-	void updateVisible();
 	// TODO: Add functionality to render our collision objects.
 
 	void processAnimationChange(AnimationChangeMessage *message);
+	void processMoveMessage(MoveMessage *message);
 
 	void removeSprite(int entityID);
 	void removeAnimation(int entityID);
+	void removeText(int entityID);
 };
 

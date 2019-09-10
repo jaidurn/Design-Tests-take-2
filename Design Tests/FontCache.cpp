@@ -45,6 +45,8 @@ Font* FontCache::getFont(string fontPath,
 		if (mit == m_fonts.end())
 		{
 			font = new Font(fontPath, pointSize, flag, italics);
+
+			m_fonts.insert(std::make_pair(fontPath, font));
 		}
 		else
 		{
@@ -68,7 +70,7 @@ void FontCache::cleanUp()
 {
 	auto fit = m_fonts.begin();
 
-	while(fit != m_fonts.end())
+	while (fit != m_fonts.end())
 	{
 		delete fit->second;
 
@@ -76,24 +78,9 @@ void FontCache::cleanUp()
 
 		fit = m_fonts.erase(fit);
 
-		if(fit != m_fonts.end())
+		if (fit != m_fonts.end())
 		{
 			fit++;
-		}
-	}
-
-	auto mit = m_textTextures.begin();
-
-	while(mit != m_textTextures.end())
-	{
-		delete mit->second;
-		mit->second = NULL;
-
-		mit = m_textTextures.erase(mit);
-
-		if(mit != m_textTextures.end())
-		{
-			mit++;
 		}
 	}
 }

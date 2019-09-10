@@ -16,7 +16,9 @@ UIButton::UIButton(int entityID, Vector2D position, Shape::Rectangle *rect, std:
 	m_wasPressed(false),
 	m_pressed(false),
 	m_rect(rect),
-	m_update(NULL)
+	m_onPress(NULL),
+	m_onRelease(NULL),
+	m_onHold(NULL)
 {
 	if(buttonTexture != "")
 	{
@@ -24,7 +26,7 @@ UIButton::UIButton(int entityID, Vector2D position, Shape::Rectangle *rect, std:
 
 		if(sprite)
 		{
-			RenderSystem::instance()->setSpriteLayer(entityID, RenderSystem::RENDER_UI);
+			RenderSystem::instance()->setSpriteLayer(entityID, RenderSystem::RENDER_UI_FOREGROUND);
 			sprite->setScaleable(false);
 		}
 	}
@@ -115,20 +117,139 @@ void UIButton::setPressed(bool pressed)
 }
 
 //=============================================================================
-// Function:
+// Function: void setRect(Rectangle*)
 // Description:
-//
+// Sets the bounding box of the button to the specified rect.
 // Parameters:
-//
-// Output:
-// 
+// Rectangle *rect - The rectangle to set the bounding box to.
 //=============================================================================
 void UIButton::setRect(Shape::Rectangle *rect)
 {
 	if (rect)
 	{
+		if (m_rect && m_rect != rect)
+		{
+			delete m_rect;
+
+			m_rect = NULL;
+		}
+
 		m_rect = rect;
 		m_rect->setCenter(m_position.getX(), m_position.getY());
+
+		SpriteComponent *sprite = RenderSystem::instance()->getSprite(m_entityID);
+
+		if (sprite)
+		{
+			sprite->setRenderSize(m_rect->width(), m_rect->height());
+		}
+	}
+}
+
+//=============================================================================
+// Function: void setText(string, Font*, SDL_Color)
+// Description:
+// Sets the text of the button to the specified text.
+// Parameters:
+// string text - The text to set the button text to.
+// Font *font - The font to use for the text.
+// SDL_Color color - The color to use for the text.
+//=============================================================================
+void UIButton::setText(string text, Font *font, SDL_Color color)
+{
+	if(text != "" && font)
+	{
+		Uint32 wrapWidth = 0;
+
+		if (m_rect)
+		{
+			int border = 20;
+			wrapWidth = m_rect->width() - border;
+		}
+
+		TextComponent *textComp = 
+			RenderSystem::instance()->createTextComponent(m_entityID,
+														  text,
+														  font,
+														  color,
+														  wrapWidth,
+														  m_position);
+	}
+}
+
+//=============================================================================
+// Function: void setWidth(int)
+// Description:
+// Sets the width of the button.
+// Parameters:
+// int width - The new button width.
+//=============================================================================
+void UIButton::setWidth(int width)
+{
+	if (0 < width)
+	{
+		m_rect->setWidth(width);
+
+		SpriteComponent *sprite = RenderSystem::instance()->getSprite(m_entityID);
+
+		if (sprite)
+		{
+			SDL_Rect clip = sprite->renderSize();
+
+			sprite->setRenderSize(m_rect->width(), clip.h);
+		}
+
+		TextComponent *text = RenderSystem::instance()->getText(m_entityID);
+
+		if (text)
+		{
+			text->setWrapWidth(width - 20);
+		}
+	}
+}
+
+//=============================================================================
+// Function: void setHeight(int)
+// Description:
+// Sets the height of the button.
+// Parameters:
+// int height - The new button height.
+//=============================================================================
+void UIButton::setHeight(int height)
+{
+	if (0 < height)
+	{
+		m_rect->setHeight(height);
+
+		SpriteComponent *sprite = RenderSystem::instance()->getSprite(m_entityID);
+
+		if (sprite)
+		{
+			SDL_Rect clip = sprite->renderSize();
+
+			sprite->setRenderSize(clip.w, m_rect->height());
+		}
+	}
+}
+
+//=============================================================================
+// Function: void setActive(bool)
+// Description:
+// Sets the active state.
+// Parameters:
+// bool active - The active state to set.
+//=============================================================================
+void UIButton::setActive(bool active)
+{
+	if (m_active != active)
+	{
+		if (m_active)
+		{
+			m_pressed = false;
+			m_wasPressed = false;
+		}
+
+		m_active = active;
 	}
 }
 
@@ -154,6 +275,32 @@ void UIButton::setPosition(Vector2D position)
 }
 
 //=============================================================================
+// Function: void setVisible(bool)
+// Description:
+// Sets the visiblity of the button.
+// Parameters:
+// bool visible - The visibility of the button.
+//=============================================================================
+void UIButton::setVisible(bool visible)
+{
+	SpriteComponent *sprite = RenderSystem::instance()->getSprite(m_entityID);
+
+	if(sprite)
+	{
+		sprite->setVisible(visible);
+	}
+
+	TextComponent *textComp = RenderSystem::instance()->getText(m_entityID);
+
+	if(textComp)
+	{
+		textComp->setVisible(visible);
+	}
+
+	m_visible = visible;
+}
+
+//=============================================================================
 // Function: void update(float)
 // Description:
 // Updates the logic of the button.
@@ -162,15 +309,32 @@ void UIButton::setPosition(Vector2D position)
 //=============================================================================
 void UIButton::update(float delta)
 {
-	m_wasPressed = m_pressed;
-
 	if (m_active)
 	{
-		if (m_update)
+		if(getPressed())
 		{
-			m_update();
+			if(m_onPress)
+			{
+				m_onPress();
+			}
+		}
+		else if(getReleased())
+		{
+			if(m_onRelease)
+			{
+				m_onRelease();
+			}
+		}
+		else if(getHeld())
+		{
+			if(m_onHold)
+			{
+				m_onHold();
+			}
 		}
 	}
+
+	m_wasPressed = m_pressed;
 }
 
 //=============================================================================
@@ -207,110 +371,152 @@ void UIButton::processMessage(IMessage *message)
 		}
 		case IMessage::INPUT:
 		{
-			CollisionSystem *collisionSys = PhysicsSystem::instance()->collisionSystem();
-
-			InputMessage *input = static_cast<InputMessage*>(message);
-
-			switch (input->m_inputType)
+			if (m_rect)
 			{
-			case InputMessage::INPUT_BUTTON:
-			{
-				InputButtonMessage *button = static_cast<InputButtonMessage*>(input);
+				CollisionSystem *collisionSys = PhysicsSystem::instance()->collisionSystem();
 
-				if (button->m_deviceType == InputDevice::MOUSE && button->m_button == SDL_BUTTON_LEFT)
+				InputMessage *input = static_cast<InputMessage*>(message);
+
+				switch (input->m_inputType)
 				{
-					InputDevice *device = InputSystem::instance()->getDevice(button->m_deviceID);
+				case InputMessage::INPUT_BUTTON:
+				{
+					InputButtonMessage *button = static_cast<InputButtonMessage*>(input);
 
-					if (device)
+					if (button->m_deviceType == InputDevice::MOUSE && button->m_button == SDL_BUTTON_LEFT)
 					{
-						if (device->type() == InputDevice::MOUSE)
+						InputDevice *device = InputSystem::instance()->getDevice(button->m_deviceID);
+
+						if (device)
 						{
-							Input::Mouse *mouse = static_cast<Input::Mouse*>(device);
-
-							Vector2D scaledPoint{ mouse->getX(), mouse->getY() };
-
-							Camera2D *camera = RenderSystem::instance()->camera();
-
-							if (camera)
+							if (device->type() == InputDevice::MOUSE)
 							{
-								// TODO: FIND OUT WHY THE SCALING DOESN'T WORK
-								scaledPoint.setX(scaledPoint.getX() + (camera->getX()));
-								scaledPoint.setY(scaledPoint.getY() + (camera->getY()));
-							}
+								Input::Mouse *mouse = static_cast<Input::Mouse*>(device);
 
-							if (collisionSys->pointInsideRect(m_rect, (int)scaledPoint.getX(), (int)scaledPoint.getY()))
-							{
-								m_wasPressed = m_pressed;
+								Vector2D scaledPoint{ mouse->getX(), mouse->getY() };
 
-								if (button->m_pressed)
+								Camera2D *camera = RenderSystem::instance()->camera();
+
+								if (camera)
 								{
-									m_pressed = true;
+									// TODO: FIND OUT WHY THE SCALING DOESN'T WORK
+									scaledPoint.setX(scaledPoint.getX() + (camera->getX()));
+									scaledPoint.setY(scaledPoint.getY() + (camera->getY()));
 								}
-								else
+
+								if (collisionSys->pointInsideRect(m_rect, (int)scaledPoint.getX(), (int)scaledPoint.getY()))
 								{
+									m_wasPressed = m_pressed;
+
+									if (button->m_pressed)
+									{
+										m_pressed = true;
+									}
+									else
+									{
+										m_pressed = false;
+									}
+								}
+							}
+						}
+					}
+
+					break;
+				}
+				case InputMessage::INPUT_MOVE:
+				{
+					InputMoveMessage *move = static_cast<InputMoveMessage*>(input);
+
+					if (move->m_deviceType == InputDevice::MOUSE)
+					{
+						InputDevice *device = InputSystem::instance()->getDevice(move->m_deviceID);
+
+						if (device)
+						{
+							if (device->type() == InputDevice::MOUSE)
+							{
+								Input::Mouse *mouse = static_cast<Input::Mouse*>(device);
+
+								Vector2D scaledPoint{ mouse->getX(), mouse->getY() };
+
+								Camera2D *camera = RenderSystem::instance()->camera();
+
+								if (camera)
+								{
+									scaledPoint.setX(scaledPoint.getX() + (camera->getX()));
+									scaledPoint.setY(scaledPoint.getY() + (camera->getY()));
+								}
+
+								if (!collisionSys->pointInsideRect(m_rect, scaledPoint.getX(), scaledPoint.getY()))
+								{
+									m_wasPressed = m_pressed;
 									m_pressed = false;
 								}
 							}
 						}
 					}
+
+					break;
 				}
-
-				break;
-			}
-			case InputMessage::INPUT_MOVE:
-			{
-				InputMoveMessage *move = static_cast<InputMoveMessage*>(input);
-
-				if (move->m_deviceType == InputDevice::MOUSE)
-				{
-					InputDevice *device = InputSystem::instance()->getDevice(move->m_deviceID);
-
-					if (device)
-					{
-						if (device->type() == InputDevice::MOUSE)
-						{
-							Input::Mouse *mouse = static_cast<Input::Mouse*>(device);
-
-							Vector2D scaledPoint{ mouse->getX(), mouse->getY() };
-
-							Camera2D *camera = RenderSystem::instance()->camera();
-
-							if (camera)
-							{
-								scaledPoint.setX(scaledPoint.getX() + (camera->getX()));
-								scaledPoint.setY(scaledPoint.getY() + (camera->getY()));
-							}
-
-							if (!collisionSys->pointInsideRect(m_rect, scaledPoint.getX(), scaledPoint.getY()))
-							{
-								m_wasPressed = m_pressed;
-								m_pressed = false;
-							}
-						}
-					}
 				}
-
-				break;
-			}
 			}
 
 			break;
 		}
 		}
 	}
+
+	switch (message->type())
+	{
+	case IMessage::MOVE:
+	{
+		MoveMessage *move = static_cast<MoveMessage*>(message);
+
+		if (move->m_entityID == m_entityID)
+		{
+			setPosition(move->m_newPosition);
+		}
+
+		break;
+	}
+	}
 }
 
 //=============================================================================
-// Function: void setUpdateFunction(updatePtr)
+// Function: void setOnPress(functionPtr)
 // Description:
-// Sets the update function to use.
+// Sets the current on press function to the specified function.
 // Parameters:
-// updatePtr update - The new update function to use for the button.
+// functionPtr onPress - The pointer to the function to run when 
+// the button is pressed.
 //=============================================================================
-void UIButton::setUpdateFunction(updatePtr update)
+void UIButton::setOnPress(functionPtr onPress)
 {
-	if(update)
-	{
-		m_update = update;
-	}
+	m_onPress = onPress;
+}
+
+//=============================================================================
+// Function: void setOnRelease(functionPtr)
+// Description:
+// Sets the current on release function to the specified function.
+// Parameters:
+// functionPtr onRelease - The pointer containing the function to run on
+// release.
+//=============================================================================
+void UIButton::setOnRelease(functionPtr onRelease)
+{
+	m_onRelease = onRelease;
+}
+
+//=============================================================================
+// Function: void setOnHold(functionPtr)
+// Description:
+// Sets the current on hold function to the specified function.
+// Parameters:
+// functionPtr onHold - The pointer containing the function to run on
+// button held.
+//=============================================================================
+void UIButton::setOnHold(functionPtr onHold)
+{
+	m_onHold = onHold;
 }

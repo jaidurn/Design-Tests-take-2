@@ -20,6 +20,9 @@ SpriteComponent::SpriteComponent(Texture *texture)
 	m_clip.x = 0; m_clip.y = 0;
 	m_clip.w = 0; m_clip.h = 0;
 
+	m_renderSize.x = 0; m_renderSize.y = 0;
+	m_renderSize.w = 0; m_renderSize.h = 0;
+
 	m_blendMode = SDL_BLENDMODE_BLEND;
 
 	// Default the anchor to the center
@@ -29,6 +32,9 @@ SpriteComponent::SpriteComponent(Texture *texture)
 
 		m_clip.w = m_texture->width();
 		m_clip.h = m_texture->height();
+
+		m_renderSize.w = m_texture->width();
+		m_renderSize.h = m_texture->height();
 	
 		if(SDL_GetTextureColorMod(texture->texture(), &m_colorMod.r, &m_colorMod.g, &m_colorMod.b) != 0)
 		{
@@ -100,8 +106,36 @@ void SpriteComponent::setTexture(Texture *texture)
 //=============================================================================
 void SpriteComponent::setClip(int x, int y, int w, int h)
 {
+	if(m_renderSize.w == m_clip.w &&
+		m_renderSize.h == m_clip.h)
+	{
+		if (0 < w) { m_renderSize.w = w; }
+		if (0 < h) { m_renderSize.h = h; }
+	}
+
 	if (0 <= x) { m_clip.x = x; }
 	if (0 <= y) { m_clip.y = y; }
 	if (0 < w) { m_clip.w = w; }
 	if (0 < h) { m_clip.h = h; }
+}
+
+//=============================================================================
+// Function: void setRenderSize(int, int)
+// Description:
+// Sets the size to render the sprite at.
+// Parameters:
+// int width - The width of the sprite.
+// int height - The height of the sprite.
+//=============================================================================
+void SpriteComponent::setRenderSize(int width, int height)
+{
+	if(0 < width)
+	{
+		m_renderSize.w = width;
+	}
+	
+	if(0 < height)
+	{
+		m_renderSize.h = height;
+	}
 }

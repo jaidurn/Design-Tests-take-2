@@ -1,0 +1,34 @@
+Menu
+X 0
+Y 0
+Width 500
+Height 500
+Docked 1
+ItemCount 3
+
+Item_0 Background
+Background_Type Graphic
+Background_X 100
+Background_Y 100
+Background_Width 100
+Background_Height 100
+Background_Path "Resources/menu.png"
+
+Item_1 Title
+Title_Type Text
+Title_X 10
+Title_Y 10
+Title_Width 100
+Title_Height 100
+Title_Path "Resources/Fonts/RobotoMono-"
+Title_Red 255
+Title_Blue 255
+Title_Green 255
+Title_Alpha 255
+
+Item_2 Close
+Close_Type Button
+Close_X -50
+Close_Y -50
+Close_Width 100
+Close_Height 100

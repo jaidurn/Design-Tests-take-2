@@ -13,11 +13,22 @@
 #include "EnemyIdleState.h"
 #include "World.h"
 #include "UIButton.h"
+#include "UIText.h"
+#include "UIMenu.h"
+#include "UIGraphic.h"
+#include "UIDeckGrid.h"
+#include "Deck.h"
 
 Game::Game()
-	:m_physicsSys(NULL), m_renderSys(NULL), m_messageSys(NULL),
-	m_inputSys(NULL), m_logicSys(NULL), m_initialized(false), m_currentState(GS_EXIT),
-	m_button(NULL), m_room(NULL), m_resource(NULL)
+	:m_physicsSys(NULL),
+	m_renderSys(NULL),
+	m_messageSys(NULL),
+	m_inputSys(NULL), 
+	m_logicSys(NULL),
+	m_initialized(false), 
+	m_currentState(GS_EXIT),
+	m_resource(NULL), 
+	m_menu(NULL)
 {
 	m_world = new World("Resources/rooms.dat");
 }
@@ -32,13 +43,35 @@ Game::~Game()
 	m_inputSys = NULL;
 	m_logicSys = NULL;
 
-	delete m_button;
-	m_button = NULL;
+	delete m_menu;
+	m_menu = NULL;
 
 	delete m_world;
 	m_world = NULL;
 
 	m_timer.stop();
+}
+
+void press()
+{
+	std::cout << "Pressed!\n";
+}
+
+void release()
+{
+	std::cout << "Released!\n";
+}
+
+void hold()
+{
+	static int time = 0;
+
+	if(time % 10 == 0)
+	{
+		std::cout << "YEE HAW!\n";
+	}
+
+	time++;
 }
 
 //=============================================================================
@@ -70,13 +103,98 @@ bool Game::init(std::string gamePath)
 
 				if (m_physicsSys && m_renderSys && m_messageSys && m_logicSys && m_inputSys)
 				{
-					while(!m_world->exists())
+					while (!m_world->exists())
 					{
 						m_world->dungeon();
 					}
 
 					int player = EntitySystem::instance()->createEntity(0, m_world->getRoom(0)->rect()->center());
 					int enemy = EntitySystem::instance()->createEntity(1, Vector2D(200, 100));
+
+					Camera2D *camera = RenderSystem::instance()->camera();
+
+					Vector2D cameraCenter(camera->getX() + (camera->getWidth() / 2),
+						camera->getY() + (camera->getHeight() / 2));
+
+					Deck *deck = new Deck();
+
+					int cardID = EntitySystem::instance()->createEntity();
+					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_COMMON);
+
+					Rectangle *cardRect = new Rectangle(0, 0, 64, 128);
+
+					UIButton *card0 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardWorld.png");
+
+					cardID = EntitySystem::instance()->createEntity();
+					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_UNCOMMON);
+
+					UIButton *card1 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardWorld.png");
+
+					cardID = EntitySystem::instance()->createEntity();
+					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_RARE);
+
+					UIButton *card2 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardWorld.png");
+
+					cardID = EntitySystem::instance()->createEntity();
+					deck->addCard(cardID, Card::CARD_STAT, Card::CARD_COMMON);
+
+					UIButton *card3 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardBase.png");
+
+					cardID = EntitySystem::instance()->createEntity();
+					deck->addCard(cardID, Card::CARD_STAT, Card::CARD_COMMON);
+
+					UIButton *card4 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardBase.png");
+
+					cardID = EntitySystem::instance()->createEntity();
+					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_COMMON);
+
+					UIButton *card5 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardWorld.png");
+
+					cardID = EntitySystem::instance()->createEntity();
+					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_COMMON);
+
+					UIButton *card6 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardWorld.png");
+
+					cardID = EntitySystem::instance()->createEntity();
+					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_COMMON);
+
+					UIButton *card7 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardBase.png");
+
+					cardID = EntitySystem::instance()->createEntity();
+					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_COMMON);
+
+					UIButton *card8 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardBase.png");
+
+					cardID = EntitySystem::instance()->createEntity();
+					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_COMMON);
+
+					UIButton *card9 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardBase.png");
+
+					cardID = EntitySystem::instance()->createEntity();
+					
+					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_COMMON);
+
+					UIButton *card10 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardBase.png");
+
+
+					m_menu = new UIDeckGrid(cameraCenter, (camera->getWidth() - 160),
+						(camera->getHeight() - 40), "Resources/menu.png", 
+						8, 4, deck);
+
+					m_menu->addItem(card0->getEntityID(), card0);
+					m_menu->addItem(card1->getEntityID(), card1);
+					m_menu->addItem(card2->getEntityID(), card2);
+					m_menu->addItem(card3->getEntityID(), card3);
+					m_menu->addItem(card4->getEntityID(), card4);
+					m_menu->addItem(card5->getEntityID(), card5);
+					m_menu->addItem(card6->getEntityID(), card6);
+					m_menu->addItem(card7->getEntityID(), card7);
+					m_menu->addItem(card8->getEntityID(), card8);
+					m_menu->addItem(card9->getEntityID(), card9);
+					m_menu->addItem(card10->getEntityID(), card10);
+
+					m_menu->setVisible(false);
+					m_menu->setActive(false);
 
 					m_renderSys->setCameraTarget(player);
 					m_renderSys->camera()->setBoundingBoxSize(ResourceManager::instance()->window()->width() / 4, ResourceManager::instance()->window()->height() / 4);
@@ -105,14 +223,6 @@ bool Game::init(std::string gamePath)
 					enemyLog->addState("Idle", idle4);
 
 					playerLog->changeState("Idle");
-
-					Camera2D *camera = RenderSystem::instance()->camera();
-
-					m_button = new UIButton(-1, Vector2D((float)(80), (float)(80)), NULL, "Resources/button.png");
-
-					Shape::Rectangle *rect = new Shape::Rectangle(m_button->getPosition().getX(), m_button->getPosition().getY(), 100, 100);
-
-					m_button->setRect(rect);
 
 					m_initialized = true;
 					success = true;
@@ -149,16 +259,7 @@ void Game::loop()
 		processLogic(deltaTime);
 		processPhysics(deltaTime);
 
-		if(m_button->getPressed())
-		{
-			std::cout << "Pressed\n";
-		}
-		else if (m_button->getReleased())
-		{
-			std::cout << "Released!\n";
-		}
-
-		m_button->update(deltaTime);
+		m_menu->update(deltaTime);
 
 		m_world->renderRooms();
 
@@ -215,6 +316,19 @@ void Game::processInput()
 						}
 					}
 				}
+				else if(e.key.keysym.sym == SDLK_ESCAPE)
+				{
+					if(m_menu->getVisible())
+					{
+						m_menu->setVisible(false);
+						m_menu->setActive(false);
+					}
+					else
+					{
+						m_menu->setVisible(true);
+						m_menu->setActive(true);
+					}
+				}
 			}
 		}
 	}
@@ -239,7 +353,7 @@ void Game::processMessages()
 				m_logicSys->processMessage(message);
 				m_physicsSys->processMessage(message);
 				m_renderSys->processMessage(message);
-				m_button->processMessage(message);
+				m_menu->processMessage(message);
 			}
 		}
 	}
@@ -299,16 +413,6 @@ void Game::updateRenderer(float delta)
 {
 	if(m_initialized)
 	{
-		Line left{ m_button->getRect()->getTopLeft(), m_button->getRect()->getBottomLeft() };
-		Line right{ m_button->getRect()->getTopRight(), m_button->getRect()->getBottomRight() };
-		Line top{ m_button->getRect()->getTopLeft(), m_button->getRect()->getTopRight() };
-		Line bottom{ left.end, right.end };
-		SDL_Color red{ 255, 0, 0, 255 };
-
-		m_renderSys->drawLine(left, red);
-		m_renderSys->drawLine(right, red);
-		m_renderSys->drawLine(top, red);
-		m_renderSys->drawLine(bottom, red);
 		m_renderSys->update(delta);
 	}
 }
