@@ -12,12 +12,6 @@
 #include "EnemyTargetState.h"
 #include "EnemyIdleState.h"
 #include "World.h"
-#include "UIButton.h"
-#include "UIText.h"
-#include "UIMenu.h"
-#include "UIGraphic.h"
-#include "UIDeckGrid.h"
-#include "Deck.h"
 
 Game::Game()
 	:m_physicsSys(NULL),
@@ -27,8 +21,7 @@ Game::Game()
 	m_logicSys(NULL),
 	m_initialized(false), 
 	m_currentState(GS_EXIT),
-	m_resource(NULL), 
-	m_menu(NULL)
+	m_resource(NULL)
 {
 	m_world = new World("Resources/rooms.dat");
 }
@@ -43,36 +36,12 @@ Game::~Game()
 	m_inputSys = NULL;
 	m_logicSys = NULL;
 
-	delete m_menu;
-	m_menu = NULL;
-
 	delete m_world;
 	m_world = NULL;
 
 	m_timer.stop();
 }
 
-void press()
-{
-	std::cout << "Pressed!\n";
-}
-
-void release()
-{
-	std::cout << "Released!\n";
-}
-
-void hold()
-{
-	static int time = 0;
-
-	if(time % 10 == 0)
-	{
-		std::cout << "YEE HAW!\n";
-	}
-
-	time++;
-}
 
 //=============================================================================
 // Function: bool init(string)
@@ -116,86 +85,6 @@ bool Game::init(std::string gamePath)
 					Vector2D cameraCenter(camera->getX() + (camera->getWidth() / 2),
 						camera->getY() + (camera->getHeight() / 2));
 
-					Deck *deck = new Deck();
-
-					int cardID = EntitySystem::instance()->createEntity();
-					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_COMMON);
-
-					Rectangle *cardRect = new Rectangle(0, 0, 64, 128);
-
-					UIButton *card0 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardWorld.png");
-
-					cardID = EntitySystem::instance()->createEntity();
-					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_UNCOMMON);
-
-					UIButton *card1 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardWorld.png");
-
-					cardID = EntitySystem::instance()->createEntity();
-					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_RARE);
-
-					UIButton *card2 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardWorld.png");
-
-					cardID = EntitySystem::instance()->createEntity();
-					deck->addCard(cardID, Card::CARD_STAT, Card::CARD_COMMON);
-
-					UIButton *card3 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardBase.png");
-
-					cardID = EntitySystem::instance()->createEntity();
-					deck->addCard(cardID, Card::CARD_STAT, Card::CARD_COMMON);
-
-					UIButton *card4 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardBase.png");
-
-					cardID = EntitySystem::instance()->createEntity();
-					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_COMMON);
-
-					UIButton *card5 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardWorld.png");
-
-					cardID = EntitySystem::instance()->createEntity();
-					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_COMMON);
-
-					UIButton *card6 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardWorld.png");
-
-					cardID = EntitySystem::instance()->createEntity();
-					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_COMMON);
-
-					UIButton *card7 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardBase.png");
-
-					cardID = EntitySystem::instance()->createEntity();
-					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_COMMON);
-
-					UIButton *card8 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardBase.png");
-
-					cardID = EntitySystem::instance()->createEntity();
-					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_COMMON);
-
-					UIButton *card9 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardBase.png");
-
-					cardID = EntitySystem::instance()->createEntity();
-					
-					deck->addCard(cardID, Card::CARD_WORLD, Card::CARD_COMMON);
-
-					UIButton *card10 = new UIButton(cardID, Vector2D(0, 0), cardRect, "Resources/cardBase.png");
-
-
-					m_menu = new UIDeckGrid(cameraCenter, (camera->getWidth() - 160),
-						(camera->getHeight() - 40), "Resources/menu.png", 
-						8, 4, deck);
-
-					m_menu->addItem(card0->getEntityID(), card0);
-					m_menu->addItem(card1->getEntityID(), card1);
-					m_menu->addItem(card2->getEntityID(), card2);
-					m_menu->addItem(card3->getEntityID(), card3);
-					m_menu->addItem(card4->getEntityID(), card4);
-					m_menu->addItem(card5->getEntityID(), card5);
-					m_menu->addItem(card6->getEntityID(), card6);
-					m_menu->addItem(card7->getEntityID(), card7);
-					m_menu->addItem(card8->getEntityID(), card8);
-					m_menu->addItem(card9->getEntityID(), card9);
-					m_menu->addItem(card10->getEntityID(), card10);
-
-					m_menu->setVisible(false);
-					m_menu->setActive(false);
-
 					m_renderSys->setCameraTarget(player);
 					m_renderSys->camera()->setBoundingBoxSize(ResourceManager::instance()->window()->width() / 4, ResourceManager::instance()->window()->height() / 4);
 					m_renderSys->setSpriteLayer(player, RenderSystem::RENDER_FOREGROUND1);
@@ -203,9 +92,6 @@ bool Game::init(std::string gamePath)
 					m_inputSys->createInputComponent(player)->addDevice(m_inputSys->getNextFreeDevice());
 					m_inputSys->getInputComponent(player)->addDevice(m_inputSys->getNextFreeDevice());
 					m_inputSys->getInputComponent(player)->addDevice(m_inputSys->getNextFreeDevice());
-
-					CollisionComponent *playerCol = m_physicsSys->getCollisionComponent(player);
-					CollisionComponent *enemyCol = m_physicsSys->getCollisionComponent(enemy);
 
 					LogicComponent *playerLog = m_logicSys->createLogicComponent(player, LogicComponent::LOGIC_PLAYER);
 					LogicComponent *enemyLog = m_logicSys->createLogicComponent(enemy, LogicComponent::LOGIC_ENEMY);
@@ -258,8 +144,6 @@ void Game::loop()
 		processInput();
 		processLogic(deltaTime);
 		processPhysics(deltaTime);
-
-		m_menu->update(deltaTime);
 
 		m_world->renderRooms();
 
@@ -316,19 +200,6 @@ void Game::processInput()
 						}
 					}
 				}
-				else if(e.key.keysym.sym == SDLK_ESCAPE)
-				{
-					if(m_menu->getVisible())
-					{
-						m_menu->setVisible(false);
-						m_menu->setActive(false);
-					}
-					else
-					{
-						m_menu->setVisible(true);
-						m_menu->setActive(true);
-					}
-				}
 			}
 		}
 	}
@@ -353,7 +224,6 @@ void Game::processMessages()
 				m_logicSys->processMessage(message);
 				m_physicsSys->processMessage(message);
 				m_renderSys->processMessage(message);
-				m_menu->processMessage(message);
 			}
 		}
 	}

@@ -2,61 +2,50 @@
 //==========================================================================================
 // File Name: UIComponent.h
 // Author: Brian Blackmon
-// Date Created: 8/15/2019
+// Date Created: 9/11/2019
 // Purpose: 
-// The base class for UI components.
+// Holds the base information for UI Components. Extends the Component class.
 //==========================================================================================
 #include "Component.h"
 #include "Vector2D.h"
+#include "Rectangle.h"
+#include <string>
 
-class IMessage;
+typedef Shape::Rectangle Rectangle;
+typedef std::string string;
 
-class UIComponent : public Component
+class UIComponent :	public Component
 {
 public:
-	enum UI_TYPE
+	enum UI_Type
 	{
 		UI_BUTTON,
-		UI_TEXT,
 		UI_GRAPHIC,
+		UI_TEXT
 	};
 
-	UIComponent(UI_TYPE type, int entityID, Vector2D position);
+	UIComponent(int entityID, UI_Type type, Vector2D position, string name);
 	virtual ~UIComponent();
+	
+	virtual void setPosition(Vector2D position);
+	virtual void setWidth(int width);
+	virtual void setHeight(int height);	
+	virtual void setName(string name);
 
-	UI_TYPE getType() { return m_type; }
+	virtual Vector2D getPosition();
+	virtual int getWidth();
+	virtual int getHeight();
+	virtual int getEntityID();
+	virtual string getName();
 
-	int getEntityID() { return m_entityID; }
-
-	// Position
-	Vector2D getPosition() { return m_position; }
-	virtual void setPosition(Vector2D position) { m_position = position; }
-
-	virtual void setWidth(int width) = 0;
-	virtual void setHeight(int height) = 0;
-
-	bool getActive() { return m_active; }
-	virtual void setActive(bool active) { m_active = active; }
-
-	bool getDocked() { return m_docked; }
-	void setDocked(bool docked) { m_docked = docked; }
-
-	bool getVisible() { return m_visible; }
-	virtual void setVisible(bool visible) = 0;
-
-	// Logic
-	virtual void update(float delta) = 0;
-	virtual void processMessage(IMessage *message) = 0;
+	UI_Type getType() { return m_type; }
 
 protected:
+	Rectangle *m_rect;
+
 	int m_entityID;
-	bool m_active;
-	bool m_docked;
-	bool m_visible;
+	string m_name;
 
-	Vector2D m_position;
-
-private:
-	UI_TYPE m_type;
+	UI_Type m_type;
 };
 

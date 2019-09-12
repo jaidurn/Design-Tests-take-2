@@ -18,7 +18,6 @@ class LogicSystem;
 class InputSystem;
 class World;
 class Room;
-class UIDeckGrid;
 
 class Game
 {
@@ -55,8 +54,6 @@ private:
 	InputSystem *m_inputSys;
 	LogicSystem *m_logicSys;
 	World *m_world;
-
-	UIDeckGrid *m_menu;
 
 	Timer m_timer;
 
