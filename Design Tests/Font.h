@@ -40,6 +40,7 @@ public:
 
 	int getGlyphMetrics(Uint16 glyph, int *minX, int *minY, int *maxX, int *maxY, int *advance);
 	int getTextSize(string text, int *width, int *height);
+	int getPointSize() { return m_pointSize; }
 
 	void setItalic(bool italic);
 	void setFlag(FontFlags flag);

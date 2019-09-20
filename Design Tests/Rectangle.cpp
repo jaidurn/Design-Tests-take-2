@@ -9,8 +9,19 @@ Rectangle::Rectangle()
 
 }
 
-Rectangle::Rectangle(float centerX, float centerY, int width, int height)
-	:IShape(centerX, centerY), m_width(width), m_height(height)
+Rectangle::Rectangle(float centerX, 
+	float centerY, 
+	int width, 
+	int height)
+	:IShape(centerX, centerY), 
+	m_width(width), 
+	m_height(height)
+{
+
+}
+
+Rectangle::Rectangle(Vector2D centerPos, int width, int height)
+	:IShape(centerPos), m_width(width), m_height(height)
 {
 
 }

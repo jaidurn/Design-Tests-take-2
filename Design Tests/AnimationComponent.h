@@ -43,6 +43,8 @@ public:
 	int currentAnimationLength();
 	int animationLength(std::string name);
 
+	bool getPaused() { return m_paused; }
+
 	// Adding animations/frames
 	void addAnimation(std::string name, bool loop, float speed, int directionCount);
 	void addFrame(std::string name, Direction direction, SDL_Rect frame);
@@ -55,11 +57,14 @@ public:
 	void setAnimationSpeed(std::string name, float speed);
 	void resetIndex();
 
+	void setPaused(bool paused);
+
 private:
 	std::map<std::string, Animation> m_animations;
 
 	std::string m_currentName;
 	Direction m_currentDirection;
 	float m_currentFrameIndex;
+	bool m_paused;
 };
 

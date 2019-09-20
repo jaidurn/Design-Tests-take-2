@@ -21,13 +21,19 @@ namespace Shape
 	{
 	public:
 		IShape()
-			:m_center(0, 0), m_rotation(0.0)
+			:m_center(0.0f, 0.0f), m_rotation(0.0f)
 		{
 		}
 
 		IShape(float centerX, float centerY)
-			:m_center(centerX, centerY), m_rotation(0.0)
+			:m_center(centerX, centerY), m_rotation(0.0f)
 		{
+		}
+
+		IShape(Vector2D centerPos)
+			:m_center(centerPos), m_rotation(0.0f)
+		{
+
 		}
 
 		~IShape() { }
@@ -40,6 +46,8 @@ namespace Shape
 			m_center.setX(x);
 			m_center.setY(y);
 		}
+
+		void setCenter(Vector2D position) { m_center = position; }
 
 		virtual void setCenterX(float centerX) { m_center.setX(centerX); }
 		virtual void setCenterY(float centerY) { m_center.setY(centerY); }

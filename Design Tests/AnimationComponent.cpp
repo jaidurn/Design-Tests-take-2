@@ -3,7 +3,11 @@
 #include <iostream>
 
 AnimationComponent::AnimationComponent()
-	:Component(ANIMATION), m_currentName(""), m_currentFrameIndex(0), m_currentDirection(DIR_DOWN)
+	:Component(ANIMATION), 
+	m_currentName(""), 
+	m_currentFrameIndex(0), 
+	m_currentDirection(DIR_DOWN),	
+	m_paused(false)
 {
 
 }
@@ -20,7 +24,7 @@ AnimationComponent::~AnimationComponent()
 //=============================================================================
 void AnimationComponent::update()
 {
-	if(m_currentName != "")
+	if(!m_paused && m_currentName != "")
 	{
 		auto mit = m_animations.find(m_currentName);
 
@@ -349,4 +353,16 @@ void AnimationComponent::setAnimationSpeed(std::string name, float speed)
 void AnimationComponent::resetIndex()
 {
 	m_currentFrameIndex = 0.0f;
+}
+
+//=============================================================================
+// Function: void setPaused(bool)
+// Description:
+// Sets the paused state.
+// Parameters:
+// bool paused - The new paused state.
+//=============================================================================
+void AnimationComponent::setPaused(bool paused)
+{
+	m_paused = paused;
 }

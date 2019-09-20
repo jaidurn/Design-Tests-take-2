@@ -31,13 +31,16 @@ public:
 	virtual void setWidth(int width);
 	virtual void setHeight(int height);	
 	virtual void setName(string name);
+	virtual void setVisible(bool visible);
+	virtual void setActive(bool active);
 
 	virtual Vector2D getPosition();
 	virtual int getWidth();
 	virtual int getHeight();
-	virtual int getEntityID();
 	virtual string getName();
+	virtual bool getVisible();
 
+	int getEntityID() { return m_entityID; }
 	UI_Type getType() { return m_type; }
 
 protected:
@@ -45,7 +48,8 @@ protected:
 
 	int m_entityID;
 	string m_name;
-
+	bool m_visible;
+	bool m_active;
 	UI_Type m_type;
 };
 

@@ -18,6 +18,7 @@ class LogicSystem;
 class InputSystem;
 class World;
 class Room;
+class UIText;
 
 class Game
 {
@@ -54,6 +55,8 @@ private:
 	InputSystem *m_inputSys;
 	LogicSystem *m_logicSys;
 	World *m_world;
+
+	UIText *m_text;
 
 	Timer m_timer;
 

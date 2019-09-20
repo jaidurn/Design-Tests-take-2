@@ -12,6 +12,7 @@
 #include "EnemyTargetState.h"
 #include "EnemyIdleState.h"
 #include "World.h"
+#include "UIText.h"
 
 Game::Game()
 	:m_physicsSys(NULL),
@@ -21,7 +22,8 @@ Game::Game()
 	m_logicSys(NULL),
 	m_initialized(false), 
 	m_currentState(GS_EXIT),
-	m_resource(NULL)
+	m_resource(NULL),
+	m_text(NULL)
 {
 	m_world = new World("Resources/rooms.dat");
 }
@@ -38,6 +40,9 @@ Game::~Game()
 
 	delete m_world;
 	m_world = NULL;
+
+	delete m_text;
+	m_text = NULL;
 
 	m_timer.stop();
 }
@@ -109,6 +114,18 @@ bool Game::init(std::string gamePath)
 					enemyLog->addState("Idle", idle4);
 
 					playerLog->changeState("Idle");
+
+					Font *font = m_resource->getFont("Resources/Fonts/RobotoMono-", 16, Font::FONT_REGULAR, false);
+
+					int textID = EntitySystem::instance()->createEntity();
+					Vector2D textPos(camera->getX() + 200, camera->getY() + 100);
+					SDL_Color red{ 255, 0, 0, 255 };
+					m_text = new UIText(textID, textPos, "Text");
+
+					m_renderSys->createTextComponent(textID, "Test", font, red, 0, textPos);
+
+					m_text->setWidth(200);
+					m_text->setHeight(100);
 
 					m_initialized = true;
 					success = true;
@@ -199,6 +216,22 @@ void Game::processInput()
 							m_world->dungeon();
 						}
 					}
+				}
+				else if (e.key.keysym.sym == SDLK_0)
+				{
+					m_text->setText("Short text!");
+				}
+				else if (e.key.keysym.sym == SDLK_1)
+				{
+					m_text->setText("Medium text ahahaha!");
+				}
+				else if (e.key.keysym.sym == SDLK_2)
+				{
+					m_text->setText("Looooooooooo ng text is here boyos it's here!");
+				}
+				else if (e.key.keysym.sym == SDLK_3)
+				{
+					m_text->setText("Test");
 				}
 			}
 		}

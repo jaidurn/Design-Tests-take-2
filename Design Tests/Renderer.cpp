@@ -349,8 +349,8 @@ void Renderer::renderTexture(Texture *texture, int x, int y, SDL_Rect *clip)
 		}
 		else
 		{
-			width = (int)round(texture->center().getX() * 2);
-			height = (int)round(texture->center().getY() * 2);
+			width = (int)round(texture->width());
+			height = (int)round(texture->height());
 		}
 
 		SDL_Rect renderRect{ x, y, width, height };

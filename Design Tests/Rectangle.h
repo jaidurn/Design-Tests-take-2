@@ -16,6 +16,7 @@ namespace Shape
 		Rectangle();
 
 		Rectangle(float centerX, float centerY, int width, int height);
+		Rectangle(Vector2D centerPos, int width, int height);
 
 		~Rectangle();
 

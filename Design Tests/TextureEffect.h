@@ -24,25 +24,32 @@ public:
 		EFFECT_ALL_FLASH
 	};
 
-	TextureEffect(SpriteComponent *sprite, EffectType type, SDL_Color endColor, SDL_BlendMode blendMode, float duration, float speed);
+	TextureEffect(SpriteComponent *sprite, 
+		EffectType type, 
+		SDL_Color endColor, 
+		SDL_BlendMode blendMode, 
+		float duration,
+		float speed);
 
 	~TextureEffect();
 
 	void start();
 	void applyEffect(float delta);
 	void reset();
-	
+
 	void setEndColor(SDL_Color endColor) { m_endColor = endColor; }
 	void setBlendMode(SDL_BlendMode blendMode) { m_blendMode = blendMode; }
 	void setDuration(float duration) { m_duration = duration; }
 	void setSpeed(float speed) { m_speed = speed; }
+	void setPaused(bool paused) { m_paused = paused; }
 
 	EffectType getType() { return m_type; }
-	SDL_Color currentColor() { return m_currentColor; }
-	SDL_BlendMode blendMode() { return m_blendMode; }
+	SDL_Color getCurrentColor() { return m_currentColor; }
+	SDL_BlendMode getBlendMode() { return m_blendMode; }
 	float getSpeed() { return m_speed; }
 	float getDuration() { return m_duration; }
-	bool started() { return m_started; }
+	bool getStarted() { return m_started; }
+	bool getPaused() { return m_paused; }
 
 protected:
 	SpriteComponent *m_sprite;
@@ -59,6 +66,7 @@ protected:
 	bool m_started;
 	bool m_colorFadeComplete;
 	bool m_alphaFadeComplete;
+	bool m_paused;
 
 	float lerp(int a, int b, float percent);
 

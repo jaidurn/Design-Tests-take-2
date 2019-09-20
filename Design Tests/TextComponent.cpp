@@ -40,10 +40,10 @@ TextComponent::~TextComponent()
 //=============================================================================
 void TextComponent::setText(string text)
 {
-	if(text != "" && m_text != text)
+	if(m_text != text)
 	{
 		m_text = text;
-
+		
 		createTexture();
 	}
 }
@@ -105,12 +105,9 @@ void TextComponent::setColor(int r, int g, int b, int a)
 //=============================================================================
 void TextComponent::setFont(Font *font)
 {
-	if(font && m_font != font)
-	{
-		m_font = font;
+	m_font = font;
 
-		createTexture();
-	}
+	createTexture();
 }
 
 //=============================================================================
@@ -126,6 +123,34 @@ void TextComponent::setWrapWidth(Uint32 width)
 	if (width < 0) { width = 0; }
 
 	m_wrapWidth = width;
+
+	createTexture();
+}
+
+//=============================================================================
+// Function: void setWidth(int)
+// Description:
+// Sets the width of the text.
+// Parameters:
+// int width - The new width of the text.
+//=============================================================================
+void TextComponent::setWidth(int width)
+{
+	setWrapWidth(width);
+}
+
+//=============================================================================
+// Function: void setHeight(int)
+// Description:
+// Sets the height of the text.
+// Parameters:
+// int height - The new height of the text.
+//=============================================================================
+void TextComponent::setHeight(int height)
+{
+	m_height = height;
+
+	createTexture();
 }
 
 //=============================================================================
@@ -135,16 +160,18 @@ void TextComponent::setWrapWidth(Uint32 width)
 //=============================================================================
 void TextComponent::createTexture()
 {
-	if(m_texture)
+	if (m_font)
 	{
-		destroyTexture();
-	}
+		if (m_texture)
+		{
+			destroyTexture();
+		}
 
-	if(m_font && m_text != "")
-	{
+		fixTextSize();
+
 		SDL_Surface *textSurface = NULL;
 
-		if(0 < m_wrapWidth)
+		if (0 < m_wrapWidth)
 		{
 			textSurface = TTF_RenderText_Blended_Wrapped(m_font->getFont(), m_text.c_str(), m_color, m_wrapWidth);
 		}
@@ -153,11 +180,11 @@ void TextComponent::createTexture()
 			textSurface = TTF_RenderText_Blended(m_font->getFont(), m_text.c_str(), m_color);
 		}
 
-		if(textSurface)
+		if (textSurface)
 		{
 			SDL_Texture *temp = SDL_CreateTextureFromSurface(ResourceManager::instance()->renderer()->renderer(), textSurface);
 
-			if(temp)
+			if (temp)
 			{
 				Vector2D position{ (float)(textSurface->w / 2), (float)(textSurface->h / 2) };
 
@@ -180,5 +207,82 @@ void TextComponent::destroyTexture()
 	{
 		delete m_texture;
 		m_texture = NULL;
+	}
+}
+
+//=============================================================================
+// Function: void fixTextSize()
+// Description:
+// Fixes the font size of the text to make sure that it fits within
+// the width and height of the text object.
+//=============================================================================
+void TextComponent::fixTextSize()
+{
+	const int MIN_PT = 2;
+	const int MAX_PT = 72;
+
+	int textWidth = 0;
+	int textLineHeight = 0;
+
+	m_font->getTextSize(m_text, &textWidth, &textLineHeight);
+
+	if (textWidth != -1)
+	{
+		int textWrapCount = textWidth;
+
+		if (m_wrapWidth != 0)
+		{
+			textWrapCount = (int)round((float)textWrapCount / (float)m_wrapWidth);
+		}
+
+		int textHeight = textLineHeight * textWrapCount;
+		int fontSize = m_font->getPointSize();
+
+		if (m_height < textHeight)
+		{
+			while (m_height < textHeight && MIN_PT < fontSize)
+			{
+				fontSize--;
+
+				m_font->setPointSize(fontSize);
+
+				m_font->getTextSize(m_text, &textWidth, &textLineHeight);
+
+				textWrapCount = textWidth;
+
+				if (m_wrapWidth != 0)
+				{
+					textWrapCount = (int)round((float)textWrapCount / (float)m_wrapWidth);
+				}
+
+				textHeight = textLineHeight * textWrapCount;
+			}
+		}
+		else if (textHeight < m_height)
+		{
+			while (textHeight < m_height && fontSize < MAX_PT)
+			{
+				fontSize++;
+
+				m_font->setPointSize(fontSize);
+
+				m_font->getTextSize(m_text, &textWidth, &textLineHeight);
+
+				textWrapCount = textWidth;
+
+				if (m_wrapWidth != 0)
+				{
+					textWrapCount = (int)round((float)textWrapCount / (float)m_wrapWidth);
+				}
+
+				textHeight = textLineHeight * textWrapCount;
+			}
+
+			if (m_height < textHeight)
+			{
+				fontSize--;
+				m_font->setPointSize(fontSize);
+			}
+		}
 	}
 }

@@ -1,26 +1,29 @@
 #pragma once
 //==========================================================================================
-// File Name: UIGraphic.h
+// File Name: UIText.h
 // Author: Brian Blackmon
-// Date Created: 9/11/2019
+// Date Created: 9/12/2019
 // Purpose: 
-// Extends the UIComponent class and adds functionality for graphical UI.
+// Extends the UIComponent and adds text capabilities.
 //==========================================================================================
 #include "UIComponent.h"
-#include "RenderSystem.h"
+#include <SDL.h>
 
-class UIGraphic : public UIComponent
+class Font;
+
+class UIText : public UIComponent
 {
 public:
-	UIGraphic(int entityID, Vector2D position, string name);
-	virtual ~UIGraphic();
+	UIText(int entityID, Vector2D position, string name);
+	virtual ~UIText();
 
 	virtual void setPosition(Vector2D position);
 	virtual void setWidth(int width);
 	virtual void setHeight(int height);
 	virtual void setVisible(bool visible);
-	virtual void setActive(bool active);
-	
-	void setLayer(RenderSystem::RenderLayers layer);
+
+	void setFont(Font *font);
+	void setText(string text);
+	void setColor(SDL_Color color);
 };
 

@@ -2,8 +2,23 @@
 #include "SpriteComponent.h"
 #include <iostream>
 
-TextureEffect::TextureEffect(SpriteComponent *sprite, EffectType type, SDL_Color endColor, SDL_BlendMode blendMode, float duration, float speed)
-	:m_sprite(sprite), m_type(type), m_endColor(endColor), m_colorFadeComplete(false), m_alphaFadeComplete(false), m_duration(duration), m_speed(speed), m_currentTime(0.0f), m_blendMode(blendMode), m_started(false)
+TextureEffect::TextureEffect(SpriteComponent *sprite, 
+	EffectType type, 
+	SDL_Color endColor, 
+	SDL_BlendMode blendMode, 
+	float duration, 
+	float speed)
+	:m_sprite(sprite),
+	m_type(type),
+	m_endColor(endColor),
+	m_colorFadeComplete(false),
+	m_alphaFadeComplete(false),
+	m_duration(duration),
+	m_speed(speed),
+	m_currentTime(0.0f),
+	m_blendMode(blendMode),
+	m_started(false),
+	m_paused(false)
 {
 	m_startColor.r = 0;
 	m_startColor.g = 0;
@@ -24,138 +39,111 @@ TextureEffect::TextureEffect(SpriteComponent *sprite, EffectType type, SDL_Color
 
 TextureEffect::~TextureEffect()
 {
-
+	m_sprite = NULL;
 }
 
 void TextureEffect::start()
 {
-	if(!started())
+	if(!getStarted())
 	{
 		m_currentTime = 0.0f;
 		m_started = true;
+		m_paused = false;
 	}
 }
 
 void TextureEffect::applyEffect(float delta)
 {
-	if(m_currentTime < m_duration)
+	if (!m_paused)
 	{
-		switch(m_type)
+		if (m_currentTime < m_duration)
 		{
-		case EFFECT_COLOR_FADE:
-		{
-			colorFade();
-			break;
-		}
-		case EFFECT_COLOR_FLASH:
-		{
-			colorFlash();
-			break;
-		}
-		case EFFECT_ALPHA_FADE:
-		{
-			alphaFade();
-			break;
-		}
-		case EFFECT_ALPHA_FLASH:
-		{
-			alphaFlash();
-			break;
-		}
-		case EFFECT_ALL_FADE:
-		{
-			colorFade();
-			alphaFade();
-			break;
-		}
-		case EFFECT_ALL_FLASH:
-		{
-			colorFlash();
-			alphaFlash();
-			break;
-		}
-		}
+			switch (m_type)
+			{
+			case EFFECT_COLOR_FADE:
+			{
+				colorFade();
+				break;
+			}
+			case EFFECT_COLOR_FLASH:
+			{
+				colorFlash();
+				break;
+			}
+			case EFFECT_ALPHA_FADE:
+			{
+				alphaFade();
+				break;
+			}
+			case EFFECT_ALPHA_FLASH:
+			{
+				alphaFlash();
+				break;
+			}
+			case EFFECT_ALL_FADE:
+			{
+				colorFade();
+				alphaFade();
+				break;
+			}
+			case EFFECT_ALL_FLASH:
+			{
+				colorFlash();
+				alphaFlash();
+				break;
+			}
+			}
 
-		m_currentTime += delta;
-	}
-	else
-	{
-		switch(m_type)
-		{
-		case EFFECT_COLOR_FADE:
-		{
-			m_currentColor.r = m_endColor.r;
-			m_currentColor.g = m_endColor.g;
-			m_currentColor.b = m_endColor.b;
-
-			break;
+			m_currentTime += delta;
 		}
-		case EFFECT_COLOR_FLASH:
+		else
 		{
-			if(!m_colorFadeComplete)
+			switch (m_type)
+			{
+			case EFFECT_COLOR_FADE:
 			{
 				m_currentColor.r = m_endColor.r;
 				m_currentColor.g = m_endColor.g;
 				m_currentColor.b = m_endColor.b;
+
+				break;
 			}
-			else
+			case EFFECT_COLOR_FLASH:
 			{
 				m_currentColor.r = m_startColor.r;
 				m_currentColor.g = m_startColor.g;
 				m_currentColor.b = m_startColor.b;
-			}
 
-			break;
-		}
-		case EFFECT_ALPHA_FADE:
-		{
-			m_currentColor.a = m_endColor.a;
-			break;
-		}
-		case EFFECT_ALPHA_FLASH:
-		{
-			if(!m_alphaFadeComplete)
+				break;
+			}
+			case EFFECT_ALPHA_FADE:
 			{
 				m_currentColor.a = m_endColor.a;
+				break;
 			}
-			else
+			case EFFECT_ALPHA_FLASH:
+			{
+
+				m_currentColor.a = m_startColor.a;
+
+				break;
+			}
+			case EFFECT_ALL_FADE:
+			{
+				m_currentColor = m_endColor;
+				break;
+			}
+			case EFFECT_ALL_FLASH:
 			{
 				m_currentColor.a = m_startColor.a;
-			}
 
-			break;
-		}
-		case EFFECT_ALL_FADE:
-		{
-			m_currentColor = m_endColor;
-			break;
-		}
-		case EFFECT_ALL_FLASH:
-		{
-			if (!m_alphaFadeComplete)
-			{
-				m_currentColor.a = m_endColor.a;
-			}
-			else
-			{
-				m_currentColor.a = m_startColor.a;
-			}
-
-			if (!m_colorFadeComplete)
-			{
-				m_currentColor.r = m_endColor.r;
-				m_currentColor.g = m_endColor.g;
-				m_currentColor.b = m_endColor.b;
-			}
-			else
-			{
 				m_currentColor.r = m_startColor.r;
 				m_currentColor.g = m_startColor.g;
 				m_currentColor.b = m_startColor.b;
-			}
 
-			break;
-		}
+				break;
+			}
+			}
 		}
 	}
 }
@@ -169,16 +157,11 @@ void TextureEffect::reset()
 
 	m_currentColor = m_startColor;
 	m_started = false;
-
+	m_paused = false;
 }
 
 float TextureEffect::lerp(int a, int b, float percent)
 {
-/*	if (0.98 < percent)
-	{
-		percent = 1;
-	}
-*/
 	float amount = ((1.0f - percent) * (float)a) + (percent * (float)b);
 
 	return amount;

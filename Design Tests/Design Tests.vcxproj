@@ -186,8 +186,13 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureCache.cpp" />
     <ClCompile Include="TextureEffect.cpp" />
+    <ClCompile Include="UIButton.cpp" />
     <ClCompile Include="UIComponent.cpp" />
     <ClCompile Include="UIGraphic.cpp" />
+    <ClCompile Include="UIGroup.cpp" />
+    <ClCompile Include="UIXList.cpp" />
+    <ClCompile Include="UIMenu.cpp" />
+    <ClCompile Include="UIText.cpp" />
     <ClCompile Include="Vector2D.cpp" />
     <ClCompile Include="VelocityComponent.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -262,8 +267,13 @@
     <ClInclude Include="TextureEffect.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="TreeNode.h" />
+    <ClInclude Include="UIButton.h" />
     <ClInclude Include="UIComponent.h" />
     <ClInclude Include="UIGraphic.h" />
+    <ClInclude Include="UIGroup.h" />
+    <ClInclude Include="UIXList.h" />
+    <ClInclude Include="UIMenu.h" />
+    <ClInclude Include="UIText.h" />
     <ClInclude Include="Vector2D.h" />
     <ClInclude Include="VelocityComponent.h" />
     <ClInclude Include="VelocityIncreaseMessage.h" />

@@ -675,14 +675,14 @@ void RenderSystem::drawSprites(float delta, int layer)
 
 						if (effect)
 						{
-							if (!effect->started())
+							if (!effect->getStarted())
 							{
 								effect->start();
 							}
 
 							effect->applyEffect(delta);
-							colorMod = effect->currentColor();
-							blendMode = effect->blendMode();
+							colorMod = effect->getCurrentColor();
+							blendMode = effect->getBlendMode();
 						}
 
 						SDL_SetTextureColorMod(texture->texture(), colorMod.r, colorMod.g, colorMod.b);
@@ -787,14 +787,14 @@ void RenderSystem::drawUI(float delta)
 
 						if (effect)
 						{
-							if (!effect->started())
+							if (!effect->getStarted())
 							{
 								effect->start();
 							}
 
 							effect->applyEffect(delta);
-							colorMod = effect->currentColor();
-							blendMode = effect->blendMode();
+							colorMod = effect->getCurrentColor();
+							blendMode = effect->getBlendMode();
 						}
 
 						SDL_SetTextureColorMod(texture->texture(), colorMod.r, colorMod.g, colorMod.b);
@@ -839,14 +839,16 @@ void RenderSystem::drawText(float delta)
 		{
 			if (text->getTexture())
 			{
-				Vector2D targetPosition(text->getPosition().getX() - (text->getTexture()->width() / 2),
-					text->getPosition().getY() - (text->getTexture()->height() / 2));
+				Vector2D targetPosition = text->getPosition();
 
 				if (m_camera)
 				{
 					targetPosition.setX(targetPosition.getX() - (float)m_camera->getX());
 					targetPosition.setY(targetPosition.getY() - (float)m_camera->getY());
 				}
+
+				targetPosition.setX(targetPosition.getX() - (text->getWidth() / 2));
+				targetPosition.setY(targetPosition.getY() - (text->getHeight() / 2));
 
 				m_renderer->renderTexture(text->getTexture(),
 					(int)targetPosition.getX(),

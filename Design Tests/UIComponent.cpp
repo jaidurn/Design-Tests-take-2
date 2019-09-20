@@ -1,6 +1,6 @@
 #include "UIComponent.h"
-
-
+#include "MessageSystem.h"
+#include "MoveMessage.h"
 
 UIComponent::UIComponent(int entityID,
 	UI_Type type,
@@ -10,7 +10,8 @@ UIComponent::UIComponent(int entityID,
 	m_entityID(entityID),
 	m_name(name),
 	m_type(type),
-	m_rect(NULL)
+	m_rect(NULL),
+	m_visible(true)
 {
 	m_rect = new Rectangle(position.getX(),
 						   position.getY(),
@@ -40,6 +41,10 @@ void UIComponent::setPosition(Vector2D position)
 	{
 		m_rect = new Rectangle(position.getX(), position.getY(), 0, 0);
 	}
+
+	MoveMessage *move = new MoveMessage(m_entityID, m_rect->center(), position);
+
+	MessageSystem::instance()->pushMessage(move);
 
 	m_rect->setCenter(position.getX(), position.getY());
 }
@@ -93,6 +98,30 @@ void UIComponent::setName(string name)
 	{
 		m_name = name;
 	}
+}
+
+//=============================================================================
+// Function: void setVisible(bool)
+// Description:
+// Sets the visible state.
+// Parameters:
+// bool visible - The new visible state.
+//=============================================================================
+void UIComponent::setVisible(bool visible)
+{
+	m_visible = visible;
+}
+
+//=============================================================================
+// Function: void setActive(bool)
+// Description:
+// Sets the active state.
+// Parameters:
+// bool active - The new active state.
+//=============================================================================
+void UIComponent::setActive(bool active)
+{
+	m_active = active;
 }
 
 //=============================================================================
@@ -161,19 +190,6 @@ int UIComponent::getHeight()
 }
 
 //=============================================================================
-// Function: int getEntityID()
-// Description:
-// Gets the entity ID that the component was created with.
-// Output:
-// int 
-// Returns the entity ID.
-//=============================================================================
-int UIComponent::getEntityID()
-{
-	return m_entityID;
-}
-
-//=============================================================================
 // Function: string getName()
 // Description:
 // Gets the name of the component.
@@ -185,3 +201,25 @@ string UIComponent::getName()
 {
 	return m_name;
 }
+
+//=============================================================================
+// Function: bool getVisible()
+// Description:
+// Gets the current visible state.
+// Output:
+// bool
+// Returns the visible state.
+//=============================================================================
+bool UIComponent::getVisible()
+{
+	return m_visible;
+}
+
+//=============================================================================
+// Function: bool getActive()
+// Description:
+// Gets the current active state.
+// Output:
+// bool
+// Returns the active state.
+//=============================================================================
