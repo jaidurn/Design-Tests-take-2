@@ -7,6 +7,11 @@
 // Extends the UIGroup class and adds new functionality for visual lists.
 //==========================================================================================
 #include "UIGroup.h"
+#include <SDL.h>
+
+class EntityDestroyMessage;
+class InputMessage;
+
 class UIXList : public UIGroup
 {
 public:
@@ -22,8 +27,21 @@ public:
 	virtual void processMessage(IMessage *message);
 	virtual void update();
 
-private:
-	UIComponent *m_selected;
+	UIComponent* getCurrentItem();
+
+protected:
+	int m_currentItem;
 	int m_itemsVisible;
+	int m_itemOffset;
+	
+	Uint32 m_prevUpdate;
+	const Uint32 m_UPDATE_COOLDOWN = 500;
+
+	virtual void cleanUp();
+	virtual void updatePositions();
+	virtual void adjustCurrentItem(int amount);
+
+	virtual void processInput(InputMessage *inputMsg);
+	virtual void processEntityDestroy(EntityDestroyMessage *destroyMsg);
 };
 

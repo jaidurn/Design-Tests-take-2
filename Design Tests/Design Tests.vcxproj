@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Microsoft.CodeAnalysis.FxCopAnalyzers.2.9.4\build\Microsoft.CodeAnalysis.FxCopAnalyzers.props" Condition="Exists('..\packages\Microsoft.CodeAnalysis.FxCopAnalyzers.2.9.4\build\Microsoft.CodeAnalysis.FxCopAnalyzers.props')" />
   <Import Project="..\packages\Microsoft.NetFramework.Analyzers.2.9.4\build\Microsoft.NetFramework.Analyzers.props" Condition="Exists('..\packages\Microsoft.NetFramework.Analyzers.2.9.4\build\Microsoft.NetFramework.Analyzers.props')" />
@@ -164,12 +164,11 @@
     <ClCompile Include="InputComponent.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="Controller.cpp" />
-    <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="KeyboardMouse.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="LogicSystem.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MessageSystem.cpp" />
-    <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="PlayerIdleState.cpp" />
     <ClCompile Include="PlayerLogicComponent.cpp" />
@@ -235,7 +234,7 @@
     <ClInclude Include="InputSystem.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="IState.h" />
-    <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="KeyboardMouse.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="LogicComponent.h" />
@@ -243,7 +242,6 @@
     <ClInclude Include="MoveMessage.h" />
     <ClInclude Include="OldMessage.h" />
     <ClInclude Include="MessageSystem.h" />
-    <ClInclude Include="Mouse.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="PhysicsSystem.h" />
     <ClInclude Include="PlayerIdleState.h" />

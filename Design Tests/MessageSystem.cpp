@@ -601,7 +601,7 @@ bool MessageSystem::combineInput(IMessage *message)
 						InputButtonMessage *firstButton = static_cast<InputButtonMessage*>(first);
 						InputButtonMessage *secondButton = static_cast<InputButtonMessage*>(second);
 
-						if(firstButton->m_button == secondButton->m_button)
+						if(firstButton->m_buttonCode == secondButton->m_buttonCode)
 						{
 							secondButton->m_pressed = firstButton->m_pressed;
 

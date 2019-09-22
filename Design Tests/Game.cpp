@@ -13,6 +13,9 @@
 #include "EnemyIdleState.h"
 #include "World.h"
 #include "UIText.h"
+#include "UIXList.h"
+#include "UIButton.h"
+#include "UIGraphic.h"
 
 Game::Game()
 	:m_physicsSys(NULL),
@@ -23,7 +26,8 @@ Game::Game()
 	m_initialized(false), 
 	m_currentState(GS_EXIT),
 	m_resource(NULL),
-	m_text(NULL)
+	m_text(NULL),
+	m_list(NULL)
 {
 	m_world = new World("Resources/rooms.dat");
 }
@@ -43,6 +47,9 @@ Game::~Game()
 
 	delete m_text;
 	m_text = NULL;
+
+	delete m_list;
+	m_list = NULL;
 
 	m_timer.stop();
 }
@@ -95,8 +102,6 @@ bool Game::init(std::string gamePath)
 					m_renderSys->setSpriteLayer(player, RenderSystem::RENDER_FOREGROUND1);
 
 					m_inputSys->createInputComponent(player)->addDevice(m_inputSys->getNextFreeDevice());
-					m_inputSys->getInputComponent(player)->addDevice(m_inputSys->getNextFreeDevice());
-					m_inputSys->getInputComponent(player)->addDevice(m_inputSys->getNextFreeDevice());
 
 					LogicComponent *playerLog = m_logicSys->createLogicComponent(player, LogicComponent::LOGIC_PLAYER);
 					LogicComponent *enemyLog = m_logicSys->createLogicComponent(enemy, LogicComponent::LOGIC_ENEMY);
@@ -121,8 +126,123 @@ bool Game::init(std::string gamePath)
 					Vector2D textPos(camera->getX() + 200, camera->getY() + 100);
 					SDL_Color red{ 255, 0, 0, 255 };
 					m_text = new UIText(textID, textPos, "Text");
-
 					m_renderSys->createTextComponent(textID, "Test", font, red, 0, textPos);
+
+					int listID = EntitySystem::instance()->createEntity();
+					Vector2D listPos(camera->getX() + (camera->getWidth() / 2), camera->getY() + camera->getHeight() - 100);
+
+					m_list = new UIXList(listID, listPos, camera->getWidth(), 100, 4);
+
+					int buttonID = EntitySystem::instance()->createEntity();
+					Vector2D buttonPos(0, 0);
+
+					UIButton *button0 = new UIButton(buttonID, buttonPos, "0", false);
+					
+					textID = EntitySystem::instance()->createEntity();
+
+					UIText *text0 = new UIText(textID, buttonPos, "t0");
+
+					m_renderSys->createTextComponent(textID, "Item 0", font, red, 0, textPos);
+
+					int graphicID = EntitySystem::instance()->createEntity();
+
+					UIGraphic *graphic0 = new UIGraphic(graphicID, buttonPos, "g0");
+
+					m_renderSys->createSprite(graphicID, "Resources/cardBase.png", buttonPos);
+					m_renderSys->setSpriteLayer(graphicID, RenderSystem::RENDER_UI_BACKGROUND);
+
+					button0->setBackground(graphic0);
+					button0->setTextUI(text0);
+
+					// Button 1
+					buttonID = EntitySystem::instance()->createEntity();
+
+					UIButton *button1 = new UIButton(buttonID, buttonPos, "1", false);
+
+					textID = EntitySystem::instance()->createEntity();
+
+					UIText *text1 = new UIText(textID, buttonPos, "t1");
+
+					m_renderSys->createTextComponent(textID, "Item 1", font, red, 0, textPos);
+
+					graphicID = EntitySystem::instance()->createEntity();
+
+					UIGraphic *graphic1 = new UIGraphic(graphicID, buttonPos, "g1");
+
+					m_renderSys->createSprite(graphicID, "Resources/cardBase.png", buttonPos);
+					m_renderSys->setSpriteLayer(graphicID, RenderSystem::RENDER_UI_BACKGROUND);
+
+					button1->setBackground(graphic1);
+					button1->setTextUI(text1);
+
+					// Button 2
+					buttonID = EntitySystem::instance()->createEntity();
+
+					UIButton *button2 = new UIButton(buttonID, buttonPos, "2", false);
+
+					textID = EntitySystem::instance()->createEntity();
+
+					UIText *text2 = new UIText(textID, buttonPos, "t2");
+
+					m_renderSys->createTextComponent(textID, "Item 2", font, red, 0, textPos);
+
+					graphicID = EntitySystem::instance()->createEntity();
+
+					UIGraphic *graphic2 = new UIGraphic(graphicID, buttonPos, "g2");
+
+					m_renderSys->createSprite(graphicID, "Resources/cardBase.png", buttonPos);
+					m_renderSys->setSpriteLayer(graphicID, RenderSystem::RENDER_UI_BACKGROUND);
+
+					button2->setBackground(graphic2);
+					button2->setTextUI(text2);
+
+					// Button 3
+					buttonID = EntitySystem::instance()->createEntity();
+
+					UIButton *button3 = new UIButton(buttonID, buttonPos, "3", false);
+
+					textID = EntitySystem::instance()->createEntity();
+
+					UIText *text3 = new UIText(textID, buttonPos, "t3");
+
+					m_renderSys->createTextComponent(textID, "Item 3", font, red, 0, textPos);
+
+					graphicID = EntitySystem::instance()->createEntity();
+
+					UIGraphic *graphic3 = new UIGraphic(graphicID, buttonPos, "g3");
+
+					m_renderSys->createSprite(graphicID, "Resources/cardBase.png", buttonPos);
+					m_renderSys->setSpriteLayer(graphicID, RenderSystem::RENDER_UI_BACKGROUND);
+
+					button3->setBackground(graphic3);
+					button3->setTextUI(text3);
+
+					// Button 4
+					buttonID = EntitySystem::instance()->createEntity();
+
+					UIButton *button4 = new UIButton(buttonID, buttonPos, "4", false);
+
+					textID = EntitySystem::instance()->createEntity();
+
+					UIText *text4 = new UIText(textID, buttonPos, "t4");
+
+					m_renderSys->createTextComponent(textID, "Item 4", font, red, 0, buttonPos);
+
+					graphicID = EntitySystem::instance()->createEntity();
+
+					UIGraphic *graphic4 = new UIGraphic(graphicID, buttonPos, "g4");
+
+					m_renderSys->createSprite(graphicID, "Resources/cardBase.png", buttonPos);
+					m_renderSys->setSpriteLayer(graphicID, RenderSystem::RENDER_UI_BACKGROUND);
+
+					button4->setBackground(graphic4);
+					button4->setTextUI(text4);
+
+					m_list->addItem(button0);
+					m_list->addItem(button1);
+					m_list->addItem(button2);
+					m_list->addItem(button3);
+					m_list->addItem(button4);
 
 					m_text->setWidth(200);
 					m_text->setHeight(100);
@@ -160,6 +280,9 @@ void Game::loop()
 
 		processInput();
 		processLogic(deltaTime);
+		
+		m_list->update();
+
 		processPhysics(deltaTime);
 
 		m_world->renderRooms();
@@ -174,7 +297,7 @@ void Game::loop()
 			static float renderTime = 0;
 
 			renderTime = m_timer.currentSeconds() - startTime;
-			std::cout << "Render time: " << renderTime << ", Prev time: " << prevTime << std::endl;
+			//std::cout << "Render time: " << renderTime << ", Prev time: " << prevTime << std::endl;
 		}
 
 		counter++;
@@ -253,6 +376,7 @@ void Game::processMessages()
 		{
 			if (message)
 			{
+				m_list->processMessage(message);
 				EntitySystem::instance()->processMessage(message);
 				m_logicSys->processMessage(message);
 				m_physicsSys->processMessage(message);

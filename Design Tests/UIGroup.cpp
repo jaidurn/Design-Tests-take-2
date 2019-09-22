@@ -76,7 +76,7 @@ void UIGroup::setWidth(int width)
 				Vector2D itemPos = m_items[i]->getPosition();
 				int xFix = widthDifference / 2;
 
-				if (itemPos.getX() < m_rect->center().getX())
+				if (m_rect->center().getX() < itemPos.getX())
 				{
 					xFix *= -1;
 				}
@@ -123,7 +123,7 @@ void UIGroup::setHeight(int height)
 				
 				int yFix = heightDiff / 2;
 
-				if (itemPos.getY() < m_rect->center().getY())
+				if (m_rect->center().getY() < itemPos.getY())
 				{
 					yFix *= -1;
 				}

@@ -1,10 +1,8 @@
 #include "InputComponent.h"
 #include "Controller.h"
-#include "Keyboard.h"
+#include "KeyboardMouse.h"
 #include "Rotation.h"
 #include <iostream>
-
-using namespace Input;
 
 InputComponent::InputComponent()
 	:Component(INPUT)
@@ -55,7 +53,7 @@ InputDevice::DEVICE_TYPE InputComponent::getDeviceType(int deviceNumber)
 	{
 		if(0 <= deviceNumber)
 		{
-			type = m_devices[deviceNumber]->type();
+			type = m_devices[deviceNumber]->getDeviceType();
 		}
 	}
 
@@ -71,13 +69,13 @@ InputDevice::DEVICE_TYPE InputComponent::getDeviceType(int deviceNumber)
 // Output:
 // Returns true if the button is pressed, false if it isn't.
 //=============================================================================
-bool InputComponent::buttonPressed(InputDevice::Button button)
+bool InputComponent::buttonPressed(InputDevice::BUTTON_CODE buttonCode)
 {
 	bool pressed = false;
 
 	for(int i = 0; i < numberOfDevices(); i++)
 	{
-		pressed = (m_devices[i]->buttonPressed(button) || pressed);
+		pressed = (m_devices[i]->buttonPressed(buttonCode) || pressed);
 	}
 
 	return pressed;
@@ -99,7 +97,7 @@ float InputComponent::xLeftAxis()
 	{
 		if (m_devices[i])
 		{
-			switch (m_devices[i]->type())
+			switch (m_devices[i]->getDeviceType())
 			{
 			case InputDevice::DEVICE_TYPE::GAMEPAD:
 			{
@@ -112,16 +110,15 @@ float InputComponent::xLeftAxis()
 
 				break;
 			}
-			case InputDevice::DEVICE_TYPE::KEYBOARD:
+			case InputDevice::DEVICE_TYPE::KEYBOARD_MOUSE:
 			{
-				Keyboard *keyboard = static_cast<Keyboard*>(m_devices[i]);
-
+				KeyboardMouse *kbm = static_cast<KeyboardMouse*>(m_devices[i]);
 				// TODO: Make your own mapping system for the keyboard.
-				if (keyboard->buttonPressed(SDLK_a))
+				if (kbm->buttonPressed(InputDevice::ANALOG_LEFT))
 				{
 					xAmount = -1.0f;
 				}
-				else if (keyboard->buttonPressed(SDLK_d))
+				else if (kbm->buttonPressed(InputDevice::ANALOG_RIGHT))
 				{
 					xAmount = 1.0f;
 				}
@@ -149,7 +146,7 @@ float InputComponent::yLeftAxis()
 	{
 		if (m_devices[i])
 		{
-			switch (m_devices[i]->type())
+			switch (m_devices[i]->getDeviceType())
 			{
 			case InputDevice::DEVICE_TYPE::GAMEPAD:
 			{
@@ -162,18 +159,20 @@ float InputComponent::yLeftAxis()
 
 				break;
 			}
-			case InputDevice::DEVICE_TYPE::KEYBOARD:
+			case InputDevice::DEVICE_TYPE::KEYBOARD_MOUSE:
 			{
-				Keyboard *keyboard = static_cast<Keyboard*>(m_devices[i]);
+				KeyboardMouse *kbm = static_cast<KeyboardMouse*>(m_devices[i]);
 
-				if (keyboard->buttonPressed(SDLK_w))
-				{
-					yAmount = -1.0f;
-				}
-				else if (keyboard->buttonPressed(SDLK_s))
+				if (kbm->buttonPressed(InputDevice::ANALOG_DOWN))
 				{
 					yAmount = 1.0f;
 				}
+				else if (kbm->buttonPressed(InputDevice::ANALOG_UP))
+				{
+					yAmount = -1.0f;
+				}
+
+				break;
 			}
 			}
 		}
@@ -198,7 +197,7 @@ float InputComponent::xRightAxis()
 	{
 		if (m_devices[i])
 		{
-			switch (m_devices[i]->type())
+			switch (m_devices[i]->getDeviceType())
 			{
 			case InputDevice::DEVICE_TYPE::GAMEPAD:
 			{
@@ -234,7 +233,7 @@ float InputComponent::yRightAxis()
 	{
 		if (m_devices[i])
 		{
-			switch (m_devices[i]->type())
+			switch (m_devices[i]->getDeviceType())
 			{
 			case InputDevice::DEVICE_TYPE::GAMEPAD:
 			{

@@ -147,12 +147,6 @@
     <ClCompile Include="InputSystem.cpp">
       <Filter>Source Files\Input System</Filter>
     </ClCompile>
-    <ClCompile Include="Keyboard.cpp">
-      <Filter>Source Files\Input System</Filter>
-    </ClCompile>
-    <ClCompile Include="Mouse.cpp">
-      <Filter>Source Files\Input System</Filter>
-    </ClCompile>
     <ClCompile Include="GameInitSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -255,6 +249,9 @@
     <ClCompile Include="UIXList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="KeyboardMouse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header Template.h">
@@ -330,12 +327,6 @@
       <Filter>Header Files\Input System</Filter>
     </ClInclude>
     <ClInclude Include="InputDevice.h">
-      <Filter>Header Files\Input System</Filter>
-    </ClInclude>
-    <ClInclude Include="Keyboard.h">
-      <Filter>Header Files\Input System</Filter>
-    </ClInclude>
-    <ClInclude Include="Mouse.h">
       <Filter>Header Files\Input System</Filter>
     </ClInclude>
     <ClInclude Include="SettingIO.h">
@@ -495,6 +486,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UIXList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyboardMouse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,7 +2,7 @@
 
 
 
-UIMenu::UIMenu()
+UIMenu::UIMenu(Vector2D position, int width, int height)
 {
 }
 

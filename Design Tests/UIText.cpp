@@ -28,6 +28,13 @@ UIText::~UIText()
 void UIText::setPosition(Vector2D position)
 {
 	UIComponent::setPosition(position);
+
+	TextComponent *textComp = RenderSystem::instance()->getText(m_entityID);
+
+	if (textComp)
+	{
+		textComp->setPosition(position);
+	}
 }
 
 //=============================================================================

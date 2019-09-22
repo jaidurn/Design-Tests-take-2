@@ -6,7 +6,7 @@
 #include "PhysicsSystem.h"
 #include "InputMessage.h"
 #include "InputSystem.h"
-#include "Mouse.h"
+#include "KeyboardMouse.h"
 
 UIButton::UIButton(int entityID,
 	Vector2D position,
@@ -55,13 +55,14 @@ void UIButton::setPosition(Vector2D position)
 		m_background->setPosition(position);
 	}
 
-	if (m_rect && m_textUI)
+	if (m_rect)
 	{
-		Vector2D textOffset = m_textUI->getPosition() - m_rect->center();
-
-		m_textUI->setPosition(position + textOffset);
-
 		m_rect->setCenter(position);
+	}
+
+	if (m_textUI)
+	{
+		m_textUI->setPosition(position);
 	}
 }
 
@@ -83,16 +84,7 @@ void UIButton::setWidth(int width)
 
 		if (m_textUI)
 		{
-			int widthDifference = width - m_rect->width();
-
-			m_textUI->setWidth(m_textUI->getWidth() - widthDifference);
-
-			// Fix the x position of the text
-			Vector2D textPosDiff = m_textUI->getPosition() - m_rect->center();
-
-			textPosDiff.setX(textPosDiff.getX() - ((float)widthDifference / 2.0f));
-
-			m_textUI->setPosition(textPosDiff);
+			m_textUI->setWidth(width);
 		}
 
 		m_rect->setWidth(width);
@@ -117,16 +109,7 @@ void UIButton::setHeight(int height)
 
 		if (m_textUI)
 		{
-			int heightDifference = height - m_rect->height();
-
-			m_textUI->setWidth(m_textUI->getHeight() - heightDifference);
-
-			// Fix the Y position of the text.
-			Vector2D textPosDiff = m_textUI->getPosition() - m_rect->center();
-
-			textPosDiff.setY(textPosDiff.getY() - ((float)heightDifference / 2.0f));
-
-			m_textUI->setPosition(textPosDiff);
+			m_textUI->setHeight(height);
 		}
 
 		m_rect->setHeight(height);
@@ -210,6 +193,9 @@ void UIButton::setTextUI(UIText *textUI)
 		}
 
 		m_textUI = textUI;
+
+		m_textUI->setWidth(m_rect->width());
+		m_textUI->setHeight(m_rect->height());
 
 		m_textUI->setPosition(m_textUI->getPosition() + m_rect->center());
 	}
@@ -401,13 +387,13 @@ void UIButton::processInput(InputMessage *inputMsg)
 			{
 				InputButtonMessage *button = static_cast<InputButtonMessage*>(inputMsg);
 
-				if (button->m_deviceType == InputDevice::MOUSE)
+				if (button->m_deviceType == InputDevice::KEYBOARD_MOUSE)
 				{
 					InputDevice *inputDevice = InputSystem::instance()->getDevice(button->m_deviceID);
 
-					Input::Mouse *mouse = static_cast<Input::Mouse*>(inputDevice);
-
-					Vector2D mousePosition(mouse->getX(), mouse->getY());
+					KeyboardMouse *kbm = static_cast<KeyboardMouse*>(inputDevice);
+					
+					Vector2D mousePosition = kbm->getPosition();
 
 					Camera2D *camera = RenderSystem::instance()->camera();
 
@@ -420,17 +406,17 @@ void UIButton::processInput(InputMessage *inputMsg)
 
 					if (collisionSys->pointInsideRect(m_rect, (int)mousePosition.getX(), (int)mousePosition.getY()))
 					{
-						if (button->m_button == SDL_BUTTON_LEFT)
+						if (button->m_buttonCode == InputDevice::SELECT)
 						{
-							if (button->m_pressed)
-							{
-								m_pressed = true;
-							}
-							else
-							{
-								m_pressed = false;
-							}
+							m_pressed = button->m_pressed;
 						}
+					}
+				}
+				else
+				{
+					if (button->m_buttonCode == InputDevice::SELECT)
+					{
+						m_pressed = button->m_pressed;
 					}
 				}
 
@@ -440,28 +426,21 @@ void UIButton::processInput(InputMessage *inputMsg)
 			{
 				InputMoveMessage *inputMove = static_cast<InputMoveMessage*>(inputMsg);
 
-				if (inputMove->m_deviceType == InputDevice::MOUSE)
+				if (inputMove->m_deviceType == InputDevice::KEYBOARD_MOUSE)
 				{
-					InputDevice *inputDevice = InputSystem::instance()->getDevice(inputMove->m_deviceID);
+					Vector2D mousePos(inputMove->m_x, inputMove->m_y);
 
-					if (inputDevice->type() == InputDevice::MOUSE)
+					Camera2D *camera = RenderSystem::instance()->camera();
+
+					if (camera)
 					{
-						Input::Mouse *mouse = static_cast<Input::Mouse*>(inputDevice);
+						mousePos.setX(mousePos.getX() + (float)camera->getX());
+						mousePos.setY(mousePos.getY() + (float)camera->getY());
+					}
 
-						Vector2D mousePosition(mouse->getX(), mouse->getY());
-
-						Camera2D *camera = RenderSystem::instance()->camera();
-
-						if (camera)
-						{
-							mousePosition.setX(mousePosition.getX() + camera->getX());
-							mousePosition.setY(mousePosition.getY() + camera->getY());
-						}
-
-						if (!collisionSys->pointInsideRect(m_rect, (int)mousePosition.getX(), (int)mousePosition.getY()))
-						{
-							m_pressed = false;
-						}
+					if (!collisionSys->pointInsideRect(m_rect, (int)mousePos.getX(), (int)mousePos.getY()))
+					{
+						m_pressed = false;
 					}
 				}
 

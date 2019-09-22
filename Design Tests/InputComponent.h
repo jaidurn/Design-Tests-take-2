@@ -23,7 +23,7 @@ public:
 
 	void addDevice(InputDevice *device);
 
-	bool buttonPressed(InputDevice::Button button);
+	bool buttonPressed(InputDevice::BUTTON_CODE buttonCode);
 
 	float xLeftAxis();
 	float yLeftAxis();

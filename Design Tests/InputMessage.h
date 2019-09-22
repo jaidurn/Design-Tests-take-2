@@ -39,16 +39,16 @@ public:
 class InputButtonMessage : public InputMessage
 {
 public:
-	InputButtonMessage(int deviceID, InputDevice::DEVICE_TYPE deviceType, Uint32 button, bool pressed)
+	InputButtonMessage(int deviceID, InputDevice::DEVICE_TYPE deviceType, InputDevice::BUTTON_CODE buttonCode, bool pressed)
 		:InputMessage(deviceID, deviceType, INPUT_BUTTON), 
 		m_pressed(pressed),
-		m_button(button)
+		m_buttonCode(buttonCode)
 	{
 	}
 
 	virtual ~InputButtonMessage() {}
 
-	Uint32 m_button;
+	InputDevice::BUTTON_CODE m_buttonCode;
 	bool m_pressed;
 };
 

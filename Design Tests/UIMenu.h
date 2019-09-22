@@ -19,14 +19,14 @@ public:
 	UIMenu(Vector2D position, int width, int height);
 	virtual ~UIMenu();
 
-	virtual void setPosition(Vector2D position);
-	virtual void setWidth(int width);
-	virtual void setHeight(int height);
+	virtual void setPosition(Vector2D position) {}
+	virtual void setWidth(int width) {}
+	virtual void setHeight(int height) {}
 
-	virtual void setBackground(UIGraphic *background);
+	virtual void setBackground(UIGraphic *background) {}
 
-	virtual void addItem(UIComponent *item);
-	virtual void removeItem(int entityID);
+	virtual void addItem(UIComponent *item) {}
+	virtual void removeItem(int entityID) {}
 
 protected:
 	Rectangle *m_rect;

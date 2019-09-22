@@ -1,46 +1,128 @@
 #include "controller.h"
+#include "MessageSystem.h"
+#include "InputMessage.h"
 #include <iostream>
 
-using namespace Input;
-
-Controller::Controller(int controllerID, bool hapticEnabled)
-	:m_controller(NULL), m_haptic(NULL), m_ID(controllerID), m_xLeftAxis(0.0f), m_yLeftAxis(0.0f),
-	m_xRightAxis(0.0f), m_yRightAxis(0.0f),
-	m_leftTriggerAxis(0.0f), m_rightTriggerAxis(0.0f)
+Controller::Controller(int deviceID,
+	int controllerID, 
+	bool hapticEnabled)
+	:InputDevice(deviceID, GAMEPAD),
+	m_controller(NULL), 
+	m_haptic(NULL), 
+	m_ID(controllerID), 
+	m_xLeftAxis(0.0f), 
+	m_yLeftAxis(0.0f),
+	m_xRightAxis(0.0f), 
+	m_yRightAxis(0.0f),
+	m_leftTriggerAxis(0.0f), 
+	m_rightTriggerAxis(0.0f)
 {
 	open();
 	if (hapticEnabled) { enableHaptic(); }
 }
-
 
 Controller::~Controller()
 {
 	close();
 }
 
-
 //=============================================================================
-// Function: void pressButton(Uint8)
+// Function: void mapButton(BUTTON_CODE, Button)
 // Description:
-// Toggles the button in the map to pressed.
+// Maps a button code to a button.
 // Parameters:
-// Uint8 button - The button ID to press.
+// BUTTON_CODE buttonCode - The button code to map.
+// Button button - The button to map to it.
 //=============================================================================
-void Controller::pressButton(Button button)
+void Controller::mapButton(BUTTON_CODE buttonCode, Button button)
 {
-	m_buttons[button] = true;
+	auto mit = m_buttonMap.find(button);
+
+	if (mit != m_buttonMap.end())
+	{
+		mit->second = buttonCode;
+	}
+	else
+	{
+		m_buttonMap.insert(std::make_pair(button, buttonCode));
+	}
 }
 
 //=============================================================================
-// Function: void releaseButton(Uint8)
+// Function: void pressButton(Button)
 // Description:
-// Releases the button.
+// Finds the button code related to the button and sets it to pressed.
 // Parameters:
-// Uint8 button - The button ID to release.
+// Button button - The button to press.
+//=============================================================================
+void Controller::pressButton(Button button)
+{
+	auto buttonMit = m_buttonMap.find(button);
+
+	if (buttonMit != m_buttonMap.end())
+	{
+		BUTTON_CODE buttonCode = buttonMit->second;
+
+		auto buttonStateMit = m_buttonState.find(buttonCode);
+
+		if (buttonStateMit != m_buttonState.end())
+		{
+			buttonStateMit->second = true;
+
+			sendInputButtonMsg(buttonCode, true);
+		}
+	}
+}
+
+//=============================================================================
+// Function: void releaseButton(Button)
+// Description:
+// Finds the button code for the button and releases it.
+// Parameters:
+// Button button - The button to release.
 //=============================================================================
 void Controller::releaseButton(Button button)
 {
-	m_buttons[button] = false;
+	auto buttonMit = m_buttonMap.find(button);
+
+	if (buttonMit != m_buttonMap.end())
+	{
+		BUTTON_CODE buttonCode = buttonMit->second;
+
+		auto buttonStateMit = m_buttonState.find(buttonCode);
+
+		if (buttonStateMit != m_buttonState.end())
+		{
+			buttonStateMit->second = false;
+
+			sendInputButtonMsg(buttonCode, false);
+		}
+	}
+}
+
+//=============================================================================
+// Function: bool buttonPressed(BUTTON_CODE)
+// Description:
+// Gets the pressed state of the buttonCode.
+// Parameters:
+// BUTTON_CODE buttonCode - The button code to check the state of.
+// Output:
+// bool 
+// Returns true on button pressed 
+// Returns false on button released.
+//=============================================================================
+bool Controller::buttonPressed(BUTTON_CODE buttonCode)
+{
+	bool pressed = false;
+
+	auto mit = m_buttonState.find(buttonCode);
+
+	if (mit != m_buttonState.end())
+	{
+		pressed = mit->second;
+	}
+
+	return pressed;
 }
 
 //=============================================================================
@@ -76,6 +158,8 @@ void Controller::moveLeftAxisX(Sint16 movement)
 	}
 
 	m_xLeftAxis = moveAmount;
+
+	sendInputAxisMsg(SDL_CONTROLLER_AXIS_LEFTX, m_xLeftAxis);
 }
 
 //=============================================================================
@@ -111,6 +195,8 @@ void Controller::moveLeftAxisY(Sint16 movement)
 	}
 
 	m_yLeftAxis = moveAmount;
+
+	sendInputAxisMsg(SDL_CONTROLLER_AXIS_LEFTY, m_yLeftAxis);
 }
 
 //=============================================================================
@@ -146,6 +232,8 @@ void Controller::moveRightAxisX(Sint16 movement)
 	}
 
 	m_xRightAxis = moveAmount;
+
+	sendInputAxisMsg(SDL_CONTROLLER_AXIS_RIGHTX, m_xRightAxis);
 }
 
 //=============================================================================
@@ -181,6 +269,8 @@ void Controller::moveRightAxisY(Sint16 movement)
 	}
 
 	m_yRightAxis = moveAmount;
+
+	sendInputAxisMsg(SDL_CONTROLLER_AXIS_RIGHTY, m_yRightAxis);
 }
 
 //=============================================================================
@@ -200,6 +290,8 @@ void Controller::moveLeftTriggerAxis(Sint16 movement)
 	moveAmount = workingMovement / (workingAxisMax - 1);
 
 	m_leftTriggerAxis = moveAmount;
+
+	sendInputAxisMsg(SDL_CONTROLLER_AXIS_TRIGGERLEFT, m_leftTriggerAxis);
 }
 
 //=============================================================================
@@ -219,6 +311,8 @@ void Controller::moveRightTriggerAxis(Sint16 movement)
 	moveAmount = workingMovement / (workingAxisMax - 1);
 
 	m_rightTriggerAxis = moveAmount;
+
+	sendInputAxisMsg(SDL_CONTROLLER_AXIS_TRIGGERRIGHT, m_rightTriggerAxis);
 }
 
 //=============================================================================
@@ -239,28 +333,6 @@ void Controller::triggerHaptic(float strength, Uint32 length)
 }
 
 //=============================================================================
-// Function: bool buttonPressed(Uint8 button)
-// Description:
-// Checks if the button is pressed. If the button doesn't exist in our map,
-// then that means it's not pressed.
-// Parameters:
-// Uint8 button - The button id to check.
-// Output:
-// bool - Returns true on button pressed, false on button released.
-//=============================================================================
-bool Controller::buttonPressed(Button button)
-{
-	auto mit = m_buttons.find(button);
-
-	if (mit == m_buttons.end())
-	{
-		return false;
-	}
-
-	return mit->second;
-}
-
-//=============================================================================
 // Function: void toggleHapticOnOff()
 // Description:
 // Toggles the haptic feedback on and off. Use for user preferences.
@@ -269,6 +341,79 @@ void Controller::toggleHapticOnOff()
 {
 	if (m_haptic) { disableHaptic(); }
 	else { enableHaptic(); }
+}
+
+//=============================================================================
+// Function: int getInstanceID()
+// Description:
+// Gets the instance ID of the controller.
+// Output:
+// int
+// On success - Returns the instance id of the controller.
+// On failure - Returns -1.
+//=============================================================================
+int Controller::getInstanceID()
+{
+	int instanceID = -1;
+
+	SDL_Joystick *joystick = SDL_GameControllerGetJoystick(m_controller);
+
+	if (joystick)
+	{
+		instanceID = SDL_JoystickInstanceID(joystick);
+	}
+
+	return instanceID;
+}
+
+//=============================================================================
+// Function: void sendInputButtonMsg(BUTTON_CODE, bool)
+// Description:
+// Sends a message to the message system containing the button
+// press information.
+// Parameters:
+// BUTTON_CODE buttonCode - The button code that was updated.
+// bool pressed - The pressed state of the button.
+//=============================================================================
+void Controller::sendInputButtonMsg(BUTTON_CODE buttonCode, bool pressed)
+{
+	InputButtonMessage *button =
+		new InputButtonMessage(m_deviceID, m_deviceType, buttonCode, pressed);
+
+	MessageSystem::instance()->pushMessage(button);
+}
+
+//=============================================================================
+// Function: void sendInputAxisMsg(Uint32, float)
+// Description:
+// Sends a message to the message system containing axis information.
+// Parameters:
+// Uint8 axis - The updated axis.
+// float amount - The current axis amount.
+//=============================================================================
+void Controller::sendInputAxisMsg(Uint8 axis, float amount)
+{
+	InputAxisMessage *axisMsg =
+		new InputAxisMessage(m_deviceID, m_deviceType, axis, amount);
+
+	MessageSystem::instance()->pushMessage(axisMsg);
+}
+
+//=============================================================================
+// Function: void initialize()
+// Description:
+// Initializes the controller with default button mapping.
+//=============================================================================
+void Controller::initialize()
+{
+	InputDevice::initialize();
+
+	m_buttonMap.insert(std::make_pair(SDL_CONTROLLER_BUTTON_DPAD_UP, ANALOG_UP));
+	m_buttonMap.insert(std::make_pair(SDL_CONTROLLER_BUTTON_DPAD_DOWN, ANALOG_DOWN));
+	m_buttonMap.insert(std::make_pair(SDL_CONTROLLER_BUTTON_DPAD_RIGHT, ANALOG_RIGHT));
+	m_buttonMap.insert(std::make_pair(SDL_CONTROLLER_BUTTON_DPAD_LEFT, ANALOG_LEFT));
+	m_buttonMap.insert(std::make_pair(SDL_CONTROLLER_BUTTON_A, SELECT));
+	m_buttonMap.insert(std::make_pair(SDL_CONTROLLER_BUTTON_B, BACK));
 }
 
 //=============================================================================
