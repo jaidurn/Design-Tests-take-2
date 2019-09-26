@@ -144,6 +144,7 @@ void UIText::setText(string text)
 	if (textComp)
 	{
 		textComp->setText(text);
+
 	}
 }
 

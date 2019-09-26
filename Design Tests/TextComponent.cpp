@@ -136,6 +136,8 @@ void TextComponent::setWrapWidth(Uint32 width)
 //=============================================================================
 void TextComponent::setWidth(int width)
 {
+	m_width = width;
+
 	setWrapWidth(width);
 }
 

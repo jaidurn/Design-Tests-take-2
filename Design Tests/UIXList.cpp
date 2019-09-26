@@ -5,12 +5,7 @@
 #include "UIGraphic.h"
 #include "UIButton.h"
 
-#define downArrow SDLK_DOWN
-#define upArrow SDLK_UP
-#define leftArrow SDLK_LEFT
-#define rightArrow SDLK_RIGHT
-#define leftMouseButton SDL_BUTTON_LEFT
-#define selectButton SDL_CONTROLLER_BUTTON_A
+#include <iostream>
 
 UIXList::UIXList(int entityID, 
 	Vector2D position,
@@ -142,38 +137,51 @@ void UIXList::addItem(UIComponent *item)
 {
 	if (item)
 	{
-		item->setWidth(m_rect->width() / m_itemsVisible);
-		item->setHeight(m_rect->height());
-
-		int currentItem = (int)m_items.size();
-		int itemWidth = m_rect->width() / m_itemsVisible;
-
-		int xOffset = (int)m_rect->getTopLeft().getX() + (itemWidth * (currentItem - m_itemOffset) + (itemWidth / 2));
-
-		Vector2D itemPos((float)xOffset, m_rect->center().getY());
-
-		item->setPosition(itemPos);
-
-		if (currentItem < m_itemOffset ||
-			m_itemOffset + (m_itemsVisible - 1) < currentItem)
+		if (m_rect)
 		{
-			item->setVisible(false);
-		}
+			item->setWidth(m_rect->width() / m_itemsVisible);
+			item->setHeight(m_rect->height());
 
-		item->setActive(false);
+			int currentItem = (int)m_items.size();
+			int itemWidth = m_rect->width() / m_itemsVisible;
 
-		if (currentItem == m_currentItem)
-		{
-			if (item->getType() == UIComponent::UI_BUTTON)
+			int xOffset = (int)m_rect->getTopLeft().getX() + (itemWidth * (currentItem - m_itemOffset) + (itemWidth / 2));
+
+			Vector2D itemPos((float)xOffset, m_rect->center().getY());
+
+			item->setPosition(itemPos);
+
+			if (currentItem < m_itemOffset ||
+				m_itemOffset + (m_itemsVisible - 1) < currentItem)
 			{
-				UIButton *button =
-					static_cast<UIButton*>(item);
-
-				button->setText("THIS");
+				item->setVisible(false);
 			}
-		}
 
-		m_items.emplace_back(item);
+			item->setActive(false);
+
+			if (currentItem == m_currentItem)
+			{
+				if (item->getType() == UIComponent::UI_BUTTON)
+				{
+					UIButton *button =
+						static_cast<UIButton*>(item);
+
+					button->setText("THIS");
+				}
+			}
+
+			m_items.emplace_back(item);
+		}
+		else
+		{
+			std::cout << "RECT DOESN'T EXIST!\n"
+				<< "DELETING ITEM WITH NAME: "
+				<< item->getName()
+				<< "!\n";
+
+			delete item;
+			item = NULL;
+		}
 	}
 }
 

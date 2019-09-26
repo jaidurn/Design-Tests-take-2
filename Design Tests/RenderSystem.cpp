@@ -847,12 +847,12 @@ void RenderSystem::drawText(float delta)
 					targetPosition.setY(targetPosition.getY() - (float)m_camera->getY());
 				}
 
-				targetPosition.setX(targetPosition.getX() - (text->getWidth() / 2));
-				targetPosition.setY(targetPosition.getY() - (text->getHeight() / 2));
+				int topLeftX = (int)targetPosition.getX() - (text->getWidth() / 2);
+				int topLeftY = (int)targetPosition.getY() - (text->getHeight() / 2);
 
 				m_renderer->renderTexture(text->getTexture(),
-					(int)targetPosition.getX(),
-					(int)targetPosition.getY(),
+					topLeftX,
+					topLeftY,
 					NULL);
 			}
 		}

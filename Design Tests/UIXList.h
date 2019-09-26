@@ -22,6 +22,8 @@ public:
 	virtual void setWidth(int width);
 	virtual void setHeight(int height);
 
+	virtual GROUP_TYPE getGroupType() { return GROUP_XLIST; }
+
 	virtual void addItem(UIComponent *item);
 
 	virtual void processMessage(IMessage *message);
@@ -35,7 +37,7 @@ protected:
 	int m_itemOffset;
 	
 	Uint32 m_prevUpdate;
-	const Uint32 m_UPDATE_COOLDOWN = 500;
+	const Uint32 m_UPDATE_COOLDOWN = 300;
 
 	virtual void cleanUp();
 	virtual void updatePositions();

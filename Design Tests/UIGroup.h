@@ -21,6 +21,14 @@ typedef std::string string;
 class UIGroup
 {
 public:
+	enum GROUP_TYPE
+	{
+		GROUP_NORMAL,
+		GROUP_XLIST,
+		GROUP_YLIST,
+		GROUP_GRID
+	};
+
 	UIGroup(int entityID, Vector2D position, int width, int height);
 	virtual ~UIGroup();
 
@@ -32,6 +40,7 @@ public:
 
 	virtual void setBackground(UIGraphic *background);
 
+	virtual GROUP_TYPE getGroupType() { return GROUP_NORMAL; }
 	Vector2D getPosition();
 	int getWidth();
 	int getHeight();

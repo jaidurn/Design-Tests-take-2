@@ -84,7 +84,9 @@ void UIButton::setWidth(int width)
 
 		if (m_textUI)
 		{
-			m_textUI->setWidth(width);
+			int textBorder = 20;
+
+			m_textUI->setWidth(width - textBorder);
 		}
 
 		m_rect->setWidth(width);
@@ -109,7 +111,9 @@ void UIButton::setHeight(int height)
 
 		if (m_textUI)
 		{
-			m_textUI->setHeight(height);
+			int textBorder = 20;
+
+			m_textUI->setHeight(height - textBorder);
 		}
 
 		m_rect->setHeight(height);
@@ -194,10 +198,13 @@ void UIButton::setTextUI(UIText *textUI)
 
 		m_textUI = textUI;
 
-		m_textUI->setWidth(m_rect->width());
-		m_textUI->setHeight(m_rect->height());
+		if (m_rect)
+		{
+			m_textUI->setWidth(m_rect->width());
+			m_textUI->setHeight(m_rect->height());
 
-		m_textUI->setPosition(m_textUI->getPosition() + m_rect->center());
+			m_textUI->setPosition(m_rect->center());
+		}
 	}
 }
 
