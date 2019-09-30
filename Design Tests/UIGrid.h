@@ -1,22 +1,26 @@
 #pragma once
 //==========================================================================================
-// File Name: UIYList.h
+// File Name: UIGrid.h
 // Author: Brian Blackmon
-// Date Created: 9/23/2019
+// Date Created: 9/30/2019
 // Purpose: 
-// Extends the UIGroup base class and adds functionality for a vertical list.
+// Extends the UI Group class and adds grid functionality.
 //==========================================================================================
 #include "UIGroup.h"
-#include <SDL.h>
 
-class InputMessage;
 class EntityDestroyMessage;
+class InputMessage;
 
-class UIYList : public UIGroup
+class UIGrid : public UIGroup
 {
 public:
-	UIYList(int entityID, Vector2D position, int width, int height, int itemsVisible);
-	virtual ~UIYList();
+	UIGrid(int entityID, 
+		Vector2D position,
+		int width,
+		int height,
+		int itemsPerRow,
+		int rowCount);
+	virtual ~UIGrid();
 
 	virtual void setPosition(Vector2D position);
 	virtual void setWidth(int width);
@@ -24,30 +28,27 @@ public:
 	virtual void setActive(bool active);
 	virtual void setVisible(bool visible);
 
-	virtual GROUP_TYPE getGroupType() { return GROUP_YLIST; }
+	virtual GROUP_TYPE getGroupType() { return GROUP_GRID; }
 
 	virtual void addItem(UIComponent *item);
 	virtual void removeItem(int entityID);
 	virtual void removeItem(string itemName);
 
-	virtual void processMessage(IMessage *message);
-	virtual void update();
-
 	UIComponent* getCurrentItem();
 
-protected:
-	Uint32 m_prevUpdate;
-	const Uint32 m_UPDATE_COOLDOWN = 300;
+	virtual void update();
+	virtual void processMessage(IMessage *message);
 
-	int m_currentItem;
-	int m_itemsVisible;
-	int m_itemOffset;
+protected:
+	int m_rowCount;
+	int m_itemsPerRow;
+	int m_rowOffset;
 
 	virtual void cleanUp();
 	virtual void updatePositions();
 	virtual void adjustCurrentItem(int amount);
 
-	virtual void processInputMsg(InputMessage *inputMsg); 
+	virtual void processInputMsg(InputMessage *inputMsg);
 	virtual void processEntityDestroyMsg(EntityDestroyMessage *destroyMsg);
 };
 

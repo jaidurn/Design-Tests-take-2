@@ -59,5 +59,7 @@ private:
 	void createTexture();
 	void destroyTexture();
 	void fixTextSize();
+	bool wordsFitWidth();
+	int getWordWidth(std::string word);
 };
 

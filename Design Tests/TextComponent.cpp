@@ -223,68 +223,138 @@ void TextComponent::fixTextSize()
 	const int MIN_PT = 2;
 	const int MAX_PT = 72;
 
+	int fontSize = m_font->getPointSize();
+	// Adjust the font by the width before the height.
+	while (!wordsFitWidth() && MIN_PT < fontSize)
+	{
+		fontSize--;
+		m_font->setPointSize(fontSize);
+	}
+
 	int textWidth = 0;
 	int textLineHeight = 0;
 
 	m_font->getTextSize(m_text, &textWidth, &textLineHeight);
 
-	if (textWidth != -1)
+	int textHeight = textLineHeight;
+
+	if (0 < m_wrapWidth)
 	{
-		int textWrapCount = textWidth;
+		textHeight = (textWidth / m_wrapWidth) * textLineHeight;
+	}
 
-		if (m_wrapWidth != 0)
+	if (m_height < textHeight)
+	{
+		while (m_height < textHeight && MIN_PT < fontSize)
 		{
-			textWrapCount = (int)round((float)textWrapCount / (float)m_wrapWidth);
-		}
+			fontSize--;
+			m_font->setPointSize(fontSize);
 
-		int textHeight = textLineHeight * textWrapCount;
-		int fontSize = m_font->getPointSize();
+			m_font->getTextSize(m_text, &textWidth, &textLineHeight);
 
-		if (m_height < textHeight)
-		{
-			while (m_height < textHeight && MIN_PT < fontSize)
+			if (0 < m_wrapWidth)
 			{
-				fontSize--;
-
-				m_font->setPointSize(fontSize);
-
-				m_font->getTextSize(m_text, &textWidth, &textLineHeight);
-
-				textWrapCount = textWidth;
-
-				if (m_wrapWidth != 0)
-				{
-					textWrapCount = (int)round((float)textWrapCount / (float)m_wrapWidth);
-				}
-
-				textHeight = textLineHeight * textWrapCount;
+				textHeight = (textWidth / m_wrapWidth) * textLineHeight;
 			}
-		}
-		else if (textHeight < m_height)
-		{
-			while (textHeight < m_height && fontSize < MAX_PT)
+			else
 			{
-				fontSize++;
-
-				m_font->setPointSize(fontSize);
-
-				m_font->getTextSize(m_text, &textWidth, &textLineHeight);
-
-				textWrapCount = textWidth;
-
-				if (m_wrapWidth != 0)
-				{
-					textWrapCount = (int)round((float)textWrapCount / (float)m_wrapWidth);
-				}
-
-				textHeight = textLineHeight * textWrapCount;
-			}
-
-			if (m_height < textHeight)
-			{
-				fontSize--;
-				m_font->setPointSize(fontSize);
+				textHeight = textLineHeight;
 			}
 		}
 	}
+	else if (textHeight < m_height)
+	{
+		while (textHeight < m_height &&
+			wordsFitWidth() &&
+			fontSize < MAX_PT)
+		{
+			fontSize++;
+			m_font->setPointSize(fontSize);
+
+			m_font->getTextSize(m_text, &textWidth, &textLineHeight);
+
+			if (0 < m_wrapWidth)
+			{
+				textHeight = (textWidth / m_wrapWidth) * textLineHeight;
+			}
+			else
+			{
+				textHeight = textLineHeight;
+			}
+		}
+
+		m_font->setPointSize(fontSize - 1);
+	}
+}
+
+//=============================================================================
+// Function: bool wordsFitWidth()
+// Description:
+// Checks to see if all of the words in the text fit the current width.
+// Output:
+// bool
+// Returns true if all words are less than the width.
+// Returns false if any word is greater than the width.
+//=============================================================================
+bool TextComponent::wordsFitWidth()
+{
+	bool wordsFit = true;
+
+	std::string currentWord = "";
+
+	for (int i = 0; i < m_text.length(); i++)
+	{
+		if (m_text[i] == ' ' ||
+			m_text[i] == '\0')
+		{
+			int wordWidth = getWordWidth(currentWord);
+
+			if (m_width <= wordWidth)
+			{
+				wordsFit = false;
+				break;
+			}
+
+			currentWord = "";
+		}
+		else
+		{
+			currentWord += m_text[i];
+		}
+	}
+
+	return wordsFit;
+}
+
+//=============================================================================
+// Function: int getWordWidth(std::string word)
+// Description:
+// Gets the total render width of the specified string.
+// Parameters:
+// string word - The word to get the width of.
+// Output:
+// int
+// Returns the width of all of the characters in the string.
+//=============================================================================
+int TextComponent::getWordWidth(std::string word)
+{
+	int width = 0;
+
+	for (int i = 0; i < word.length(); i++)
+	{
+		if (word[i] != '\0')
+		{
+			int glyphWidth = 0;
+
+			if (m_font)
+			{
+				if (m_font->getGlyphMetrics(word[i], NULL, NULL, NULL, NULL, &glyphWidth) != -1)
+				{
+					width += glyphWidth;
+				}
+			}
+		}
+	}
+
+	return width;
 }

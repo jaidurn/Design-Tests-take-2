@@ -202,6 +202,7 @@
     <ClCompile Include="UIButton.cpp" />
     <ClCompile Include="UIComponent.cpp" />
     <ClCompile Include="UIGraphic.cpp" />
+    <ClCompile Include="UIGrid.cpp" />
     <ClCompile Include="UIGroup.cpp" />
     <ClCompile Include="UIXList.cpp" />
     <ClCompile Include="UIMenu.cpp" />
@@ -283,6 +284,7 @@
     <ClInclude Include="UIButton.h" />
     <ClInclude Include="UIComponent.h" />
     <ClInclude Include="UIGraphic.h" />
+    <ClInclude Include="UIGrid.h" />
     <ClInclude Include="UIGroup.h" />
     <ClInclude Include="UIXList.h" />
     <ClInclude Include="UIMenu.h" />

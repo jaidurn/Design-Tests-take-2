@@ -255,6 +255,9 @@
     <ClCompile Include="UIYList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UIGrid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header Template.h">
@@ -495,6 +498,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UIYList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UIGrid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

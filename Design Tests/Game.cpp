@@ -13,7 +13,7 @@
 #include "EnemyIdleState.h"
 #include "World.h"
 #include "UIText.h"
-#include "UIXList.h"
+#include "UIYList.h"
 #include "UIButton.h"
 #include "UIGraphic.h"
 
@@ -129,9 +129,9 @@ bool Game::init(std::string gamePath)
 					m_renderSys->createTextComponent(textID, "Test", font, red, 0, textPos);
 
 					int listID = EntitySystem::instance()->createEntity();
-					Vector2D listPos(camera->getX() + (camera->getWidth() / 2), camera->getY() + camera->getHeight() - 100);
+					Vector2D listPos(camera->getX() + camera->getWidth() - 50, camera->getY() + (camera->getHeight() / 2));
 
-					m_list = new UIXList(listID, listPos, camera->getWidth(), 100, 4);
+					m_list = new UIYList(listID, listPos, 100, camera->getHeight(), 4);
 
 					int buttonID = EntitySystem::instance()->createEntity();
 					Vector2D buttonPos(0, 0);
