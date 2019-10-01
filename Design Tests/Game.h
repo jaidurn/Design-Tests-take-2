@@ -19,7 +19,7 @@ class InputSystem;
 class World;
 class Room;
 class UIText;
-class UIYList;
+class UIGrid;
 
 class Game
 {
@@ -58,7 +58,7 @@ private:
 	World *m_world;
 
 	UIText *m_text;
-	UIYList *m_list;
+	UIGrid *m_list;
 
 	Timer m_timer;
 

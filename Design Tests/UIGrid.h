@@ -7,6 +7,7 @@
 // Extends the UI Group class and adds grid functionality.
 //==========================================================================================
 #include "UIGroup.h"
+#include <SDL.h>
 
 class EntityDestroyMessage;
 class InputMessage;
@@ -40,9 +41,13 @@ public:
 	virtual void processMessage(IMessage *message);
 
 protected:
+	int m_currentItem;
 	int m_rowCount;
 	int m_itemsPerRow;
 	int m_rowOffset;
+
+	Uint32 m_prevUpdate;
+	const Uint32 m_UPDATE_COOLDOWN = 300;
 
 	virtual void cleanUp();
 	virtual void updatePositions();
