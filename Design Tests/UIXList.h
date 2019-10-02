@@ -15,7 +15,12 @@ class InputMessage;
 class UIXList : public UIGroup
 {
 public:
-	UIXList(int entityID, Vector2D position, int width, int height, int itemsVisible);
+	UIXList(int entityID,
+		string name,
+		Vector2D position, 
+		int width, 
+		int height, 
+		int itemsVisible);
 	virtual ~UIXList();
 
 	virtual void setPosition(Vector2D position);

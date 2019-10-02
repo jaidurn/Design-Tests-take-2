@@ -29,7 +29,11 @@ public:
 		GROUP_GRID
 	};
 
-	UIGroup(int entityID, Vector2D position, int width, int height);
+	UIGroup(int entityID,
+		string name,
+		Vector2D position, 
+		int width, 
+		int height);
 	virtual ~UIGroup();
 
 	virtual void setPosition(Vector2D position);
@@ -47,6 +51,9 @@ public:
 	bool getActive();
 	bool getVisible();
 
+	int getEntityID();
+	string getName();
+
 	virtual void addItem(UIComponent *item);
 	virtual void removeItem(int entityID);
 	virtual void removeItem(string itemName);
@@ -61,6 +68,7 @@ protected:
 	UIGraphic *m_background;
 
 	int m_entityID;
+	string m_name;
 
 	bool m_active;
 	bool m_visible;

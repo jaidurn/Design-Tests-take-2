@@ -7,12 +7,13 @@
 
 #include <iostream>
 
-UIXList::UIXList(int entityID, 
+UIXList::UIXList(int entityID,
+	string name,
 	Vector2D position,
 	int width,
 	int height,
 	int itemsVisible)
-	:UIGroup(entityID, position, width, height),
+	:UIGroup(entityID, name, position, width, height),
 	m_itemsVisible(itemsVisible),
 	m_itemOffset(0),
 	m_currentItem(0),
@@ -315,7 +316,7 @@ void UIXList::updatePositions()
 
 		m_items[i]->setPosition(itemPos);
 
-		if (i < m_itemOffset ||
+		if ((int)i < m_itemOffset ||
 			m_itemOffset + (m_itemsVisible - 1) < i)
 		{
 			m_items[i]->setVisible(false);

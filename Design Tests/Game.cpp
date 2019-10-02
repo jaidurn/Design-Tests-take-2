@@ -131,7 +131,7 @@ bool Game::init(std::string gamePath)
 					int listID = EntitySystem::instance()->createEntity();
 					Vector2D listPos(camera->getX() + camera->getWidth() - 50, camera->getY() + (camera->getHeight() / 2));
 
-					m_list = new UIGrid(listID, listPos, 100, camera->getHeight(), 2, 2);
+					m_list = new UIGrid(listID, "Group0", listPos, 100, camera->getHeight(), 2, 2);
 
 					int buttonID = EntitySystem::instance()->createEntity();
 					Vector2D buttonPos(0, 0);

@@ -15,7 +15,8 @@ class InputMessage;
 class UIGrid : public UIGroup
 {
 public:
-	UIGrid(int entityID, 
+	UIGrid(int entityID,
+		string name,
 		Vector2D position,
 		int width,
 		int height,

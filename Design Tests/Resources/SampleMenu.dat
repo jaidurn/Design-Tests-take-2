@@ -1,0 +1,17 @@
+Type Menu
+Name Sample
+X 100
+Y 360
+Width 200
+Height 720
+GroupCount 4
+Group_0_Name OwnedCards
+Group_0_Type 3
+Group_0_Width 180
+Group_0_Height 340
+Group_0_ItemCount 10
+Group_0_ItemsPerRow 3
+Group_0_RowCount 3
+Group_0_Background Resources/menu.png
+Group_0_Item_0_Name Card0
+Group_0_Item_0_Type 3

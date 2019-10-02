@@ -6,13 +6,15 @@
 #include "InputMessage.h"
 #include <iostream>
 
-UIGroup::UIGroup(int entityID, 
+UIGroup::UIGroup(int entityID,
+	string name,
 	Vector2D position, 
 	int width, 
 	int height)
 	:m_rect(NULL),
 	m_background(NULL),
 	m_entityID(entityID),
+	m_name(name),
 	m_active(true),
 	m_visible(true)
 {
@@ -314,6 +316,32 @@ bool UIGroup::getVisible()
 }
 
 //=============================================================================
+// Function: int getEntityID()
+// Description:
+// Gets the entity ID that the group was created with.
+// Output:
+// int
+// Returns the entity ID.
+//=============================================================================
+int UIGroup::getEntityID()
+{
+	return m_entityID;
+}
+
+//=============================================================================
+// Function: string getName()
+// Description:
+// Gets the name the group was created with.
+// Output:
+// string
+// Returns the group name.
+//=============================================================================
+string UIGroup::getName()
+{
+	return m_name;
+}
+
+//=============================================================================
 // Function: void addItem(UIComponent*)
 // Description:
 // Adds an item to the list of items.
@@ -356,7 +384,6 @@ void UIGroup::removeItem(int entityID)
 
 	if (m_items[i]->getEntityID() == entityID)
 	{
-		delete m_items[i];
 		m_items[i] = NULL;
 
 		vectorIt = m_items.erase(vectorIt);
@@ -383,7 +410,6 @@ void UIGroup::removeItem(string itemName)
 
 	if (m_items[i]->getName() == itemName)
 	{
-		delete m_items[i];
 		m_items[i] = NULL;
 
 		vectorIt = m_items.erase(vectorIt);
@@ -405,16 +431,13 @@ UIComponent* UIGroup::getItem(int entityID)
 {
 	UIComponent *item = NULL;
 
-	unsigned int i = 0;
-
-	while (i < m_items.size() - 1 && m_items[i]->getEntityID() != entityID)
+	for (unsigned int i = 0; i < m_items.size(); i++)
 	{
-		i++;
-	}
-
-	if (m_items[i]->getEntityID() == entityID)
-	{
-		item = m_items[i];
+		if (m_items[i]->getEntityID() == entityID)
+		{
+			item = m_items[i];
+			break;
+		}
 	}
 
 	return item;
@@ -435,16 +458,13 @@ UIComponent* UIGroup::getItem(string itemName)
 {
 	UIComponent *item = NULL;
 
-	unsigned int i = 0;
-	
-	while (i < m_items.size() - 1 && m_items[i]->getName() != itemName)
+	for (unsigned int i = 0; i < m_items.size(); i++)
 	{
-		i++;
-	}
-
-	if (m_items[i]->getName() == itemName)
-	{
-		item = m_items[i];
+		if (m_items[i]->getName() == itemName)
+		{
+			item = m_items[i];
+			break;
+		}
 	}
 
 	return item;

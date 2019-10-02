@@ -12,11 +12,12 @@
 #include <iostream>
 
 UIYList::UIYList(int entityID,
+	string name,
 	Vector2D position,
 	int width,
 	int height,
 	int itemsVisible)
-	:UIGroup(entityID, position, width, height),
+	:UIGroup(entityID, name, position, width, height),
 	m_itemsVisible(itemsVisible),
 	m_itemOffset(0),
 	m_currentItem(0),
@@ -265,7 +266,6 @@ void UIYList::removeItem(int entityID)
 		{
 			if (m_items[i]->getEntityID() == entityID)
 			{
-				delete m_items[i];
 				m_items[i] = NULL;
 
 				// Erase the spot and move everything.
@@ -308,7 +308,6 @@ void UIYList::removeItem(string name)
 		{
 			if (m_items[i]->getName() == name)
 			{
-				delete m_items[i];
 				m_items[i] = NULL;
 
 				auto vit = m_items.begin();

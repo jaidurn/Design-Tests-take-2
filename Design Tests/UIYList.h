@@ -15,7 +15,12 @@ class EntityDestroyMessage;
 class UIYList : public UIGroup
 {
 public:
-	UIYList(int entityID, Vector2D position, int width, int height, int itemsVisible);
+	UIYList(int entityID,
+		string name,
+		Vector2D position,
+		int width, 
+		int height, 
+		int itemsVisible);
 	virtual ~UIYList();
 
 	virtual void setPosition(Vector2D position);

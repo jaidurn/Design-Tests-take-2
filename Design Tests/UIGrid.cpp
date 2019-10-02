@@ -10,12 +10,13 @@
 #include "InputDevice.h"
 
 UIGrid::UIGrid(int entityID,
+	string name,
 	Vector2D position,
 	int width,
 	int height,
 	int itemsPerRow,
 	int rowCount)
-	:UIGroup(entityID, position, width, height),
+	:UIGroup(entityID, name, position, width, height),
 	m_itemsPerRow(itemsPerRow),
 	m_rowCount(rowCount),
 	m_rowOffset(0),
@@ -169,7 +170,7 @@ void UIGrid::setVisible(bool visible)
 			endingItem = m_items.size() - 1;
 		}
 
-		for (unsigned int i = startingItem; i <= endingItem; i++)
+		for (int i = startingItem; i <= endingItem; i++)
 		{
 			m_items[i]->setVisible(m_visible);
 		}
@@ -257,7 +258,6 @@ void UIGrid::removeItem(string name)
 	{
 		if(m_items[i]->getName() == name)
 		{
-			delete m_items[i];
 			m_items[i] = NULL;
 
 			auto vit = m_items.begin();
@@ -388,7 +388,7 @@ void UIGrid::updatePositions()
 
 	for (unsigned int i = 0; i < m_items.size(); i++)
 	{
-		m_items[i]->setPosition(Vector2D((int)currentX, (int)currentY));
+		m_items[i]->setPosition(Vector2D((float)currentX, (float)currentY));
 
 		if ((int)m_rect->getTopLeft().getY() < currentY &&
 			currentY < (int)m_rect->getBottomLeft().getY())
