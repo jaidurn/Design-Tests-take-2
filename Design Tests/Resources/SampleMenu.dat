@@ -15,3 +15,15 @@ Group_0_RowCount 3
 Group_0_Background Resources/menu.png
 Group_0_Item_0_Name Card0
 Group_0_Item_0_Type 3
+Group_0_Item_0_
+Group_0_Item_0_Width 300
+Group_0_Item_0_Height 300
+Group_0_Item_0_Background Resources/button.png
+Group_0_Item_0_X 0
+Group_0_Item_0_Y 0
+Group_0_Item_0_Text 
+Group_0_Item_0_Font Resources/Fonts/RobotoMono-
+Group_0_Item_0_Red 255
+Group_0_Item_0_Blue 0
+Group_0_Item_0_Green 0
+Group_0_Item_0_Alpha 255
