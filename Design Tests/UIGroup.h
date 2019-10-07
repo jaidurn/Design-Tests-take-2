@@ -45,6 +45,8 @@ public:
 	virtual void setBackground(UIGraphic *background);
 
 	virtual GROUP_TYPE getGroupType() { return GROUP_NORMAL; }
+
+	Rectangle* getRect() { return m_rect; }
 	Vector2D getPosition();
 	int getWidth();
 	int getHeight();

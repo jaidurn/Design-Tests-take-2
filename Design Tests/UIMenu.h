@@ -8,10 +8,14 @@
 //==========================================================================================
 #include "UIGroup.h"
 #include "Rectangle.h"
+#include <SDL.h>
 #include <map>
 #include <vector>
 
 class UIGraphic;
+class CameraMoveMessage;
+class InputMessage;
+class EntityDestroyMessage;
 
 class UIMenu
 {
@@ -38,10 +42,13 @@ public:
 	virtual void removeGroup(int entityID);
 	virtual void removeGroup(string name);
 
-	UIGroup* getGroup(int entityID);
-	UIGroup* getGroup(string name);
+	UIGroup* getGroup(int entityID) const;
+	UIGroup* getGroup(string name) const;
 
-	UIGroup* getCurrentGroup();
+	UIGroup* getCurrentGroup() const;
+
+	virtual void update();
+	virtual void processMessage(IMessage *message);
 
 protected:
 	Rectangle *m_rect;
@@ -53,6 +60,9 @@ protected:
 	int m_currentX;
 	int m_currentY;
 
+	Uint32 m_prevUpdate;
+	const Uint32 m_UPDATE_COOLDOWN = 300;
+
 	bool m_docked;
 	bool m_visible;
 	bool m_active;
@@ -63,5 +73,14 @@ protected:
 	virtual void cleanUp();
 	virtual void insertGroup(UIGroup *group, int mapX, int mapY);
 	virtual void removeFromTravelMap(int entityID);
+	virtual void moveCurrentX(int amount);
+	virtual void moveCurrentY(int amount);
+	virtual void setCurrentGroup(int entityID);
+
+	virtual void processInputMsg(InputMessage *inputMsg);
+	virtual void processEntityDestroyMsg(EntityDestroyMessage *destroyMsg);
+	virtual void processCameraMoveMsg(CameraMoveMessage *moveMsg);
+
+	virtual UIGroup* pointInsideGroup(Vector2D point);
 };
 

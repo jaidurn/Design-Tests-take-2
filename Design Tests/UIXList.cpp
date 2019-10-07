@@ -317,7 +317,7 @@ void UIXList::updatePositions()
 		m_items[i]->setPosition(itemPos);
 
 		if ((int)i < m_itemOffset ||
-			m_itemOffset + (m_itemsVisible - 1) < i)
+			m_itemOffset + (m_itemsVisible - 1) < (int)i)
 		{
 			m_items[i]->setVisible(false);
 			m_items[i]->setActive(false);

@@ -20,6 +20,7 @@ class World;
 class Room;
 class UIText;
 class UIGrid;
+class UIMenu;
 
 class Game
 {
@@ -58,7 +59,7 @@ private:
 	World *m_world;
 
 	UIText *m_text;
-	UIGrid *m_list;
+	UIMenu *m_menu;
 
 	Timer m_timer;
 

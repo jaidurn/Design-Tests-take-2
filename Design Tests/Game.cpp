@@ -14,6 +14,7 @@
 #include "World.h"
 #include "UIText.h"
 #include "UIGrid.h"
+#include "UIMenu.h"
 #include "UIButton.h"
 #include "UIGraphic.h"
 
@@ -27,7 +28,7 @@ Game::Game()
 	m_currentState(GS_EXIT),
 	m_resource(NULL),
 	m_text(NULL),
-	m_list(NULL)
+	m_menu(NULL)
 {
 	m_world = new World("Resources/rooms.dat");
 }
@@ -48,8 +49,8 @@ Game::~Game()
 	delete m_text;
 	m_text = NULL;
 
-	delete m_list;
-	m_list = NULL;
+	delete m_menu;
+	m_menu = NULL;
 
 	m_timer.stop();
 }
@@ -128,10 +129,19 @@ bool Game::init(std::string gamePath)
 					m_text = new UIText(textID, textPos, "Text");
 					m_renderSys->createTextComponent(textID, "Test", font, red, 0, textPos);
 
-					int listID = EntitySystem::instance()->createEntity();
-					Vector2D listPos(camera->getX() + camera->getWidth() - 50, camera->getY() + (camera->getHeight() / 2));
+					int menuID = EntitySystem::instance()->createEntity();
+					Vector2D menuPos((camera->getWidth() / 2), (camera->getHeight() / 2));
+					m_menu = new UIMenu(menuID, "Menu0", menuPos, 400, 430, 2, 2);
 
-					m_list = new UIGrid(listID, "Group0", listPos, 100, camera->getHeight(), 2, 2);
+					int backgroundID = EntitySystem::instance()->createEntity();
+					UIGraphic *menuBackground = new UIGraphic(backgroundID, Vector2D(0, 0), "Background");
+
+					m_menu->setBackground(menuBackground);
+
+					int listID = EntitySystem::instance()->createEntity();
+					Vector2D listPos(200.0f, 110);
+
+					UIGrid *list0 = new UIGrid(listID, "Group0", listPos, 200, 200, 3, 2);
 
 					int buttonID = EntitySystem::instance()->createEntity();
 					Vector2D buttonPos(0, 0);
@@ -238,11 +248,21 @@ bool Game::init(std::string gamePath)
 					button4->setBackground(graphic4);
 					button4->setTextUI(text4);
 
-					m_list->addItem(button0);
-					m_list->addItem(button1);
-					m_list->addItem(button2);
-					m_list->addItem(button3);
-					m_list->addItem(button4);
+					listID = EntitySystem::instance()->createEntity();
+					Vector2D list1Pos(200, 320);
+
+					UIGrid *list1 = new UIGrid(listID, "List1", list1Pos, 200, 200, 3, 2);
+
+					list0->addItem(button0);
+					list0->addItem(button1);
+					list0->addItem(button2);
+					list1->addItem(button3);
+					list1->addItem(button4);
+
+					m_menu->addGroup(list0);
+					m_menu->addGroup(list1);
+					m_menu->setActive(false);
+					m_menu->setVisible(false);
 
 					m_text->setWidth(200);
 					m_text->setHeight(100);
@@ -266,43 +286,45 @@ bool Game::init(std::string gamePath)
 //=============================================================================
 void Game::loop()
 {
+	static float startTime = m_timer.currentSeconds();
+	static float prevTime = 0;
+	static int counter = 0;
+
+	clearRenderer();
+
+	processMessages();
+
+	float deltaTime = m_timer.currentSeconds() - startTime;
+
+	processInput();
+
 	if (m_currentState == GS_RUNNING)
 	{
-		static float startTime = m_timer.currentSeconds();
-		static float prevTime = 0;
-		static int counter = 0;
-
-		clearRenderer();
-
-		processMessages();
-
-		float deltaTime = m_timer.currentSeconds() - startTime;
-
-		processInput();
 		processLogic(deltaTime);
-		
-		m_list->update();
-
-		processPhysics(deltaTime);
-
-		m_world->renderRooms();
-
-		prevTime = m_timer.currentSeconds() - startTime;
-		startTime = m_timer.currentSeconds();
-
-		updateRenderer(deltaTime);
-
-		if(counter % 10 == 0)
-		{
-			static float renderTime = 0;
-
-			renderTime = m_timer.currentSeconds() - startTime;
-			//std::cout << "Render time: " << renderTime << ", Prev time: " << prevTime << std::endl;
-		}
-
-		counter++;
 	}
-} 
+
+	m_menu->update();
+
+	if (m_currentState == GS_RUNNING)
+	{
+		processPhysics(deltaTime);
+	}
+
+	prevTime = m_timer.currentSeconds() - startTime;
+	startTime = m_timer.currentSeconds();
+
+	updateRenderer(deltaTime);
+
+	if (counter % 10 == 0)
+	{
+		static float renderTime = 0;
+
+		renderTime = m_timer.currentSeconds() - startTime;
+		//std::cout << "Render time: " << renderTime << ", Prev time: " << prevTime << std::endl;
+	}
+
+	counter++;
+}
 
 //=============================================================================
 // Function: void processInput()
@@ -340,21 +362,20 @@ void Game::processInput()
 						}
 					}
 				}
-				else if (e.key.keysym.sym == SDLK_0)
+				else if (e.key.keysym.sym == SDLK_ESCAPE)
 				{
-					m_text->setText("Short text!");
-				}
-				else if (e.key.keysym.sym == SDLK_1)
-				{
-					m_text->setText("Medium text ahahaha!");
-				}
-				else if (e.key.keysym.sym == SDLK_2)
-				{
-					m_text->setText("Looooooooooo ng text is here boyos it's here!");
-				}
-				else if (e.key.keysym.sym == SDLK_3)
-				{
-					m_text->setText("Test");
+					if (m_currentState == GS_RUNNING)
+					{
+						m_menu->setActive(true);
+						m_menu->setVisible(true);
+						m_currentState = GS_PAUSED;
+					}
+					else if (m_currentState == GS_PAUSED)
+					{
+						m_menu->setActive(false);
+						m_menu->setVisible(false);
+						m_currentState = GS_RUNNING;
+					}
 				}
 			}
 		}
@@ -376,10 +397,15 @@ void Game::processMessages()
 		{
 			if (message)
 			{
-				m_list->processMessage(message);
+				m_menu->processMessage(message);
 				EntitySystem::instance()->processMessage(message);
-				m_logicSys->processMessage(message);
-				m_physicsSys->processMessage(message);
+
+				if (m_currentState == GS_RUNNING)
+				{
+					m_logicSys->processMessage(message);
+					m_physicsSys->processMessage(message);
+				}
+
 				m_renderSys->processMessage(message);
 			}
 		}
