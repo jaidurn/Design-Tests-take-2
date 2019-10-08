@@ -73,7 +73,7 @@ public:
 	void drawLine(Line line, SDL_Color color);
 
 	void createTextureEffect(int entityID, TextureEffect::EffectType type, SDL_Color endColor, SDL_BlendMode blendMode, float duration, float speed);
-//	void deleteTextureEffect(int entityID);
+	void deleteTextureEffect(int entityID);
 
 	void setCameraTarget(int targetID);
 

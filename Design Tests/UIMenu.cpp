@@ -615,6 +615,12 @@ void UIMenu::insertGroup(UIGroup* group, int mapX, int mapY)
 				placed = true;
 			}
 		}
+
+		if (!getCurrentGroup())
+		{
+			m_currentX = currentX;
+			m_currentY = currentY;
+		}
 	}
 }
 
@@ -691,8 +697,7 @@ void UIMenu::moveCurrentX(int amount)
 
 	while (!currentGroup)
 	{
-		workingX = m_currentX + amount;
-		workingY = m_currentY;
+		workingX += amount;
 
 		if (workingX < 0)
 		{

@@ -20,6 +20,12 @@ public:
 	virtual void setHeight(int height);
 	virtual void setVisible(bool visible);
 	virtual void setActive(bool active);
+
+	void setVisualEffect(TextureEffect::EffectType effect, 
+		SDL_Color color, 
+		float duration, 
+		float speed);
+	void stopVisualEffect();
 	
 	void setLayer(RenderSystem::RenderLayers layer);
 };

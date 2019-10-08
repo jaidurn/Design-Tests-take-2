@@ -191,6 +191,17 @@ void UIGrid::addItem(UIComponent *item)
 		item->setWidth(m_rect->width() / m_itemsPerRow);
 		item->setHeight(m_rect->height() / m_rowCount);
 
+		if (m_items.size() == m_currentItem)
+		{
+			if (item->getType() == UIComponent::UI_BUTTON)
+			{
+				UIButton *button =
+					static_cast<UIButton*>(item);
+
+				button->setSelected(true);
+			}
+		}
+
 		m_items.push_back(item);
 
 		updatePositions();
@@ -442,7 +453,33 @@ void UIGrid::adjustCurrentItem(int amount)
 		m_rowOffset = currentRow - (m_rowCount - 1);
 	}
 
+	UIComponent *currentItem = getCurrentItem();
+
+	if (currentItem)
+	{
+		if (currentItem->getType() == UIComponent::UI_BUTTON)
+		{
+			UIButton *button =
+				static_cast<UIButton*>(currentItem);
+
+			button->setSelected(false);
+		}
+	}
+
 	m_currentItem = newCurrent;
+
+	UIComponent *nextCurrent = getCurrentItem();
+
+	if (nextCurrent)
+	{
+		if (nextCurrent->getType() == UIComponent::UI_BUTTON)
+		{
+			UIButton *button =
+				static_cast<UIButton*>(nextCurrent);
+
+			button->setSelected(true);
+		}
+	}
 
 	updatePositions();
 }

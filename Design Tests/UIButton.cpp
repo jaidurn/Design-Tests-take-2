@@ -7,6 +7,7 @@
 #include "InputMessage.h"
 #include "InputSystem.h"
 #include "KeyboardMouse.h"
+#include "RenderSystem.h"
 
 UIButton::UIButton(int entityID,
 	Vector2D position,
@@ -17,7 +18,8 @@ UIButton::UIButton(int entityID,
 	m_background(NULL),
 	m_toggle(toggle),
 	m_pressed(false),
-	m_wasPressed(false)
+	m_wasPressed(false),
+	m_selected(false)
 {
 
 }
@@ -161,6 +163,22 @@ void UIButton::setActive(bool active)
 	if (m_textUI)
 	{
 		m_textUI->setActive(active);
+	}
+}
+
+//=============================================================================
+// Function: void setSelected(bool)
+// Description:
+// Sets the selected state of the button.
+// Parameters:
+// bool selected - The selected state to set.
+//=============================================================================
+void UIButton::setSelected(bool selected)
+{
+	if (m_selected != selected)
+	{
+		m_selected = selected;
+		updateSelected();
 	}
 }
 
@@ -448,6 +466,18 @@ void UIButton::processInput(InputMessage *inputMsg)
 					if (!collisionSys->pointInsideRect(m_rect, (int)mousePos.getX(), (int)mousePos.getY()))
 					{
 						m_pressed = false;
+						m_selected = false;
+
+						updateSelected();
+					}
+					else
+					{
+						if (!m_selected)
+						{
+							m_selected = true;
+							
+							updateSelected();
+						}
 					}
 				}
 
@@ -480,6 +510,25 @@ void UIButton::processEntityDestroy(EntityDestroyMessage *destroyMsg)
 		{
 			delete m_textUI;
 			m_textUI = NULL;
+		}
+	}
+}
+
+void UIButton::updateSelected()
+{
+	if (m_selected)
+	{
+		if (m_background)
+		{
+			SDL_Color greyedOut{ 100, 100, 100, 255 };
+			m_background->setVisualEffect(TextureEffect::EFFECT_COLOR_FADE,
+				greyedOut, 
+				0, 
+				0);
+		}
+		else
+		{
+			m_background->stopVisualEffect();
 		}
 	}
 }

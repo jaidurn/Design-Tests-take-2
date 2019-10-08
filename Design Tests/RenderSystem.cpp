@@ -341,6 +341,7 @@ void RenderSystem::processMessage(IMessage *message)
 	{
 		EntityDestroyMessage *destroy = static_cast<EntityDestroyMessage*>(message);
 
+		deleteTextureEffect(destroy->m_entityID);
 		removeSprite(destroy->m_entityID);
 		removeAnimation(destroy->m_entityID);
 		removeText(destroy->m_entityID);
@@ -441,6 +442,24 @@ void RenderSystem::createTextureEffect(int entityID,
 
 			effect->reset();
 		}
+	}
+}
+
+//=============================================================================
+// Function: void deleteTextureEffect(int)
+// Description:
+// Finds and deletes the texture effect with the specified entity.
+// Parameters:
+// int entityID - The entity id to delete.
+//=============================================================================
+void RenderSystem::deleteTextureEffect(int entityID)
+{
+	auto effectIt = m_effects.find(entityID);
+
+	if (effectIt != m_effects.end())
+	{
+		delete effectIt->second;
+		effectIt = m_effects.erase(effectIt);
 	}
 }
 

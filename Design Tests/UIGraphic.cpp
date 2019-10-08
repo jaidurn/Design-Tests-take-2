@@ -184,6 +184,35 @@ void UIGraphic::setActive(bool active)
 }
 
 //=============================================================================
+// Function: void setVisualEffect(EffectType, SDL_Color, float, float)
+// Description:
+// Sets the visual effect for the UIGraphic.
+// Parameters:
+// EffectType effect - The type of effect to use.
+// SDL_Color color - The ending color for the visual effect.
+// float duration - The duration of the visual effect.
+// float speed - The speed of the visual effect.
+//=============================================================================
+void UIGraphic::setVisualEffect(TextureEffect::EffectType effect,
+	SDL_Color color,
+	float duration,
+	float speed)
+{
+	RenderSystem::instance()->createTextureEffect(m_entityID,
+		effect, color, SDL_BLENDMODE_BLEND, duration, speed);
+}
+
+//=============================================================================
+// Function: void stopVisualEffect()
+// Description:
+// Stops the current visual effect.
+//=============================================================================
+void UIGraphic::stopVisualEffect()
+{
+	RenderSystem::instance()->deleteTextureEffect(m_entityID);
+}
+
+//=============================================================================
 // Function: void setLayer(RenderLayers)
 // Description:
 // Sets the rendering layer for our graphic.

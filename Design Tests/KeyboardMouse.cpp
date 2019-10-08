@@ -172,6 +172,7 @@ void KeyboardMouse::initialize()
 	m_buttonMap.insert(std::make_pair(SDLK_LEFT, ANALOG_LEFT));
 	m_buttonMap.insert(std::make_pair(SDL_BUTTON_LEFT, SELECT));
 	m_buttonMap.insert(std::make_pair(SDLK_KP_ENTER, SELECT));
+	m_buttonMap.insert(std::make_pair(SDLK_BACKSPACE, BACK));
 }
 
 //=============================================================================

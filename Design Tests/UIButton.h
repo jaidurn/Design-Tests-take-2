@@ -25,6 +25,7 @@ public:
 	virtual void setHeight(int height);
 	virtual void setVisible(bool visible);
 	virtual void setActive(bool active);
+	virtual void setSelected(bool selected);
 
 	void setTextOffset(Vector2D offset);
 	void setTextUI(UIText *textUI);
@@ -45,11 +46,13 @@ private:
 	UIText *m_textUI;
 	UIGraphic *m_background;
 	
+	bool m_selected;
 	bool m_toggle;
 	bool m_pressed;
 	bool m_wasPressed;
 
 	void processInput(InputMessage *inputMsg);
 	void processEntityDestroy(EntityDestroyMessage *destroyMsg);
+	void updateSelected();
 };
 

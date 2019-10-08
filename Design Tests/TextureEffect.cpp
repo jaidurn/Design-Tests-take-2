@@ -56,7 +56,8 @@ void TextureEffect::applyEffect(float delta)
 {
 	if (!m_paused)
 	{
-		if (m_currentTime < m_duration)
+		if (m_currentTime < m_duration ||
+			m_duration == 0)
 		{
 			switch (m_type)
 			{
