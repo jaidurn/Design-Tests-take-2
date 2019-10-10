@@ -20,7 +20,6 @@ UIYList::UIYList(int entityID,
 	:UIGroup(entityID, name, position, width, height),
 	m_itemsVisible(itemsVisible),
 	m_itemOffset(0),
-	m_currentItem(0),
 	m_prevUpdate(0)
 {
 	if (m_itemsVisible <= 0)

@@ -201,6 +201,15 @@ void UIMenu::setActive(bool active)
 				groupIt++;
 			}
 		}
+		else
+		{
+			UIGroup *currentGroup = getCurrentGroup();
+
+			if (currentGroup)
+			{
+				currentGroup->setActive(true);
+			}
+		}
 
 		if (m_background)
 		{
@@ -612,11 +621,14 @@ void UIMenu::insertGroup(UIGroup* group, int mapX, int mapY)
 			else
 			{
 				m_travelMap[currentX][currentY] = group;
+
 				placed = true;
 			}
 		}
 
-		if (!getCurrentGroup())
+		UIGroup *currentGroup = getCurrentGroup();
+
+		if (!currentGroup)
 		{
 			m_currentX = currentX;
 			m_currentY = currentY;
@@ -731,6 +743,15 @@ void UIMenu::moveCurrentX(int amount)
 
 	if (currentGroup)
 	{
+		UIGroup *old = getCurrentGroup();
+
+		if (old)
+		{
+			old->setActive(false);
+		}
+
+		currentGroup->setActive(true);
+
 		m_currentX = workingX;
 		m_currentY = workingY;
 	}
@@ -781,6 +802,15 @@ void UIMenu::moveCurrentY(int amount)
 
 	if (current)
 	{
+		UIGroup *old = getCurrentGroup();
+
+		if (old)
+		{
+			old->setActive(false);
+		}
+
+		current->setActive(true);
+
 		m_currentX = workingX;
 		m_currentY = workingY;
 	}
@@ -800,12 +830,15 @@ void UIMenu::setCurrentGroup(int entityID)
 	{
 		for (unsigned int j = 0; j < m_travelMap[i].size(); j++)
 		{
-			if (m_travelMap[i][j]->getEntityID() == entityID)
+			if (m_travelMap[i][j])
 			{
-				m_currentX = i;
-				m_currentY = j;
+				if (m_travelMap[i][j]->getEntityID() == entityID)
+				{
+					m_currentX = i;
+					m_currentY = j;
 
-				return;
+					return;
+				}
 			}
 		}
 	}
@@ -822,165 +855,319 @@ void UIMenu::processInputMsg(InputMessage *inputMsg)
 {
 	if (inputMsg && m_active)
 	{
-		Uint32 passedTicks = SDL_GetTicks() - m_prevUpdate;
-
-		UIGroup *current = getCurrentGroup();
-
 		switch (inputMsg->m_inputType)
 		{
-		case InputMessage::INPUT_BUTTON:
+		case InputMessage::INPUT_AXIS:
 		{
-			InputButtonMessage *button =
-				static_cast<InputButtonMessage*>(inputMsg);
-			
-			if (button->m_pressed && 
-				m_UPDATE_COOLDOWN <= passedTicks)
-			{
-				switch (button->m_buttonCode)
-				{
-				case InputDevice::ANALOG_UP:
-				{
-					if (current && !current->getActive())
-					{
-						moveCurrentY(-1);
-						m_prevUpdate = SDL_GetTicks();
-						break;
-					}
-				}
-				case InputDevice::ANALOG_RIGHT:
-				{
-					if (current && !current->getActive())
-					{
-						moveCurrentX(1);
-						m_prevUpdate = SDL_GetTicks();
-						break;
-					}
-				}
-				case InputDevice::ANALOG_DOWN:
-				{
-					if (current && !current->getActive())
-					{
-						moveCurrentY(1);
-						m_prevUpdate = SDL_GetTicks();
-					}
+			InputAxisMessage *axisMsg =
+				static_cast<InputAxisMessage*>(inputMsg);
 
-					break;
-				}
-				case InputDevice::ANALOG_LEFT:
-				{
-					if (current && !current->getActive())
-					{
-						moveCurrentX(-1);
-						m_prevUpdate = SDL_GetTicks();
-					}
-
-					break;
-				}
-				case InputDevice::SELECT:
-				{
-					if (button->m_deviceType ==
-						InputDevice::KEYBOARD_MOUSE)
-					{
-						InputDevice *inputDevice = 
-							InputSystem::instance()->getDevice(button->m_deviceID);
-						
-						if (inputDevice)
-						{
-							KeyboardMouse *kbm =
-								static_cast<KeyboardMouse*>(inputDevice);
-
-							CollisionSystem *collisionSys =
-								PhysicsSystem::instance()->collisionSystem();
-
-							UIGroup *insideGroup = pointInsideGroup(kbm->getPosition());
-
-							if (insideGroup)
-							{
-								if (current)
-								{
-									current->setActive(false);
-								}
-
-								setCurrentGroup(insideGroup->getEntityID());
-
-								insideGroup->setActive(true);
-							}
-						}
-					}
-					else
-					{
-						if (current)
-						{
-							current->setActive(true);
-						}
-					}
-					break;
-				}
-				case InputDevice::BACK:
-				{
-					UIGroup *current = getCurrentGroup();
-
-					if (current)
-					{
-						if (current->getActive())
-						{
-							current->setActive(false);
-						}
-					}
-
-					break;
-				}
-				}
-			}
+			processInputAxisMsg(axisMsg);
 
 			break;
 		}
-		case InputMessage::INPUT_AXIS:
+		case InputMessage::INPUT_BUTTON:
 		{
-			InputAxisMessage *axis =
-				static_cast<InputAxisMessage*>(inputMsg);
+			InputButtonMessage *buttonMsg =
+				static_cast<InputButtonMessage*>(inputMsg);
 
-			if (m_UPDATE_COOLDOWN <= passedTicks)
+			processInputButtonMsg(buttonMsg);
+
+			break;
+		}
+		case InputMessage::INPUT_MOVE:
+		{
+			InputMoveMessage *moveMsg =
+				static_cast<InputMoveMessage*>(inputMsg);
+
+			processInputMoveMsg(moveMsg);
+
+			break;
+		}
+		}
+	}
+}
+
+//=============================================================================
+// Function: void processInputAxisMsg(InputAxisMessage*)
+// Description:
+// Processes input axis messages for the menu and its groups.
+// Parameters:
+// InputAxisMessage *axisMsg - The axis message to process.
+//=============================================================================
+void UIMenu::processInputAxisMsg(InputAxisMessage *axisMsg)
+{
+	if (axisMsg)
+	{
+		UIGroup *currentGroup = getCurrentGroup();
+
+		if (axisMsg->m_axis == SDL_CONTROLLER_AXIS_LEFTX)
+		{
+			if (axisMsg->m_axisMovement < 0)
 			{
-				if (current && !current->getActive())
+				if (currentGroup)
 				{
-					if (axis->m_axis == SDL_CONTROLLER_AXIS_LEFTX)
+					if (currentGroup->getCurrentIndex() != 0)
 					{
-						if (axis->m_axisMovement < 0)
+						currentGroup->processMessage(axisMsg);
+					}
+					else
+					{
+						if (canUpdate())
 						{
 							moveCurrentX(-1);
 							m_prevUpdate = SDL_GetTicks();
 						}
-						else if (0 < axis->m_axisMovement)
+					}
+				}
+				else
+				{
+					if (canUpdate())
+					{
+						moveCurrentX(-1);
+						m_prevUpdate = SDL_GetTicks();
+					}
+				}
+			}
+			else if (0 < axisMsg->m_axisMovement)
+			{
+				if (currentGroup)
+				{
+					if (currentGroup->getCurrentIndex() < currentGroup->getItemCount() - 1)
+					{
+						currentGroup->processMessage(axisMsg);
+					}
+					else
+					{
+						if (canUpdate())
 						{
 							moveCurrentX(1);
 							m_prevUpdate = SDL_GetTicks();
 						}
 					}
-					else if (axis->m_axis == SDL_CONTROLLER_AXIS_LEFTY)
+				}
+				else
+				{
+					if (canUpdate())
 					{
-						if (axis->m_axisMovement < 0)
+						moveCurrentX(1);
+						m_prevUpdate = SDL_GetTicks();
+					}
+				}
+
+			}
+		}
+		else if (axisMsg->m_axis == SDL_CONTROLLER_AXIS_LEFTY)
+		{
+			if (axisMsg->m_axisMovement < -0.5)
+			{
+				if (currentGroup)
+				{
+					if (currentGroup->getCurrentIndex() != 0)
+					{
+						currentGroup->processMessage(axisMsg);
+					}
+					else
+					{
+						if (canUpdate())
 						{
 							moveCurrentY(-1);
 							m_prevUpdate = SDL_GetTicks();
 						}
-						else if (0 < axis->m_axisMovement)
+					}
+				}
+				else
+				{
+					if (canUpdate())
+					{
+						moveCurrentY(-1);
+						m_prevUpdate = SDL_GetTicks();
+					}
+				}
+			}
+			else if (0.5 < axisMsg->m_axisMovement)
+			{
+				if (currentGroup)
+				{
+					if (currentGroup->getCurrentIndex() < currentGroup->getItemCount() - 1)
+					{
+						currentGroup->processMessage(axisMsg);
+					}
+					else
+					{
+						if (canUpdate())
 						{
 							moveCurrentY(1);
 							m_prevUpdate = SDL_GetTicks();
 						}
 					}
 				}
+				else
+				{
+					if (canUpdate())
+					{
+						moveCurrentY(1);
+						m_prevUpdate = SDL_GetTicks();
+					}
+				}
 			}
-			break;
-		}
-		}
-
-		if (current)
-		{
-			current->processMessage(inputMsg);
 		}
 	}
+}
+
+//=============================================================================
+// Function: void processInputButtonMsg(InputButtonMessage*)
+// Description:
+// Processes button messages for the menu and its groups.
+// Parameters:
+// InputButtonMessage *buttonMsg - The button message to process.
+//=============================================================================
+void UIMenu::processInputButtonMsg(InputButtonMessage *buttonMsg)
+{
+	if (buttonMsg)
+	{
+		UIGroup *currentGroup = getCurrentGroup();
+
+		if (buttonMsg->m_pressed)
+		{
+			switch (buttonMsg->m_buttonCode)
+			{
+			case InputDevice::ANALOG_UP:
+			{
+				if (currentGroup)
+				{
+					if (currentGroup->getCurrentIndex() != 0)
+					{
+						currentGroup->processMessage(buttonMsg);
+					}
+					else
+					{
+						if (canUpdate())
+						{
+							moveCurrentY(-1);
+							m_prevUpdate = SDL_GetTicks();
+						}
+					}
+				}
+				else
+				{
+					if (canUpdate())
+					{
+						moveCurrentY(-1);
+						m_prevUpdate = SDL_GetTicks();
+					}
+				}
+
+				break;
+			}
+			case InputDevice::ANALOG_RIGHT:
+			{
+				if (currentGroup)
+				{
+					if (currentGroup->getCurrentIndex() < currentGroup->getItemCount() - 1)
+					{
+						currentGroup->processMessage(buttonMsg);
+					}
+					else
+					{
+						if (canUpdate())
+						{
+							moveCurrentX(1);
+							m_prevUpdate = SDL_GetTicks();
+						}
+					}
+				}
+				else
+				{
+					if (canUpdate())
+					{
+						moveCurrentX(1);
+						m_prevUpdate = SDL_GetTicks();
+					}
+				}
+
+				break;
+			}
+			case InputDevice::ANALOG_DOWN:
+			{
+				if (currentGroup)
+				{
+					if (currentGroup->getCurrentIndex() < currentGroup->getItemCount() - 1)
+					{
+						currentGroup->processMessage(buttonMsg);
+					}
+					else
+					{
+						if (canUpdate())
+						{
+							moveCurrentY(1);
+							m_prevUpdate = SDL_GetTicks();
+						}
+					}
+				}
+				else
+				{
+					if (canUpdate())
+					{
+						moveCurrentY(1);
+						m_prevUpdate = SDL_GetTicks();
+					}
+				}
+
+				break;
+			}
+			case InputDevice::ANALOG_LEFT:
+			{
+				if (currentGroup)
+				{
+					if (currentGroup->getCurrentIndex() != 0)
+					{
+						currentGroup->processMessage(buttonMsg);
+					}
+					else
+					{
+						if (canUpdate())
+						{
+							moveCurrentX(-1);
+							m_prevUpdate = SDL_GetTicks();
+						}
+					}
+				}
+				else
+				{
+					if (canUpdate())
+					{
+						moveCurrentX(-1);
+						m_prevUpdate = SDL_GetTicks();
+					}
+				}
+
+				break;
+			}
+			case InputDevice::SELECT:
+			{
+				if (currentGroup)
+				{
+					currentGroup->processMessage(buttonMsg);
+				}
+
+				break;
+			}
+			}
+		}
+	}
+}
+
+//=============================================================================
+// Function: void processInputMoveMsg(InputMoveMessage*)
+// Description:
+// Processes input move messages.
+// Parameters:
+// InputMoveMessage *moveMsg - The move message to process.
+//=============================================================================
+void UIMenu::processInputMoveMsg(InputMoveMessage *moveMsg)
+{
+
 }
 
 //=============================================================================
@@ -1024,6 +1211,32 @@ void UIMenu::processCameraMoveMsg(CameraMoveMessage *moveMsg)
 
 		setPosition(moveMsg->m_newPosition + offset);
 	}
+}
+
+//=============================================================================
+// Function: bool canUpdate()
+// Description:
+// Checks to see if the menu can update.
+// Output:
+// bool
+// Returns true if can update.
+// Returns false if can't update.
+//=============================================================================
+bool UIMenu::canUpdate()
+{
+	bool canUpdate = false;
+
+	if (m_active)
+	{
+		Uint32 passedTicks = SDL_GetTicks() - m_prevUpdate;
+
+		if (m_UPDATE_COOLDOWN <= passedTicks)
+		{
+			canUpdate = true;
+		}
+	}
+
+	return canUpdate;
 }
 
 //=============================================================================

@@ -61,6 +61,8 @@ public:
 	virtual void removeItem(string itemName);
 	virtual UIComponent* getItem(int entityID);
 	virtual UIComponent* getItem(string itemName);
+	virtual int getItemCount();
+	virtual int getCurrentIndex();
 
 	virtual void processMessage(IMessage *message);
 	virtual void update();
@@ -71,6 +73,8 @@ protected:
 
 	int m_entityID;
 	string m_name;
+
+	int m_currentItem;
 
 	bool m_active;
 	bool m_visible;

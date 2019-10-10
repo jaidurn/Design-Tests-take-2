@@ -15,6 +15,7 @@ UIGroup::UIGroup(int entityID,
 	m_background(NULL),
 	m_entityID(entityID),
 	m_name(name),
+	m_currentItem(0),
 	m_active(true),
 	m_visible(true)
 {
@@ -468,6 +469,34 @@ UIComponent* UIGroup::getItem(string itemName)
 	}
 
 	return item;
+}
+
+//=============================================================================
+// Function: int getItemCount()
+// Description:
+// Gets the current item count total.
+// Output:
+// int
+// Returns the total item count.
+//=============================================================================
+int UIGroup::getItemCount()
+{
+	int itemCount = (int)m_items.size();
+
+	return itemCount;
+}
+
+//=============================================================================
+// Function: int getCurrentIndex()
+// Description:
+// Gets the current item index.
+// Output:
+// int
+// Returns the index of the current item.
+//=============================================================================
+int UIGroup::getCurrentIndex()
+{
+	return m_currentItem;
 }
 
 //=============================================================================

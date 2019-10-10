@@ -259,6 +259,9 @@ bool Game::init(std::string gamePath)
 					list1->addItem(button3);
 					list1->addItem(button4);
 
+					list0->setActive(false);
+					list1->setActive(false);
+
 					m_menu->addGroup(list0);
 					m_menu->addGroup(list1);
 					m_menu->setActive(false);

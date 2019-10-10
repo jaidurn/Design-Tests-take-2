@@ -15,6 +15,9 @@
 class UIGraphic;
 class CameraMoveMessage;
 class InputMessage;
+class InputButtonMessage;
+class InputAxisMessage;
+class InputMoveMessage;
 class EntityDestroyMessage;
 
 class UIMenu
@@ -78,8 +81,13 @@ protected:
 	virtual void setCurrentGroup(int entityID);
 
 	virtual void processInputMsg(InputMessage *inputMsg);
+	virtual void processInputAxisMsg(InputAxisMessage *axisMsg);
+	virtual void processInputButtonMsg(InputButtonMessage *buttonMsg);
+	virtual void processInputMoveMsg(InputMoveMessage *moveMsg);
 	virtual void processEntityDestroyMsg(EntityDestroyMessage *destroyMsg);
 	virtual void processCameraMoveMsg(CameraMoveMessage *moveMsg);
+
+	bool canUpdate();
 
 	virtual UIGroup* pointInsideGroup(Vector2D point);
 };

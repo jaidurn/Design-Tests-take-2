@@ -20,7 +20,6 @@ UIGrid::UIGrid(int entityID,
 	m_itemsPerRow(itemsPerRow),
 	m_rowCount(rowCount),
 	m_rowOffset(0),
-	m_currentItem(0),
 	m_prevUpdate(0)
 {
 
@@ -139,6 +138,15 @@ void UIGrid::setActive(bool active)
 					static_cast<UIButton*>(currentItem);
 
 				button->setActive(active);
+
+				if (!active)
+				{
+					button->setSelected(false);
+				}
+				else
+				{
+					button->setSelected(true);
+				}
 			}
 		}
 	}
@@ -556,12 +564,12 @@ void UIGrid::processInputMsg(InputMessage *inputMsg)
 
 				if (axis->m_axis == SDL_CONTROLLER_AXIS_LEFTX)
 				{
-					if (axis->m_axisMovement < 0)
+					if (axis->m_axisMovement < -0.5)
 					{
 						adjustCurrentItem(-1);
 						updateTicks = true;
 					}
-					else if (0 < axis->m_axisMovement)
+					else if (0.5 < axis->m_axisMovement)
 					{
 						adjustCurrentItem(1);
 						updateTicks = true;
@@ -569,12 +577,12 @@ void UIGrid::processInputMsg(InputMessage *inputMsg)
 				}
 				else if (axis->m_axis == SDL_CONTROLLER_AXIS_LEFTY)
 				{
-					if (axis->m_axisMovement < 0)
+					if (axis->m_axisMovement < -0.5)
 					{
 						adjustCurrentItem(-m_itemsPerRow);
 						updateTicks = true;
 					}
-					else if (0 < axis->m_axisMovement)
+					else if (0.5 < axis->m_axisMovement)
 					{
 						adjustCurrentItem(m_itemsPerRow);
 						updateTicks = true;

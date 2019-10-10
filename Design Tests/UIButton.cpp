@@ -526,7 +526,10 @@ void UIButton::updateSelected()
 				0, 
 				0);
 		}
-		else
+	}
+	else
+	{
+		if (m_background)
 		{
 			m_background->stopVisualEffect();
 		}

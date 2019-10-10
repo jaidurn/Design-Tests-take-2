@@ -42,7 +42,6 @@ public:
 	virtual void processMessage(IMessage *message);
 
 protected:
-	int m_currentItem;
 	int m_rowCount;
 	int m_itemsPerRow;
 	int m_rowOffset;

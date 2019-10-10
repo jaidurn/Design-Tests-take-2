@@ -37,7 +37,6 @@ public:
 	UIComponent* getCurrentItem();
 
 protected:
-	int m_currentItem;
 	int m_itemsVisible;
 	int m_itemOffset;
 	

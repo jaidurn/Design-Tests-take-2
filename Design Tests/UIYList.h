@@ -44,7 +44,6 @@ protected:
 	Uint32 m_prevUpdate;
 	const Uint32 m_UPDATE_COOLDOWN = 300;
 
-	int m_currentItem;
 	int m_itemsVisible;
 	int m_itemOffset;
 
